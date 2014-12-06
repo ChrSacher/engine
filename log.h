@@ -147,6 +147,15 @@ public:
 	void fatal(const std::string& msg);
 
 
+	/**
+	 * @brief operator << will log with the semantics of a debug log, everything else should be
+	 *	explicit
+	 * @param msg
+	 * @return reference to logger
+	 */
+	Log& operator<<(const std::string& msg);
+
+
 ///
 /// INTERFACE END
 ///

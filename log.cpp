@@ -45,3 +45,9 @@ void Log::fatal(const std::string& msg)
 	if(__lvl >= LogLevel::fatal)
 		__outstream << "Fatal: " << msg << std::endl;
 }
+
+Log& Log::operator<<(const std::string& msg)
+{
+	this->debug(msg);
+	return *this;
+}
