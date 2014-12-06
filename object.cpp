@@ -2,10 +2,10 @@
 
 Physix::Object::Object()
 {
-
 }
 
-void Physix::Object::advance(double dt)
+
+void Physix::Object::update(double dt)
 {
 	// new velocity
 	__velocity+= __acceleration * dt;
@@ -18,3 +18,11 @@ void Physix::Object::advance(double dt)
 	__acceleration.reset();
 
 }
+
+
+/*Log& operator<<(Log& log, const Physix::Object& o)
+{
+	log << o.acceleration() << "\n";
+	log << o.velocity() << "\n";
+	log << o.position() << "\n";
+}*/

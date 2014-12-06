@@ -153,7 +153,7 @@ public:
 	 * @param msg
 	 * @return reference to logger
 	 */
-	Log& operator<<(const std::string& msg);
+	//Log& operator<<(const std::string& msg);
 
 
 ///
@@ -163,5 +163,6 @@ private:
 	enum LogLevel		__lvl;		/** loglevel determines which logmessages are printed */
 	std::ostream&		__outstream;/** outputstream where the log is written */
 };
+
 
 #endif // LOG_H

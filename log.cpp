@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+
 Log::Log(LogLevel level) :
 	__lvl { level },
 	__outstream (std::cout)
@@ -46,8 +47,8 @@ void Log::fatal(const std::string& msg)
 		__outstream << "Fatal: " << msg << std::endl;
 }
 
-Log& Log::operator<<(const std::string& msg)
+/*Log& Log::operator<<(const std::string& msg)
 {
-	this->debug(msg);
+	__outstream << msg;
 	return *this;
-}
+}*/

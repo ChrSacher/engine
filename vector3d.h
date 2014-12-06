@@ -51,7 +51,7 @@ namespace Physix
 
 	};
 
-	Log& operator<<(const Log& logger, const Vector3D& v);
+	//Log& operator<<(Log& logger, const Vector3D& v);
 
 }
 
