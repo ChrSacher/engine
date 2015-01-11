@@ -74,6 +74,15 @@ namespace Math
 		Vector4D& operator+(const Vector4D& v);
 		Vector4D& operator-(const Vector4D& v);
 
+		/**
+		 * @brief scalarProduct calculates the scalar product of the 2 vectors
+		 * @param v
+		 * @return
+		 *
+		 * \sa
+		 */
+		float scalarProduct(const Vector4D& v);
+
 
 	private:
 		float data[4];

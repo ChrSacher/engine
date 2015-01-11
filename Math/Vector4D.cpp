@@ -23,5 +23,10 @@ namespace Math
 		return *this;
 	}
 
+	float Vector4D::scalarProduct(const Vector4D& v)
+	{
+		return data[0] * v.x() + data[1] * v.y() + data[2] * v.z() + data[3] * v.w();
+	}
+
 
 }
