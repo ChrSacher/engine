@@ -34,19 +34,61 @@ ungestört davon weiter programmieren was sie gerade wollen.
 
 ================================================================
 
-2. Git installieren
+2. Mit Git arbeiten
 
-Das haben andere schon besser erklärt als ich.
-https://help.github.com/articles/set-up-git/
-
+  Das wurde hier eigentlich sehr schön erklärt.
+  http://rogerdudler.github.io/git-guide/index.de.html
+  http://rogerdudler.github.io/git-guide/files/git_cheat_sheet.pdf
+  
 ================================================================
 
-3. Zentrales Repository nutzen
+3. Projektstrukturierung
 
-  i. Um das Zentrale Repository(das hier) zu nutzen muss man
-  erst mal wissen wo es lokal hin synchronisiert werden soll.
+Ich habe da gewisse Vorstellungen, ihr dürft da gerne Änderungen
+und so mit einbringen, wir müssen uns halt nur auf eine
+EINHEITLICHE Projektstruktur und Entwickelmethode einigen.
+
+  i. Wir Versionieren unsere Engine
+    --> Immer eine gewisse Anzahl an nächsten Features sammeln
+      und dann ein Branch dafür machen.
+    --> Überblick über den Projektfortschritt.
+    --> Vorher Planbar wann man welche Version haben möchte
+    --> Ich denke es macht die Sachen einfacher für uns und
+      man hat mehr Erfolgserlebnisse, weil man wieder ne neue
+      Version hat ;)
+    --> Jede Version bildet ein Branch, der sobald die Verison
+    fertig ist nicht mehr weiter entwickelt wird.
+    
+    Branchbenennung: version_<Number>
+      
+      
+  ii. Aktuellste Entwicklungsversion ist master-Branch
+    --> Darauf wird NICHT DIREKT PROGRAMMIERT!!!
+    --> Grund seht ihr in der Anleitung zu git.
+    
+  iii. Jeder macht lokal branches für seine aktuelle Entwicklung
+    --> wir kommen uns nicht in die Quere 
+    --> Sobald Feature fertig ist wird es auf den Master gebrancht
+    --> man kann einfacher mal was ausprobieren
+    --> möchte man das den anderen zeigen was man ausprobiert hat
+      kann man den Branch hochladen, die andern ziehen ihn sich
+      und schauen da mal rein
+      
+      Branchbenennung: experimental_<sinnvollerName>
+      
+  iv. Jedes Modul bekommt ein Ordner
+    --> Übersichtlich
+    --> Module sind Math, System, Gfx, Physix
+      brauchen wir mehr?
+      
+  v. Usecases als kleine Anwendungsfälle unserer Engine erstellen
+    Wieder einfach ein Branch erstellen, dann kann man von da aus
+    eine kleine Anwendung basteln die halt die Features schon mal
+    zeigen soll.
+    Branchbenennung: usecase_<sinnvollerName>
+    
+  vi. UML-Planung immer mit integrieren und hochladen, um auch zu
+  sehen was man sich dabei gedacht hat. Die Planung ist wichtig,
+  weil der Prof. sie haben will!
   
-  ii. In den gewünschten Ordner auf dem lokalen PC wechseln.
-  
-  iii. Repository clonen mit:
-  
+  vii. Sonst noch was? Was euch dazu einfällt.
