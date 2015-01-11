@@ -1,0 +1,52 @@
+Hallo und Recht herzlich Willkommen meine Damen und Herren :P
+
+
+Ich möchte hier nur einen kleinen Leitfaden zum Einstieg mit git
+geben, damit wir sinnvoll zusammen arbeiten können und uns nicht
+ständig unseren Quellcode gegenseitig zunichte machen / uns 
+prinzipiell in die Quere kommen.
+
+================================================================
+
+1. Was macht git?
+
+Git an sich versioniert unsere Dateien die wir haben, das muss
+kein Quellcode sein, sondern jede Datei.
+Es macht Sinn unsere Planungen in UML auch zu verisonieren.
+Das alles wir in einem "repository" gespeichert, also wie ein
+Projekt.
+
+Um den Prozess zu vereinfachen/praktischer zu machen gibt 
+es in git Branches. Das sind einfach Entwicklungspfade.
+
+Als Beispiel:
+  Man weiß nicht so genau ob eine Idee die man hat funktioniert,
+  man möchte aber auch nicht das schon funktionierende
+  "verpesten". Gut wäre also, eine Kopie von dem existierenden
+  zu erstellen, in dieser Kopie die Idee auszuprobieren
+  und je nach Erfolg diese Idee dann in das existierende 
+  Integrieren oder sie zu verwerfen.
+  
+Um das zu erreichen erstellt man ein neuen Branch im repository
+und bastelt vor sich hin. Die anderen Entwickler können dann
+ungestört davon weiter programmieren was sie gerade wollen.
+
+
+================================================================
+
+2. Git installieren
+
+Das haben andere schon besser erklärt als ich.
+https://help.github.com/articles/set-up-git/
+
+================================================================
+
+3. Zentrales Repository nutzen
+
+  i. Um das Zentrale Repository(das hier) zu nutzen muss man
+  erst mal wissen wo es lokal hin synchronisiert werden soll.
+  
+  ii. In den gewünschten Ordner auf dem lokalen PC wechseln.
+  
+  iii. Repository clonen mit:
+  
