@@ -5,6 +5,32 @@
 namespace Math
 {
 
+	float Vector4D::length() const
+	{
+		float sum = 0;
+
+		for(auto i = 0; i < 3; i++)
+			sum+= data[i] * data[i];
+
+		return sqrt(sum);
+	}
+
+	Vector4D&Vector4D::normalize()
+	{
+		float l = this->length();
+		for(auto i = 0; i < 3; i++)
+			data[i]/= l;
+
+		return *this;
+	}
+
+	Vector4D Vector4D::getNormalized() const
+	{
+		Vector4D v(*this);
+
+		return v.normalize();
+	}
+
 	Vector4D& Vector4D::add(const Vector4D& v)
 	{
 		data[0] += v.data[0];

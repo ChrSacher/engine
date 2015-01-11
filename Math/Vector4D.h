@@ -72,6 +72,30 @@ namespace Math
 		bool isPoint() const { return !isDirection(); }
 
 		/**
+		 * @brief length returns the length of the vector
+		 * @return
+		 *
+		 * the w component is ignored in this calculation
+		 */
+		float length() const;
+
+		/**
+		 * @brief normalizes the vector and changes it!
+		 * @return reference to itself
+		 *
+		 * \sa getNormalized
+		 */
+		Vector4D& normalize();
+
+		/**
+		 * @brief getNormalized
+		 * @return new vector with same direction an length == 1
+		 *
+		 * \sa normalize
+		 */
+		Vector4D getNormalized() const;
+
+		/**
 		 * @brief add addtion of vectors, chances this vector!!
 		 * @param v
 		 * @return
