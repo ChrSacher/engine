@@ -7,6 +7,7 @@
 
 
 #include "Vector4D.h"
+#include "Vector3D.h"
 
 namespace Math
 {
@@ -109,12 +110,45 @@ namespace Math
 		 */
 		Matrix4D& operator-(const Matrix4D& m);
 
+		/**
+		 * @brief print just for debugging purposes
+		 */
+		void print() const;
+
 	private:
 		float data[4][4];
 	};
 
 
+	/**
+	 * @brief idendity
+	 * @return idendity matrix for dimensional
+	 */
 	Matrix4D idendity();
+
+	/**
+	 * @brief translate returns a translation matrix for given translationvector
+	 * @param v where w != 0, otherwise translation has no effect
+	 * @return
+	 */
+	Matrix4D translate(Vector3D& v);
+	Matrix4D translate(float x, float y, float z);
+
+	/**
+	 * @brief scale returns a scaling matrix for given scalevector
+	 * @param v
+	 * @return
+	 */
+	Matrix4D scale(Vector3D& v);
+	Matrix4D scale(float x, float y, float z);
+
+	/**
+	 * @brief rotate returns a rotationmatrix for a given rotationaxis and an angle in degree
+	 * @param v must be a unitvector!
+	 * @return
+	 */
+	Matrix4D rotate(Vector3D& v,float angle);
+	Matrix4D rotate(float x, float y, float z, float angle);
 }
 
 #endif

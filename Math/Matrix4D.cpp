@@ -1,5 +1,7 @@
 #include "Matrix4D.h"
 #include <stdexcept>
+#include <iostream>
+#include <cmath>
 
 namespace Math
 {
@@ -93,6 +95,18 @@ namespace Math
 				data[i][j]-= m.data[i][j];
 	}
 
+	void Matrix4D::print() const
+	{
+		for(auto i = 0; i < 4; i++)
+		{
+			for(auto j = 0; j < 4; j++)
+			{
+				std::cout << data[i][j] << "\t";
+			}
+			std::cout << std::endl;
+		}
+	}
+
 
 
 
@@ -105,6 +119,69 @@ namespace Math
 		Matrix4D m;
 		m.loadIdendity();
 		return m;
+	}
+
+	Matrix4D translate(Vector3D& v)
+	{
+		Matrix4D m;
+		m.loadIdendity();
+		for(auto i = 0; i < 3; i++)
+			m.at_ref(i, 3) = v[i];
+
+		return m;
+	}
+
+	Matrix4D translate(float x, float y, float z)
+	{
+		Vector3D v(x,y,z);
+		return translate(v);
+	}
+
+	Matrix4D scale(Vector3D& v)
+	{
+		Matrix4D m;
+		m.loadIdendity();
+
+		for(auto i = 0; i < 3; i++)
+			m.at_ref(i, i) = v[i];
+
+		return m;
+	}
+
+	Matrix4D scale(float x, float y, float z)
+	{
+		Vector3D v(x,y,z);
+		return scale(v);
+	}
+
+	Matrix4D rotate(Vector3D& v, float angle)
+	{
+		return rotate(v.x(), v.y(), v.z(), angle);
+	}
+
+	Matrix4D rotate(float x, float y, float z, float angle)
+	{
+		// book: Grundlagen der 3D-Programmierung, Gerhard Virag, S.495
+		float c = cos(angle);
+		float s = sin(angle);
+
+		Matrix4D m;
+		m.loadIdendity();
+
+		// do the first row
+		m.at_ref(0, 0) = x * x * (1 - c) + c;
+		m.at_ref(0, 1) = x * y * (1 - c) - s * z;
+		m.at_ref(0, 2) = x * z * (1 - c) + s * y;
+
+		// do the second row
+		m.at_ref(1, 0) = x * y * (1 - c) + s * z;
+		m.at_ref(1, 1) = y * y * (1 - c) + c;
+		m.at_ref(1, 2) = y * z * (1 - c) - x * s;
+
+		// do the third row
+		m.at_ref(2, 0) = x * z * (1 - c) - s * y;
+		m.at_ref(2, 1) = y * z * (1 - c) + s * x;
+		m.at_ref(2, 2) = z * z * (1 - c) + c;
 	}
 
 }

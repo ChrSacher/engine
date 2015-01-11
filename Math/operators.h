@@ -4,15 +4,18 @@
 /**
  * @file Here are the Declaration of all Algebraic Operations between vectors and matrices
  */
-namespace Math
-{
+
+#include "Vector3D.h"
 #include "Vector4D.h"
 #include "Matrix4D.h"
 
+
+namespace Math
+{
 	//----------------------------------------------------------------------------------------------
 	// VECTORS ONLY
 	//----------------------------------------------------------------------------------------------
-	Math::Vector4D scalarProduct(Math::Vector4D v1, Math::Vector4D v2);
+	float scalarProduct(Vector4D v1, Vector4D v2);
 
 
 	//----------------------------------------------------------------------------------------------
@@ -22,9 +25,9 @@ namespace Math
 	 * @brief operator * usual matrix times vector multiplication
 	 * @param m
 	 * @param v
-	 * @return transformed vector
+	 * @return transformed vector = m * v
 	 */
-	Math::Vector4D operator*(Math::Matrix4D& m, Math::Vector4D& v);
+	Vector4D operator*(Matrix4D& m, Vector4D& v);
 
 	//----------------------------------------------------------------------------------------------
 	// MATRICES ONLY
@@ -33,9 +36,9 @@ namespace Math
 	 * @brief operator * usual matrix multiplication with 2 matrices
 	 * @param m1
 	 * @param m2
-	 * @return new matrix
+	 * @return new matrix = m1 * m2
 	 */
-	Math::Matrix4D operator*(Math::Matrix4D& m1, Math::Matrix4D& m2);
+	Matrix4D operator*(Matrix4D& m1, Matrix4D& m2);
 }
 
 

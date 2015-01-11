@@ -1,5 +1,6 @@
-#include "Vector3d.h"
+#include "Vector3D.h"
 
-Vector3D::Vector3D()
+namespace Math
 {
+
 }

@@ -71,8 +71,19 @@ namespace Math
 		 */
 		bool isPoint() const { return !isDirection(); }
 
-		Vector4D& operator+(const Vector4D& v);
-		Vector4D& operator-(const Vector4D& v);
+		/**
+		 * @brief add addtion of vectors, chances this vector!!
+		 * @param v
+		 * @return
+		 */
+		Vector4D& add(const Vector4D& v);
+
+		/**
+		 * @brief subtract subtraction of vectors, chances this vector!!
+		 * @param v
+		 * @return
+		 */
+		Vector4D& subtract(const Vector4D& v);
 
 		/**
 		 * @brief scalarProduct calculates the scalar product of the 2 vectors
@@ -83,6 +94,11 @@ namespace Math
 		 */
 		float scalarProduct(const Vector4D& v);
 
+		/**
+		 * @brief print for debugging purposes
+		 */
+		void print() const;
+
 		float operator[](int index) const;
 		float& operator[](int index);
 
@@ -90,6 +106,27 @@ namespace Math
 	private:
 		float data[4];
 	};
+
+
+	/**
+	 * @brief operator + addition of vectors, won't change any vector
+	 * @param v
+	 * @param w
+	 * @return new result-vector
+	 *
+	 * e.g. z = x + y;
+	 */
+	Vector4D operator+(const Vector4D& v, const Vector4D& w);
+
+	/**
+	 * @brief operator - subtraction of vectors, won't change any vector
+	 * @param v
+	 * @param w
+	 * @return new result-vector
+	 *
+	 * e.g. z = x - y;
+	 */
+	Vector4D operator-(const Vector4D& v, const Vector4D& w);
 }
 
 #endif
