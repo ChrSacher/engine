@@ -20,7 +20,7 @@ namespace Math
 	void Matrix4D::setRow(int nbr, Vector4D& row)
 	{
 		if(nbr < 0 || nbr >= 4)
-			throw std::out_of_range("Range for nbr is: 0 <= x <= 3!");
+			throw std::out_of_range("Range for Matrix4D is: 0 <= x <= 3!");
 
 		// for definition of interpreation see comment in class declaration
 		for(auto i = 0; i < 4; i++)
@@ -30,7 +30,7 @@ namespace Math
 	void Matrix4D::setColumn(int nbr, Vector4D& col)
 	{
 		if(nbr < 0 || nbr >= 4)
-			throw std::out_of_range("Range for nbr is: 0 <= x <= 3!");
+			throw std::out_of_range("Range for Matrix4D is: 0 <= x <= 3!");
 
 		// for definition of interpreation see comment in class declaration
 		for(auto i = 0; i < 4; i++)
@@ -40,7 +40,7 @@ namespace Math
 	Vector4D Matrix4D::getRow(int nbr)
 	{
 		if(nbr < 0 || nbr >= 4)
-			throw std::out_of_range("Range for nbr is: 0 <= x <= 3!");
+			throw std::out_of_range("Range for Matrix4D is: 0 <= x <= 3!");
 
 		Vector4D v;
 		// for definition of interpreation see comment in class declaration
@@ -53,7 +53,7 @@ namespace Math
 	Vector4D Matrix4D::getColumn(int nbr)
 	{
 		if(nbr < 0 || nbr >= 4)
-			throw std::out_of_range("Range for nbr is: 0 <= x <= 3!");
+			throw std::out_of_range("Range for Matrix4D is: 0 <= x <= 3!");
 
 		Vector4D v;
 		// for definition of interpreation see comment in class declaration
@@ -61,6 +61,22 @@ namespace Math
 			v[i] = data[i][nbr];
 
 		return v;
+	}
+
+	float Matrix4D::at(int row, int col) const
+	{
+		if(row < 0 || row >= 4 || col < 0 || col >= 4)
+			throw std::out_of_range("Range for Matrix4D is: 0 <= x <= 3!");
+
+		return data[row][col];
+	}
+
+	float&Matrix4D::at_ref(int row, int col)
+	{
+		if(row < 0 || row >= 4 || col < 0 || col >= 4)
+			throw std::out_of_range("Range for Matrix4D is: 0 <= x <= 3!");
+
+		return data[row][col];
 	}
 
 	Matrix4D&Matrix4D::operator+(const Matrix4D& m)

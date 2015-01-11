@@ -67,6 +67,7 @@ namespace Math
 		 */
 		Vector4D getRow(int nbr);
 
+
 		/**
 		 * @brief getColumn
 		 * @param nbr which col is used (0-3)
@@ -77,6 +78,22 @@ namespace Math
 		 * \sa Vector4D
 		 */
 		Vector4D getColumn(int nbr);
+
+		/**
+		 * @brief at gives acces to the value at the position [row][col]
+		 * @param row
+		 * @param col
+		 * @return value at [row][col]
+		 */
+		float at(int row, int col) const;
+
+		/**
+		 * @brief at_ref gives access and the possibility to change the matrix at [row][col]
+		 * @param row
+		 * @param col
+		 * @return reference to [row][col]
+		 */
+		float& at_ref(int row, int col);
 
 		/**
 		 * @brief operator + addition of 2 matrices
