@@ -83,6 +83,9 @@ namespace Math
 		 */
 		float scalarProduct(const Vector4D& v);
 
+		float operator[](int index) const;
+		float& operator[](int index);
+
 
 	private:
 		float data[4];
