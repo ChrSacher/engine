@@ -1,9 +1,0 @@
-Wir müssen ein einheitlichen Codingstyle festlegen!
-QtCreator unterstützt es, dass man ihn einstellen
-kann und die Automatische Formatierung kümmert sich
-um den Rest.
-Ich weiß nicht ob VisualStudio auch sowas cueles hat :)
-
-Im Moment programmier ich nach dem Muster:
-
-codestyle_qt.xml
