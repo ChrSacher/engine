@@ -69,6 +69,7 @@ namespace Math
 		 */
 		bool isPoint() const { return !isDirection(); }
 
+
 	private:
 		float data[4];
 	};
