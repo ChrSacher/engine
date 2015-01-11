@@ -1,20 +1,13 @@
-#include "scene.h"
+#include "Math/Vector4D.h"
 #include <iostream>
 
 
 
 int main()
 {
-	//logger << "Fuck this shit\n";
-	Scene test;
-	Log logger;
+	Math::Vector4D v;
 
-	test.addObject(new Physix::Object);
+	std::cout << v.x() << std::endl;
 
-	while(true)
-		test.advance();
-		//std::cout << "Hallo" << std::endl;
-
-	//logger << "What is this shit\n";
 	return 0;
 }
