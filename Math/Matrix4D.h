@@ -4,7 +4,7 @@
 
 namespace Math
 {
-	class Vector4D;
+#include "Vector4D.h"
 
 	/**
 	 * @brief The Matrix4D class
