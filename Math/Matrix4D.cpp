@@ -161,6 +161,14 @@ namespace Math
 
 	Matrix4D rotate(float x, float y, float z, float angle)
 	{
+		// now the matrix is always correct
+		// this formula worx only with normalized vector
+		Vector3D v(x, y, z);
+		v.normalize();
+		float x = v.x();
+		float y = v.y();
+		float z = v.z();
+
 		// book: Grundlagen der 3D-Programmierung, Gerhard Virag, S.495
 		float c = cos(angle);
 		float s = sin(angle);

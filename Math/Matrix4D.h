@@ -144,7 +144,7 @@ namespace Math
 
 	/**
 	 * @brief rotate returns a rotationmatrix for a given rotationaxis and an angle in degree
-	 * @param v must be a unitvector!
+	 * @param v
 	 * @return
 	 */
 	Matrix4D rotate(Vector3D& v,float angle);
