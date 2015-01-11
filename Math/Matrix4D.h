@@ -1,11 +1,15 @@
+#ifndef MATRIX4D
+#define MATRIX4D
+
 /**
- *
+ * @file This file declares Matrices
  */
+
+
+#include "Vector4D.h"
 
 namespace Math
 {
-#include "Vector4D.h"
-
 	/**
 	 * @brief The Matrix4D class
 	 *
@@ -56,6 +60,8 @@ namespace Math
 		 */
 		Vector4D getColumn(int nbr);
 
+
+
 	private:
 		float data[4][4];
 	};
@@ -63,3 +69,5 @@ namespace Math
 
 	Matrix4D idendity();
 }
+
+#endif

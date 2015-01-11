@@ -1,4 +1,6 @@
-// has to be filled
+#ifndef VECTOR4D
+#define VECTOR4D
+
 
 namespace Math
 {
@@ -36,7 +38,7 @@ namespace Math
 		 * @param z
 		 * @param w
 		 */
-		Vector4D(float x, float y, float z, float w)
+		Vector4D(float x, float y, float z, float w = 0)
 		{
 			data[0] = x;
 			data[1] = y;
@@ -69,8 +71,13 @@ namespace Math
 		 */
 		bool isPoint() const { return !isDirection(); }
 
+		Vector4D& operator+(const Vector4D& v);
+		Vector4D& operator-(const Vector4D& v);
+
 
 	private:
 		float data[4];
 	};
 }
+
+#endif
