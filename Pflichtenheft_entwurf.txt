@@ -1,0 +1,85 @@
+﻿Einsatzzweck: Lern Engine
+				- Quelltext anschaulich 
+
+Musskriterien: 	- 3D Objekte erzeugen können, diese Bewegen und darstellen. Kinematik (Bewegungsbahnen bauen)
+				- Vordefinierte Szeanen + dynamisch erzeugete Objekte
+				- Eventhandling Maus/Tastatur
+				- Zeichenfläche + Extra Elemente in GUI(Buttons)
+				- Console zum Logger ausgeben 
+				- Boundingbox Collision
+				- Szeanen speichern/laden (als : Objekte (Pos + Objektbeschreibeung))
+				- einfarbiges Rendern
+				- (K)Camera (in Szeane Kamera mit freier Bew -> Kamera modi)
+				- Objekte löschen
+				- z - Buffering
+				- Zeitbasiertes rendern
+				
+Wunschkriterien:
+				- Physik: Newtonsche Axiome
+				- Multicolor rendern
+				- Flatschading (Lichtquellen + Unterschiedliche farben)
+				- Kamerafahrten
+				(-Visability detektion)
+				- Texturen
+
+Abgrenzungskriterien:
+				- kein Spiel
+				- keine real. graphik nur direktiven
+				- Es soll Abläufe demonstrieren und nicht  auf höchste Eff/ perfm. ausgelegt sein.
+				- Es muss nicht portierbar sein
+				- keine Partikelsysteme
+				- keine runden Flächen
+				- kein Sound
+				
+Edit : Ein Use-case muss rest wunsch
+
+2.) Zielgruppe:	
+				- im Bereich der Computergraphik unerf. Entwickler mit C++ Kenntnissen
+
+Produkteinsatz: 
+				- Weiterbildung der Zielgruppe
+				- einstieg in CG + Engine
+				
+Betriebsbedingung:
+				- Laufender Windows Pc + Grundausstattung
+				
+3.) Software: 	- Windwos 7 64Bit
+				- CLI-runtime
+				- OpenGL (>= 3.x)
+				- Git + Entwicklungsumgebeung (C++- Compiler)
+				
+	Hardware: 	- CPU
+				- Bildschirm
+				- (Normaler PC mit Maus/Tast(qwertz))
+	
+	Orgware: 	- Internet
+	
+	Produktionsschnittstellen: /
+	
+4.) Später
+
+5.) 	Daten:
+		/D10/	Objekte (Erscheinungsbild... Koordinaten relativ zu seinem Ursprung)
+		/D20/	Szeanen (Position von Objekten)
+		
+6.) Produktionsleistung
+		/L10/ Genauigkeit (Float 4 Byte)
+		
+7.) Links: Zeichenfläche | rechts: Buttons
+	konsole später
+	
+8.) /
+
+9.) usecases:
+
+10.) Software: wie oben + 
+				- Doxygen
+				- UML - Designer
+				- QT/Visual Studio
+				- github
+				- (Compiler: MinGW / g++)
+	
+	HW/OW wie oben
+	
+11.) Testdaten: - Use-Cases 
+				- Glossar
