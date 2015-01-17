@@ -7,3 +7,14 @@ Ich weiß nicht ob VisualStudio auch sowas cueles hat :)
 Im Moment programmier ich nach dem Muster:
 
 codestyle_qt.xml
+
+
+Quellcodedokumentation:
+Im Moment nutze ich doxygen, was aus speziell formatierten Kommentaren
+im Quellcode ein Dokumentation für das Projekt generiert.
+Das ist eine sehr schöne Sache, weil man dann eigentlich nur
+den Quellcode anschauen muss um zu wissen was was macht 
+und im Notfall auch noch eine Webbasiert Dokumentation zur 
+Verfügung hat.
+
+Auch hier gibt es Autovervollständigungen von QtCreator.
