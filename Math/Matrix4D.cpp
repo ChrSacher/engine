@@ -95,6 +95,16 @@ namespace Math
 				data[i][j]-= m.data[i][j];
 	}
 
+	Vector4D&Matrix4D::operator[](int i)
+	{
+
+	}
+
+	const Vector4D&Matrix4D::operator[](int i) const
+	{
+
+	}
+
 	void Matrix4D::print() const
 	{
 		for(auto i = 0; i < 4; i++)

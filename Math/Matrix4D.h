@@ -7,7 +7,7 @@
 
 
 #include "Vector4D.h"
-#include "Vector3D.h"
+//#include "Vector3D.h"
 
 namespace Math
 {
@@ -111,12 +111,28 @@ namespace Math
 		Matrix4D& operator-(const Matrix4D& m);
 
 		/**
+		 * @brief operator [] access the matrix in row i
+		 * @param i which row of matrix, 0 based
+		 * @return reference to the row
+		 */
+		Vector4D& operator[](int i);
+
+		/**
+		 * @brief operator [] const version of access operator
+		 * @param i
+		 * @return
+		 *
+		 * \sa operator[]
+		 */
+		const Vector4D& operator[](int i) const;
+
+		/**
 		 * @brief print just for debugging purposes
 		 */
 		void print() const;
 
 	private:
-		float data[4][4];
+		Vector4D data[4];
 	};
 
 
