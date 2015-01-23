@@ -1,7 +1,6 @@
 #include "Math/Vector4D.h"
 #include "Math/Vector3D.h"
 #include "Math/Matrix4D.h"
-#include "Math/operators.h"
 #include <iostream>
 
 

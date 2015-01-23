@@ -15,6 +15,14 @@ namespace Math
 		void z(float z) = delete;
 		float z() const = delete;
 	};
+
+	/**
+	 * @brief scalarProduct between two vector2d
+	 * @param v1
+	 * @param v2
+	 * @return scalarProduct
+	 */
+	float scalarProduct(const Vector2D& v1, const Vector2D& v2);
 }
 
 #endif // VECTOR2D_H

@@ -17,6 +17,22 @@ namespace Math
 		Vector3D crossProduct(const Vector3D& v);
 	};
 
+	/**
+	 * @brief scalarProduct between two vector3d
+	 * @param v1
+	 * @param v2
+	 * @return scalarProduct
+	 */
+	float scalarProduct(const Vector3D& v1, const Vector3D& v2);
+
+	/**
+	 * @brief crossProduct between two vector3d
+	 * @param v1
+	 * @param v2
+	 * @return crossProduct
+	 */
+	Vector3D crossProduct(const Vector3D& v1, const Vector3D& v2);
+
 }
 
 #endif // VECTOR3D_H
