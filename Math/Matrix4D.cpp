@@ -97,12 +97,18 @@ namespace Math
 
 	Vector4D&Matrix4D::operator[](int i)
 	{
+		if(i < 0 || i >= 4)
+			throw std::out_of_range("Matrix4D has four Dimensions.");
 
+		return data[i];
 	}
 
 	const Vector4D&Matrix4D::operator[](int i) const
 	{
+		if(i < 0 || i >= 4)
+			throw std::out_of_range("Matrix4D has four Dimensions.");
 
+		return data[i];
 	}
 
 	void Matrix4D::print() const
@@ -175,9 +181,9 @@ namespace Math
 		// this formula worx only with normalized vector
 		Vector3D v(x, y, z);
 		v.normalize();
-		float x = v.x();
-		float y = v.y();
-		float z = v.z();
+		float my_x = v.x();
+		float my_y = v.y();
+		float my_z = v.z();
 
 		// book: Grundlagen der 3D-Programmierung, Gerhard Virag, S.495
 		float c = cos(angle);
@@ -187,19 +193,19 @@ namespace Math
 		m.loadIdendity();
 
 		// do the first row
-		m.at_ref(0, 0) = x * x * (1 - c) + c;
-		m.at_ref(0, 1) = x * y * (1 - c) - s * z;
-		m.at_ref(0, 2) = x * z * (1 - c) + s * y;
+		m.at_ref(0, 0) = my_x * my_x * (1 - c) + c;
+		m.at_ref(0, 1) = my_x * my_y * (1 - c) - s * my_z;
+		m.at_ref(0, 2) = my_x * my_z * (1 - c) + s * my_y;
 
 		// do the second row
-		m.at_ref(1, 0) = x * y * (1 - c) + s * z;
-		m.at_ref(1, 1) = y * y * (1 - c) + c;
-		m.at_ref(1, 2) = y * z * (1 - c) - x * s;
+		m.at_ref(1, 0) = my_x * my_y * (1 - c) + s * my_z;
+		m.at_ref(1, 1) = my_y * my_y * (1 - c) + c;
+		m.at_ref(1, 2) = my_y * my_z * (1 - c) - my_x * s;
 
 		// do the third row
-		m.at_ref(2, 0) = x * z * (1 - c) - s * y;
-		m.at_ref(2, 1) = y * z * (1 - c) + s * x;
-		m.at_ref(2, 2) = z * z * (1 - c) + c;
+		m.at_ref(2, 0) = my_x * my_z * (1 - c) - s * my_y;
+		m.at_ref(2, 1) = my_y * my_z * (1 - c) + s * my_x;
+		m.at_ref(2, 2) = my_z * my_z * (1 - c) + c;
 	}
 
 }

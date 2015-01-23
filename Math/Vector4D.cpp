@@ -1,6 +1,7 @@
 #include "Vector4D.h"
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
 
 namespace Math
 {
