@@ -11,7 +11,10 @@ namespace Math
 		Vector3D() : Vector4D() {}
 		Vector3D(float x, float y, float z) : Vector4D(x, y, z) {}
 
-		Vector3D& crossProduct(const Vector3D& v);
+		float w() const = delete;
+		void w(float w) = delete;
+
+		Vector3D crossProduct(const Vector3D& v);
 	};
 
 }

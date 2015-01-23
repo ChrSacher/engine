@@ -10,7 +10,8 @@ SOURCES += main.cpp \
     Math/Matrix4D.cpp \
     Math/Vector4D.cpp \
 	Math/Vector3D.cpp \
-    System/Log.cpp
+    System/Log.cpp \
+    Math/Vector2D.cpp
 
 
 HEADERS += \
@@ -18,5 +19,6 @@ HEADERS += \
     Math/Matrix4D.h \
     Math/Vector4D.h \
 	Math/Vector3D.h \
-    System/Log.h
+    System/Log.h \
+    Math/Vector2D.h
 

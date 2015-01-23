@@ -1,6 +1,7 @@
 #ifndef VECTOR4D
 #define VECTOR4D
 
+#include <cmath>
 
 namespace Math
 {
@@ -11,6 +12,12 @@ namespace Math
 	 * so you should rather check on epsilon then on equality.
 	 */
 	const float __epsilon = 0.001;
+
+	bool isZero(float x)
+	{
+		if(abs(x) < __epsilon) return true;
+		else return false;
+	}
 	/**
 	 * @brief The Vector4D class implements a 4d vector with precision float
 	 *
