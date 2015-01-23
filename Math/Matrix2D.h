@@ -1,18 +1,12 @@
-#ifndef MATRIX4D_H
-#define MATRIX4D_H
+#ifndef MATRIX2D_H
+#define MATRIX2D_H
 
-/**
- * @file This file declares Matrices
- */
-
-
-#include "Vector4D.h"
-#include "Vector3D.h"
+#include "Math/Vector2D.h"
 
 namespace Math
 {
 	/**
-	 * @brief The Matrix4D class
+	 * @brief The Matrix3D class
 	 *
 	 * Computation for Matrices on Processor-side with float precision (Opengl uses float)
 	 *
@@ -20,13 +14,13 @@ namespace Math
 	 *
 	 * matrix[row][col] is the interpretation of the data!
 	 */
-	class Matrix4D
+	class Matrix2D
 	{
 	public:
 		/**
-		 * @brief Matrix4D initializes the matrix to all zero
+		 * @brief Matrix2D initializes the matrix to all zero
 		 */
-		Matrix4D();
+		Matrix2D();
 
 		/**
 		 * @brief loadIdendity sets the matrix to the idendity matrix
@@ -37,48 +31,48 @@ namespace Math
 
 		/**
 		 * @brief setRow
-		 * @param nbr defines which row should be set (0-3)
+		 * @param nbr defines which row should be set (0-1)
 		 * @param row defines the values for the row
 		 *
 		 * matrix[row][col] is the interpretation of the data!
 		 *
-		 * \sa Vector4D
+		 * \sa Vector2D
 		 */
-		void setRow(int nbr, Vector4D& row);
+		void setRow(int nbr, Vector2D& row);
 
 		/**
 		 * @brief setColumn
-		 * @param nbr defines which column should be set (0-3)
+		 * @param nbr defines which column should be set (0-1)
 		 * @param col defines the values for the column
 		 *
 		 * matrix[row][col] is the interpretation of the data!
 		 *
-		 * \sa Vector4D
+		 * \sa Vector2D
 		 */
-		void setColumn(int nbr, Vector4D& col);
+		void setColumn(int nbr, Vector2D& col);
 
 		/**
 		 * @brief getRow
-		 * @param nbr which row is used. (0-3)
+		 * @param nbr which row is used. (0-1)
 		 * @return the wanted row
 		 *
 		 * matrix[row][col] is the interpretation of the data!
 		 *
-		 * \sa Vector4D
+		 * \sa Vector2D
 		 */
-		Vector4D getRow(int nbr);
+		Vector2D getRow(int nbr);
 
 
 		/**
 		 * @brief getColumn
-		 * @param nbr which col is used (0-3)
+		 * @param nbr which col is used (0-1)
 		 * @return the wanted column
 		 *
 		 * matrix[row][col] is the interpretation of the data!
 		 *
-		 * \sa Vector4D
+		 * \sa Vector2D
 		 */
-		Vector4D getColumn(int nbr);
+		Vector2D getColumn(int nbr);
 
 		/**
 		 * @brief at gives acces to the value at the position [row][col]
@@ -101,21 +95,21 @@ namespace Math
 		 * @param m
 		 * @return
 		 */
-		Matrix4D& operator+(const Matrix4D& m);
+		Matrix2D& operator+(const Matrix2D& m);
 
 		/**
 		 * @brief operator - subtraction of 2 matrices
 		 * @param m
 		 * @return
 		 */
-		Matrix4D& operator-(const Matrix4D& m);
+		Matrix2D& operator-(const Matrix2D& m);
 
 		/**
 		 * @brief operator [] access the matrix in row i
 		 * @param i which row of matrix, 0 based
 		 * @return reference to the row
 		 */
-		Vector4D& operator[](int i);
+		Vector2D& operator[](int i);
 
 		/**
 		 * @brief operator [] const version of access operator
@@ -124,7 +118,7 @@ namespace Math
 		 *
 		 * \sa operator[]
 		 */
-		const Vector4D& operator[](int i) const;
+		const Vector2D& operator[](int i) const;
 
 		/**
 		 * @brief print just for debugging purposes
@@ -132,47 +126,40 @@ namespace Math
 		void print() const;
 
 	private:
-		Vector4D data[4];
+		Vector2D data[4];
 	};
 
 
-	/**
-	 * @brief idendity
-	 * @return idendity matrix for dimensional
-	 */
-	Matrix4D idendity();
+//	/**
+//	 * @brief idendity
+//	 * @return idendity matrix for dimensional
+//	 */
+//	Matrix2D idendity();
 
-	/**
-	 * @brief translate returns a translation matrix for given translationvector
-	 * @param v where w != 0, otherwise translation has no effect
-	 * @return
-	 */
-	Matrix4D translate(Vector3D& v);
-	Matrix4D translate(float x, float y, float z);
+//	/**
+//	 * @brief translate returns a translation matrix for given translationvector
+//	 * @param v where w != 0, otherwise translation has no effect
+//	 * @return
+//	 */
+//	Matrix2D translate(Vector3D& v);
+//	Matrix2D translate(float x, float y, float z);
 
-	/**
-	 * @brief scale returns a scaling matrix for given scalevector
-	 * @param v
-	 * @return
-	 */
-	Matrix4D scale(Vector3D& v);
-	Matrix4D scale(float x, float y, float z);
+//	/**
+//	 * @brief scale returns a scaling matrix for given scalevector
+//	 * @param v
+//	 * @return
+//	 */
+//	Matrix2D scale(Vector3D& v);
+//	Matrix2D scale(float x, float y, float z);
 
-	/**
-	 * @brief rotate returns a rotationmatrix for a given rotationaxis and an angle in degree
-	 * @param v
-	 * @return
-	 */
-	Matrix4D rotate(Vector3D& v,float angle);
-	Matrix4D rotate(float x, float y, float z, float angle);
-
-	/**
-	 * @brief operator * usual matrix times vector multiplication
-	 * @param m
-	 * @param v
-	 * @return transformed vector = m * v
-	 */
-	Vector4D operator*(Matrix4D& m, Vector4D& v);
+//	/**
+//	 * @brief rotate returns a rotationmatrix for a given rotationaxis and an angle in degree
+//	 * @param v
+//	 * @return
+//	 */
+//	Matrix2D rotate(Vector3D& v,float angle);
+//	Matrix2D rotate(float x, float y, float z, float angle);
 }
 
-#endif
+
+#endif // MATRIX2D_H

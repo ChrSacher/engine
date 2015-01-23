@@ -1,5 +1,5 @@
-#ifndef VECTOR4D
-#define VECTOR4D
+#ifndef VECTOR4D_H
+#define VECTOR4D_H
 
 #include <cmath>
 
@@ -13,11 +13,17 @@ namespace Math
 	 */
 	const float __epsilon = 0.001;
 
-	bool isZero(float x)
+	/**
+	 * @brief isZero checks float-values if its smaller then __epsilon
+	 * @param x
+	 * @return true for x < __epsilon
+	 */
+	inline bool isZero(float x)
 	{
-		if(abs(x) < __epsilon) return true;
+		if(std::abs(x) < __epsilon) return true;
 		else return false;
 	}
+
 	/**
 	 * @brief The Vector4D class implements a 4d vector with precision float
 	 *
@@ -158,6 +164,14 @@ namespace Math
 	 * e.g. z = x - y;
 	 */
 	Vector4D operator-(const Vector4D& v, const Vector4D& w);
+
+	/**
+	 * @brief scalarProduct between two vector4d
+	 * @param v1
+	 * @param v2
+	 * @return scalarProduct
+	 */
+	float scalarProduct(Vector4D v1, Vector4D v2);
 }
 
 #endif

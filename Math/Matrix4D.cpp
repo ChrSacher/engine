@@ -86,6 +86,8 @@ namespace Math
 		for(auto i = 0; i < 4; i++)
 			for(auto j = 0; j < 4; j++)
 				data[i][j]+= m.data[i][j];
+
+		return *this;
 	}
 
 	Matrix4D&Matrix4D::operator-(const Matrix4D& m)
@@ -93,6 +95,8 @@ namespace Math
 		for(auto i = 0; i < 4; i++)
 			for(auto j = 0; j < 4; j++)
 				data[i][j]-= m.data[i][j];
+
+		return *this;
 	}
 
 	Vector4D&Matrix4D::operator[](int i)
@@ -206,6 +210,18 @@ namespace Math
 		m.at_ref(2, 0) = my_x * my_z * (1 - c) - s * my_y;
 		m.at_ref(2, 1) = my_y * my_z * (1 - c) + s * my_x;
 		m.at_ref(2, 2) = my_z * my_z * (1 - c) + c;
+
+		return m;
 	}
 
+	Vector4D operator*(Matrix4D& m, Vector4D& v)
+	{
+		Vector4D res;
+
+		for(auto i = 0; i < 4; i++)
+			for(auto j = 0; j < 4; j++)
+				res[i]+= m.at(i, j) * v[j];
+
+		return res;
+	}
 }
