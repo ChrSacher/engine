@@ -26,10 +26,10 @@ enum class LogLevel
  * @param b
  * @return bool
  */
-constexpr bool operator>(LogLevel a, LogLevel b)
-{
-	return static_cast<int>(a) > static_cast<int>(b);
-}
+//constexpr bool operator>(LogLevel a, LogLevel b)
+//{
+//	return static_cast<int>(a) > static_cast<int>(b);
+//}
 
 /**
  * @brief operator <
@@ -37,10 +37,10 @@ constexpr bool operator>(LogLevel a, LogLevel b)
  * @param b
  * @return bool
  */
-constexpr bool operator<(LogLevel a, LogLevel b)
-{
-	return static_cast<int>(a) < static_cast<int>(b);
-}
+//constexpr bool operator<(LogLevel a, LogLevel b)
+//{
+//	return static_cast<int>(a) < static_cast<int>(b);
+//}
 
 /**
  * @brief operator >=
@@ -48,10 +48,10 @@ constexpr bool operator<(LogLevel a, LogLevel b)
  * @param b
  * @return bool
  */
-constexpr bool operator>=(LogLevel a, LogLevel b)
-{
-	return static_cast<int>(a) >= static_cast<int>(b);
-}
+//constexpr bool operator>=(LogLevel a, LogLevel b)
+//{
+//	return static_cast<int>(a) >= static_cast<int>(b);
+//}
 
 /**
  * @brief operator <=
@@ -59,10 +59,11 @@ constexpr bool operator>=(LogLevel a, LogLevel b)
  * @param b
  * @return bool
  */
-constexpr bool operator<=(LogLevel a, LogLevel b)
-{
-	return static_cast<int>(a) <= static_cast<int>(b);
-}
+//constexpr bool operator<=(LogLevel a, LogLevel b)
+//{
+//	return static_cast<int>(a) <= static_cast<int>(b);
+//}
+
 
 /**
  * @brief The Log class is for logging in every programm.
@@ -74,10 +75,11 @@ constexpr bool operator<=(LogLevel a, LogLevel b)
  *
  * The default output is standardout(std::cout), you can choose a stream for logging.
  *
- * Inspired by http://stackoverflow.com/questions/2212776/overload-handling-of-stdendl
+ * Inspired by http://stackoverflow.com/a/8337882
  */
-class Log : public std::ostream
+class Log /*: public std::ostream*/
 {
+	/*
 	class LogStreamBuf : public std::stringbuf
 	{
 	private:
@@ -96,7 +98,7 @@ class Log : public std::ostream
 
 			return 0;
 		}
-	};
+	}; */
 
 public:
 	/**
@@ -106,16 +108,18 @@ public:
 	 * Constructs a object for logging. The Loglevel ist default error and the output is default
 	 * std::cout
 	 */
-	Log(LogLevel level = LogLevel::error);
+	Log() = delete;
 
 	/**
-	 * @brief Log constructor with outputstream and loglevel
-	 * @param stream outputstream for the log
-	 * @param level determines the loglevel \sa LogLevel
-	 * Constructs a object for logging. The Loglevel ist default error and the output is default
-	 * std::cout
+	 * @brief
+	 
 	 */
-	Log(std::ostream& stream, LogLevel level = LogLevel::error);
+	static Log& makeInstance(LogLevel l, std::ostream& outstream = std::cout)
+	{
+		static Log instance(outstream, l);
+
+		return instance;
+	}
 
 	/**
 	 * @brief disallow copyconstructor for this class
@@ -175,8 +179,16 @@ public:
 /// INTERFACE END
 ///
 private:
-	enum LogLevel		__lvl;		/** loglevel determines which logmessages are printed */
-	LogStreamBuf		__logbuffer;/** outputstream where the log is written */
+
+	/*
+	
+	*/
+	Log(std::ostream& outstream, LogLevel l) : __lvl(l), __logbuffer(outstream) {}
+
+
+	LogLevel		 __lvl;		/** loglevel determines which logmessages are printed */
+	std::ostream& __logbuffer;/** outputstream where the log is written */
+	//LogStreamBuf		__logbuffer;/** outputstream where the log is written */
 };
 
 

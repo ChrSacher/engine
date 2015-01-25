@@ -1,9 +1,9 @@
-#include "System/Log.h"
+#include "Log.h"
 #include <iostream>
 
 
 Log::Log(LogLevel level) :
-	std::ostream (std::cout),
+	//std::ostream (std::cout),
 	__lvl (level),
 	__logbuffer (std::cout)
 {
@@ -11,7 +11,7 @@ Log::Log(LogLevel level) :
 }
 
 Log::Log(std::ostream& stream, LogLevel level) :	
-	std::ostream(std::cout),
+	//std::ostream(std::cout),
 	__lvl (level),
 	__logbuffer (stream)
 {
@@ -21,30 +21,30 @@ Log::Log(std::ostream& stream, LogLevel level) :
 void Log::debug(const std::string& msg)
 {
 	if(__lvl >= LogLevel::debug)
-		*this << "Debug: " << msg << std::endl;
+		__logbuffer << "[Debug]: " << msg << std::endl;
 }
 
 void Log::info(const std::string& msg)
 {
 	if(__lvl >= LogLevel::info)
-		*this << "Info: " << msg << std::endl;
+		__logbuffer << "[Info]: " << msg << std::endl;
 }
 
 void Log::warning(const std::string& msg)
 {
 	if(__lvl >= LogLevel::warning)
-		*this << "Warning: " << msg << std::endl;
+		__logbuffer << "[Warning]: " << msg << std::endl;
 }
 
 void Log::error(const std::string& msg)
 {
 	if(__lvl >= LogLevel::error)
-		*this << "Error: " << msg << std::endl;
+		__logbuffer << "[Error]: " << msg << std::endl;
 }
 
 void Log::fatal(const std::string& msg)
 {
 	if(__lvl >= LogLevel::fatal)
-		*this << "Fatal: " << msg << std::endl;
+		__logbuffer << "[Fatal]: " << msg << std::endl;
 }
 

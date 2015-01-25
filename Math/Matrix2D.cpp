@@ -39,8 +39,11 @@ namespace Math
 
 	Vector2D Matrix2D::getRow(int nbr)
 	{
-		if(nbr < 0 || nbr >= 1)
+		if (nbr < 0 || nbr >= 1)
+		{
+
 			throw std::out_of_range("Range for Matrix2D is: 0 <= x <= 1!");
+		}
 
 		Vector2D v;
 		// for definition of interpreation see comment in class declaration
