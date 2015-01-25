@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <string>
+#include <sstream>
 
 
 /**
@@ -72,9 +73,31 @@ constexpr bool operator<=(LogLevel a, LogLevel b)
  * \sa OutputColor
  *
  * The default output is standardout(std::cout), you can choose a stream for logging.
+ *
+ * Inspired by http://stackoverflow.com/questions/2212776/overload-handling-of-stdendl
  */
-class Log
+class Log : public std::ostream
 {
+	class LogStreamBuf : public std::stringbuf
+	{
+	private:
+		std::ostream&	__o;
+
+	public:
+		LogStreamBuf(std::ostream& outstream) :
+			__o(outstream)
+		{}
+
+		virtual int sync()
+		{
+			__o << "[LOGLEVEL]" << str();
+			str("");
+			__o.flush();
+
+			return 0;
+		}
+	};
+
 public:
 	/**
 	 * @brief Log defaultconstructor for logging
@@ -98,13 +121,13 @@ public:
 	 * @brief disallow copyconstructor for this class
 	 * @param other
 	 */
-	Log(const Log& other) = delete;
+	//Log(const Log& other) = delete;
 
 	/**
 	 * @brief disallow copyassignment for this class
 	 * @param other
 	 */
-	Log& operator=(const Log& other) = delete;
+	//Log& operator=(const Log& other) = delete;
 
 	/**
 	 * @brief debug output
@@ -147,21 +170,13 @@ public:
 	void fatal(const std::string& msg);
 
 
-	/**
-	 * @brief operator << will log with the semantics of a debug log, everything else should be
-	 *	explicit
-	 * @param msg
-	 * @return reference to logger
-	 */
-	//Log& operator<<(const std::string& msg);
-
 
 ///
 /// INTERFACE END
 ///
 private:
 	enum LogLevel		__lvl;		/** loglevel determines which logmessages are printed */
-	std::ostream&		__outstream;/** outputstream where the log is written */
+	LogStreamBuf		__logbuffer;/** outputstream where the log is written */
 };
 
 

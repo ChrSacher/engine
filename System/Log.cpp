@@ -3,15 +3,17 @@
 
 
 Log::Log(LogLevel level) :
-	__lvl { level },
-	__outstream (std::cout)
+	std::ostream (std::cout),
+	__lvl (level),
+	__logbuffer (std::cout)
 {
 
 }
 
-Log::Log(std::ostream& stream, LogLevel level) :
-	__lvl { level },
-	__outstream (stream)
+Log::Log(std::ostream& stream, LogLevel level) :	
+	std::ostream(std::cout),
+	__lvl (level),
+	__logbuffer (stream)
 {
 
 }
@@ -19,35 +21,30 @@ Log::Log(std::ostream& stream, LogLevel level) :
 void Log::debug(const std::string& msg)
 {
 	if(__lvl >= LogLevel::debug)
-		__outstream << "Debug: " << msg << std::endl;
+		*this << "Debug: " << msg << std::endl;
 }
 
 void Log::info(const std::string& msg)
 {
 	if(__lvl >= LogLevel::info)
-		__outstream << "Info: " << msg << std::endl;
+		*this << "Info: " << msg << std::endl;
 }
 
 void Log::warning(const std::string& msg)
 {
 	if(__lvl >= LogLevel::warning)
-		__outstream << "Warning: " << msg << std::endl;
+		*this << "Warning: " << msg << std::endl;
 }
 
 void Log::error(const std::string& msg)
 {
 	if(__lvl >= LogLevel::error)
-		__outstream << "Error: " << msg << std::endl;
+		*this << "Error: " << msg << std::endl;
 }
 
 void Log::fatal(const std::string& msg)
 {
 	if(__lvl >= LogLevel::fatal)
-		__outstream << "Fatal: " << msg << std::endl;
+		*this << "Fatal: " << msg << std::endl;
 }
 
-/*Log& Log::operator<<(const std::string& msg)
-{
-	__outstream << msg;
-	return *this;
-}*/
