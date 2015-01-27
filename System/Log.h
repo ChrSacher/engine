@@ -1,7 +1,7 @@
 ﻿#ifndef LOG_H
 #define LOG_H
 
-#include <ostream>
+#include <iostream>
 #include <string>
 #include <sstream>
 
@@ -59,7 +59,7 @@ enum class LogLevel
  * @param b
  * @return bool
  */
-//constexpr bool operator<=(LogLevel a, LogLevel b)
+//bool operator<=(LogLevel a, LogLevel b)
 //{
 //	return static_cast<int>(a) <= static_cast<int>(b);
 //}
@@ -77,29 +77,8 @@ enum class LogLevel
  *
  * Inspired by http://stackoverflow.com/a/8337882
  */
-class Log /*: public std::ostream*/
+class Log
 {
-	/*
-	class LogStreamBuf : public std::stringbuf
-	{
-	private:
-		std::ostream&	__o;
-
-	public:
-		LogStreamBuf(std::ostream& outstream) :
-			__o(outstream)
-		{}
-
-		virtual int sync()
-		{
-			__o << "[LOGLEVEL]" << str();
-			str("");
-			__o.flush();
-
-			return 0;
-		}
-	}; */
-
 public:
 	/**
 	 * @brief Log defaultconstructor for logging
@@ -108,87 +87,98 @@ public:
 	 * Constructs a object for logging. The Loglevel ist default error and the output is default
 	 * std::cout
 	 */
-	Log() = delete;
-
-	/**
-	 * @brief
-	 
-	 */
-	static Log& makeInstance(LogLevel l, std::ostream& outstream = std::cout)
+	Log(std::ostream& out = std::cout, LogLevel level = LogLevel::debug) : 
+		__stream { out },
+		__sstream {},
+		__lvl{ level },
+		__lvl_msg{ "LogLevel" }
 	{
-		static Log instance(outstream, l);
-
-		return instance;
+	
 	}
 
-	/**
-	 * @brief disallow copyconstructor for this class
-	 * @param other
-	 */
-	//Log(const Log& other) = delete;
+	~Log() {
+		__sstream << "\n";
+		__stream << __sstream.rdbuf();
+		__stream.flush();
+	}
 
-	/**
-	 * @brief disallow copyassignment for this class
-	 * @param other
-	 */
-	//Log& operator=(const Log& other) = delete;
+	void setLevel(LogLevel l)
+	{
+		__globalLvl = l;
+	}
 
-	/**
-	 * @brief debug output
-	 * @param msg the message that should be logged
-	 *
-	 * Note that this is only printed if the level ist to debug or higher
-	 */
-	void debug(const std::string& msg);
-
-	/**
-	 * @brief info output
-	 * @param msg the message that should be logged
-	 *
-	 * Note that this is only printed if the level ist to info or higher
-	 */
-	void info(const std::string& msg);
-
-	/**
-	 * @brief warning output
-	 * @param msg the message that should be logged
-	 *
-	 * Note that this is only printed if the level ist to warning or higher
-	 */
-	void warning(const std::string& msg);
-
-	/**
-	 * @brief error output
-	 * @param msg the message that should be logged
-	 *
-	 * Note that this is only printed if the level ist to error or higher
-	 */
-	void error(const std::string& msg);
-
-	/**
-	 * @brief fatal output
-	 * @param msg the message that should be logged
-	 *
-	 * Note that this is only printed if the level ist to fatal or higher
-	 */
-	void fatal(const std::string& msg);
+	template<typename T>
+	Log& operator<<(T el)
+	{
+		//if (__lvl <= __globalLvl)
+		// until bug is fixed and operator overloading is possible
+		if (static_cast<int>(__lvl) <= static_cast<int>(__globalLvl))
+			__sstream << "[" << __lvl_msg << "]: " << el; 
+		
+		return *this;
+	}
 
 
-
-///
-/// INTERFACE END
-///
 private:
+	std::ostream&		__stream;	/** Outstream for logging */
+	std::stringstream	__sstream;	/** stringstream for output, actual data which is written */
 
-	/*
-	
-	*/
-	Log(std::ostream& outstream, LogLevel l) : __lvl(l), __logbuffer(outstream) {}
+	static LogLevel		__globalLvl;/** This member defines, which loglevel is wanted in the application */
+
+protected:
+	LogLevel			__lvl;		/** loglevel determines which logmessages are printed */
+	std::string			__lvl_msg;	/** determines what should be written in front of each log */
+};
 
 
-	LogLevel		 __lvl;		/** loglevel determines which logmessages are printed */
-	std::ostream& __logbuffer;/** outputstream where the log is written */
-	//LogStreamBuf		__logbuffer;/** outputstream where the log is written */
+class Debug : public Log
+{
+	Debug() :
+		Log()
+	{
+		__lvl		= LogLevel::debug;
+		__lvl_msg	= "DEBUG";
+	}
+};
+
+class Info : public Log
+{
+	Info() :
+		Log()
+	{
+		__lvl = LogLevel::info;
+		__lvl_msg = "INFO";
+	}
+};
+
+class Warning : public Log
+{
+	Warning() :
+		Log()
+	{
+		__lvl = LogLevel::warning;
+		__lvl_msg = "WARN";
+	}
+};
+
+class Error : public Log
+{
+	Error() :
+		Log()
+	{
+		__lvl = LogLevel::error;
+		__lvl_msg = "ERROR";
+	}
+};
+
+class Fatal : public Log
+{
+	Fatal() :
+		Log()
+	{
+		__lvl = LogLevel::fatal;
+		__lvl_msg = "FATAL";
+	}
 };
 
 

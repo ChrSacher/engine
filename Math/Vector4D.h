@@ -11,7 +11,7 @@ namespace Math
 	 * This variable is needed, because floatingpoint operation are not superaccurate,
 	 * so you should rather check on epsilon then on equality.
 	 */
-	const float __epsilon = 0.001;
+	const float __epsilon = 0.001f;
 
 	/**
 	 * @brief isZero checks float-values if its smaller then __epsilon

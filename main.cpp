@@ -1,6 +1,7 @@
 #include "Math/Vector4D.h"
 #include "Math/Vector3D.h"
 #include "Math/Matrix4D.h"
+#include "System\Log.h"
 #include <iostream>
 
 
@@ -18,13 +19,14 @@ int main()
 
 	v = m * n;
 
-	v.print();
-
-	std::cout << "---------------------------" << std::endl;
+	Log() << "Hallo Welt, ich bin ein Logger";
 
 	//v = z + n;
 	//for(auto i = 0; i < 4; i++)
 	//	std::cout << i << " = " << z[i] << std::endl;
+
+	int i;
+	std::cin >> i;
 
 	return 0;
 }
