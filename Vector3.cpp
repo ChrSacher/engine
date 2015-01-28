@@ -161,6 +161,21 @@ GLfloat Vector3::distanceSquared(const Vector3& v) const
     return dx*dx + dy*dy + dz*dz;
 }
 
+GLfloat Vector3::x() const
+{
+    return vec[0];
+}
+
+GLfloat Vector3::y() const
+{
+    return vec[1];
+}
+
+GLfloat Vector3::z() const
+{
+    return vec[2];
+}
+
 GLfloat Vector3::length(void) const
 {
     return sqrt(lengthSquared());
