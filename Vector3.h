@@ -39,9 +39,9 @@ public:
         void normalize(void);//changes values so that the length of the vector is 1
         GLfloat dot(const Vector3& v) const;//skalarprodukt
         Vector3 cross(const Vector3& v) const;//kreuzprodukt
-        GLfloat x();
-        GLfloat y();
-        GLfloat z();
+        GLfloat x() const;
+        GLfloat y() const;
+        GLfloat z() const;
         
         static const Vector3 Zero;
         static const Vector3 X_Axis;
