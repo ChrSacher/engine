@@ -107,6 +107,12 @@ public:
 		__globalLvl = l;
 	}
 
+	/**
+	 * @brief operator<< template overload, will output everything, which overloads operator<< for std::cout for example
+	 * @param el the elemnt to log
+	 *
+	 * Nice way, to dont write everything 10 times :)
+	*/
 	template<typename T>
 	Log& operator<<(T el)
 	{
