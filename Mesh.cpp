@@ -62,7 +62,7 @@ bool Mesh::loadOBJ(std::string path)
 
 	FILE * file = fopen(path.c_str(), "r");
 	if( file == NULL ){
-		printf("Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n");
+		printf("Impossible to open the file %s \n",path.c_str());
 		return false;
 	}
 
