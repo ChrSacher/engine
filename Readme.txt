@@ -1,0 +1,2 @@
+Ich weiß noch nicht ob ich die Vertex Klasse überhaupt brauche oder alles per mesh mache.
+Im prinzip müssen die ganzen Vertices und indices nicht gespeichert werden die können einfach übergeben werden. 
