@@ -24,6 +24,7 @@ public:
 	void addVertices(std::vector<Vertex> newvertices,std::vector<GLuint> indices);
 	bool loadOBJ(std::string path);
 	void loadBuffer();
+    void clearData();
 	void draw();
 	std::vector<Vector3> vertices;
     std::vector<Vector2> uvs;

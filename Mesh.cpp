@@ -62,7 +62,7 @@ bool Mesh::loadOBJ(std::string path)
 
 	FILE * file = fopen(path.c_str(), "r");
 	if( file == NULL ){
-		printf("Impossible to open file %s \n",path.c_str());
+		printf("Impossible to open the file %s ",path.c_str());
 		return false;
 	}
 
@@ -103,7 +103,7 @@ bool Mesh::loadOBJ(std::string path)
 			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
 			if (matches != 9)
 			{
-				printf("File %s cannot be read\n",path.c_str());
+				printf("File %s cannot be read",path.c_str());
 				return false;
 			}
 			vertexIndices.push_back(vertexIndex[0] - 1 + currentvert);
@@ -137,11 +137,26 @@ bool Mesh::loadOBJ(std::string path)
 	{
 		normals .push_back(temp_normals[i]);
 	}
-	for(int i=0;i<vertices.size();i++)
+	for(int i=0;i<temp_vertices.size();i++)
 	{
-		Vertices.push_back(Vertex(vertices[i]));
+		Vertices.push_back(Vertex(temp_vertices[i]));
 	}
 	return true;
 
 }
+
+void Mesh::loadBuffer()
+{
+	addVertices(Vertices,vertexIndices);
+}
  
+void Mesh::clearData()
+{
+	vertices.clear();
+	uvs.clear();
+    normals.clear();
+	Vertices.clear();
+	vertexIndices.clear();
+	uvIndices.clear();
+	normalIndices.clear();
+}
