@@ -62,7 +62,7 @@ bool Mesh::loadOBJ(std::string path)
 
 	FILE * file = fopen(path.c_str(), "r");
 	if( file == NULL ){
-		printf("Impossible to open the file %s \n",path.c_str());
+		printf("Impossible to open file %s \n",path.c_str());
 		return false;
 	}
 
@@ -103,7 +103,7 @@ bool Mesh::loadOBJ(std::string path)
 			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
 			if (matches != 9)
 			{
-				printf("File can't be read by our simple parser :-( Try exporting with other options\n");
+				printf("File %s cannot be read\n",path.c_str());
 				return false;
 			}
 			vertexIndices.push_back(vertexIndex[0] - 1 + currentvert);
