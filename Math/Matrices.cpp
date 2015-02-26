@@ -1279,16 +1279,47 @@ std::ostream& operator<<(std::ostream& os, const Matrix4& m)
     return os;
 }
 
-Matrix4& Matrix4::initProjection(float newfov,float newwidth,float newheight,float newznear,float newzfar)
+Matrix4& Matrix4::perspective(float newfov,float aspect,float newznear,float newzfar)
 {
-	float ar = newwidth/newheight;
 	float tanHalfFov= (float)tanf(((newfov/2) * DEG2RAD));
 	float zRange = newznear - newzfar;
-	m[0] = 1.0f / (tanHalfFov * ar);	m[1] = 0;					m[2] = 0;									 m[3] = 0;
-    m[4] = 0;					m[5] =1.0f / tanHalfFov;	m[6] = 0;									 m[7] = 0;
-    m[8] = 0;					m[9] =0;					m[10]=(-newznear - newzfar) / zRange;		 m[11]= 2 * newzfar * newznear / zRange;
-    m[12]= 0;					m[13]=0 ;					m[14]= 1;									 m[15]= 0;
-
+	m[0] = 1.0f / (tanHalfFov * aspect);	m[4] = 0;					m[8] = 0;									 m[12] = 0;
+    m[1] = 0;					            m[5] =1.0f / tanHalfFov;	m[9] = 0;									 m[13] = 0;
+    m[2] = 0;					            m[6] =0;					m[10]=(-newznear - newzfar) / zRange;		 m[14]= 2 * newzfar * newznear / zRange;
+    m[3]= 0;			                    m[7]=0 ;					m[11]= 1;									 m[15]= 0;
 	return *this;
 }
+
+Matrix4& Matrix4::InitRotationFromVectors(const Vector3& n, const Vector3& v, const Vector3& u)
+	{
+		m[0] = u[0];	 m[4] =  u[1];		m[8] = u[2];		 m[11] = 0;
+		m[1] = v[0];	 m[5] = v[1];		m[9] = v[2];		 m[12] = 0;
+		m[2] = n[0];	 m[6] = n[1];		m[10] = n[2];		 m[13] = 0;
+		m[3] = 0;		 m[7] = 0;          m[14] = 0;		     m[14] = 1;  
+		
+		return *this;
+	}
+
+Matrix4& Matrix4::InitRotationFromDirection(Vector3& forward,Vector3& up)
+{
+	Vector3 n = forward.normalize();
+	Vector3 u = Vector3(up.normalize()).cross(n);
+	Vector3 v = n.cross(u);
+	
+	return InitRotationFromVectors(n,v,u);
+}
+
+Matrix4& Matrix4::InitOrthographic(float left, float right, float bottom, float top, float near, float far)
+	{
+		const float width = (right - left);
+		const float height = (top - bottom);
+		const float depth = (far - near);
+
+		m[0] = (2)/width;	m[4] = 0;        m[8] = 0;          m[12] = -(right + left)/width;
+		m[1] = 0;			m[5] = 2/height; m[9] = 0;          m[13] = -(top + bottom)/height;
+		m[2] = 0;			m[6] = 0;        m[10] = -2/depth;  m[14] = -(far + near)/depth;
+		m[3] = 0;			m[7] = 0;        m[11] = 0;         m[15] = 1; 
+		
+		return *this;
+	}
 // END OF MATRIX4 //////////////////////////////////////////////////////

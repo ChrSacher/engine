@@ -1,5 +1,6 @@
 #include "Mesh.h"
 
+Model loadOBJ(std::string path);
 
 Mesh::~Mesh(void)
 {
@@ -8,9 +9,18 @@ Mesh::~Mesh(void)
 
 void Mesh::draw()
 {
-	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLES,0,Vertices.size());
-	glBindVertexArray(0);
+	if(!indiced)
+	{
+		glBindVertexArray(vao);
+		glDrawArrays(GL_TRIANGLES,0,model.Vertices.size());
+		glBindVertexArray(0);
+	}
+	else
+	{
+		glBindVertexArray(vao);
+		glDrawElementsBaseVertex(GL_TRIANGLES,model.Indices.size(),GL_UNSIGNED_INT,0,0);
+		glBindVertexArray(0);
+	}
 }
 
 Mesh::Mesh(std::vector<Vertex> vertices)
@@ -18,8 +28,11 @@ Mesh::Mesh(std::vector<Vertex> vertices)
 	
 	glGenVertexArrays(1,&vao);
 	glBindVertexArray(vao);
-	Vertices=vertices;
-	loadBuffer();
+	for(int i=0;i<vertices.size();i++)
+	{
+		model.Vertices.push_back(vertices[i]);
+	}
+	loadBufferVertex();
 }
 Mesh::Mesh(std::string path)
 {
@@ -27,6 +40,8 @@ Mesh::Mesh(std::string path)
 	glGenVertexArrays(1,&vao);
 	glBindVertexArray(vao);
 	loadOBJ(path);
+	loadBufferVertex();
+	
 }
 
 Mesh::Mesh()
@@ -39,32 +54,118 @@ Mesh::Mesh()
 
 Vertex::Vertex()
 {
-	pos=vec3(0,0,0);
+	pos=Vector3(0,0,0);
 }
-Vertex::Vertex(const vec3& position,const vec2& tcoord)
+Vertex::Vertex(const Vector3& position,const Vector2& tcoord,const Vector3 &tnormal)
 {
 	pos=position;
 	uv=tcoord;
+	normal = tnormal;
 }
 Vertex::Vertex(float x, float y, float z)
 {
-	pos=vec3(x,y,z);
+	pos=Vector3(x,y,z);
 }
 
 void Mesh::loadOBJ(std::string path)
 {
+	model = OBJLoader::loadOBJ(path);
+	loadBufferVertex();
+	
+};
+
+void Mesh::loadBufferVertex()
+{
+	indiced=false;
+	std::vector<Vector3> positions;
+	std::vector<Vector2> uvs;
+	std::vector<Vector3> normals;
+	positions.reserve(model.Vertices.size());
+	uvs.reserve(model.Vertices.size());
+	normals.reserve(model.Vertices.size());
+	for(int i = 0;i< model.Vertices.size();i++)
+	{
+		positions.push_back(*model.Vertices[i].getPos());
+		uvs.push_back(*model.Vertices[i].getUV());
+		normals.push_back(*model.Vertices[i].getNormal());
+	}
+	glGenBuffers(NUMBUFFERS,vab);
+
+	glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
+	glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(positions[0]),&positions[0],GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
+
+	
+	glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
+	glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(uvs[0]),&uvs[0],GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
+
+	glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALVB]);
+	glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(normals[0]),&normals[0],GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
+
+	glBindVertexArray(0);
+}
+
+void Mesh::clearData()
+{
+	model.Vertices.clear();
+	loadBuffer();
+}
+
+void Mesh::loadBuffer()
+{
+	indiced=true;
+	glGenBuffers(NUMBUFFERS,vab);
+
+	glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
+	glBufferData(GL_ARRAY_BUFFER,model.vertices.size() * sizeof(model.vertices[0]),&model.vertices[0],GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
+
+	
+	glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
+	glBufferData(GL_ARRAY_BUFFER,model.uvs.size() * sizeof(model.uvs[0]),&model.uvs[0],GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
+
+	glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALVB]);
+	glBufferData(GL_ARRAY_BUFFER,model.normals.size() * sizeof(model.normals[0]),&model.normals[0],GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vab[INDICESVB]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,model.Indices.size() * sizeof(model.Indices[0]),&model.Indices[0],GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
+}
+
+OBJLoader::OBJLoader(void)
+{
+}
+
+
+OBJLoader::~OBJLoader(void)
+{
+}
+
+Model OBJLoader::loadOBJ(std::string path)
+{
 	printf("Loading OBJ file %s...\n", path.c_str());
 
-	std::vector<vec3> temp_vertices; 
-	std::vector<vec2> temp_uvs;
-	std::vector<vec3> temp_normals;
+	std::vector<Vector3> temp_vertices; 
+	std::vector<Vector2> temp_uvs;
+	std::vector<Vector3> temp_normals;
 	std::vector<GLuint> vertexIndices,uvIndices,normalIndices;
 
 
 	FILE * file = fopen(path.c_str(), "r");
 	if( file == NULL ){
 		printf("Impossible to open the file %s ",path.c_str());
-		return ;
+		return Model();
 	}
 
 	while( 1 )
@@ -80,20 +181,20 @@ void Mesh::loadOBJ(std::string path)
 		
 		if ( strcmp( lineHeader, "v" ) == 0 )
 		{
-			vec3 vertex;
+			Vector3 vertex;
 			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
 			temp_vertices.push_back(vertex);
 		}
 		else if ( strcmp( lineHeader, "vt" ) == 0 )
 		{
-			vec2 uv;
+			Vector2 uv;
 			fscanf(file, "%f %f\n", &uv.x, &uv.y );
 			uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
 			temp_uvs.push_back(uv);
 		}
 		else if ( strcmp( lineHeader, "vn" ) == 0 )
 		{
-			vec3 normal;
+			Vector3 normal;
 			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
 			temp_normals.push_back(normal);
 		}
@@ -105,7 +206,7 @@ void Mesh::loadOBJ(std::string path)
 			if (matches != 9)
 			{
 				printf("File %s cannot be read",path.c_str());
-				return ;
+				return Model();
 			}
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
@@ -124,48 +225,48 @@ void Mesh::loadOBJ(std::string path)
 		}
 
 	}
-	for( unsigned int i=0; i<vertexIndices.size(); i++ )
+	Model model;
+	for(int i=0;i<temp_vertices.size();i++)
 	{
-		glm::vec3 vertex = temp_vertices[ vertexIndices[i] - 1 ];
-		glm::vec2 uv = temp_uvs[ uvIndices[i] - 1 ];
-		Vertices.push_back(Vertex(vertex,uv));
+		model.vertices.push_back(temp_vertices[i]);
 	}
-	loadBuffer();
-	
-};
-
-void Mesh::loadBuffer()
-{
-	
-	std::vector<vec3> positions;
-	std::vector<vec2> uvs;
-	positions.reserve(Vertices.size());
-	uvs.reserve(Vertices.size());
-	for(int i = 0;i< Vertices.size();i++)
+	for(int i=0;i<temp_uvs.size();i++)
 	{
-		positions.push_back(*Vertices[i].getPos());
-		uvs.push_back(*Vertices[i].getUV());
+		model.uvs.push_back(temp_uvs[i]);
 	}
-	glGenBuffers(NUMBUFFERS,vab);
+	for(int i=0;i<temp_normals.size();i++)
+	{
+		model.normals.push_back(temp_normals[i]);
+	}
+	for(int i = 0;i<vertexIndices.size();i++)
+	{
+		model.Indices.push_back(vertexIndices[i] - 1);
+	}
+	for(int i = 0;i<uvIndices.size();i++)
+	{
+		model.Indices.push_back(uvIndices[i] - 1);
+	}
+	for(int i = 0;i<normalIndices.size();i++)
+	{
+		model.Indices.push_back(normalIndices[i] - 1);
+	}
+	model.index.vertexIndex=vertexIndices.size();
+	model.index.uvIndex=uvIndices.size();
+	model.index.normalIndex=vertexIndices.size();
 
-	glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
-	glBufferData(GL_ARRAY_BUFFER,Vertices.size() * sizeof(positions[0]),&positions[0],GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
-
-	
-
-	glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
-	glBufferData(GL_ARRAY_BUFFER,Vertices.size() * sizeof(uvs[0]),&uvs[0],GL_STATIC_DRAW);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
-
-	glBindVertexArray(0);
+	for( unsigned int i=0; i<model.index.vertexIndex; i++ )
+	{
+		Vector3 vertex = model.vertices[ vertexIndices[i] - 1 ];
+		Vector2 uv = temp_uvs[ uvIndices[i] - 1 ];
+		Vector3 normal = temp_normals[ normalIndices[i] - 1 ];
+		model.Vertices.push_back(Vertex(vertex,uv,normal));
+	}
+	return model;
 }
 
-void Mesh::clearData()
+Model::Model()
 {
-	Vertices.clear();
-	Vertices.push_back(Vertex(vec3(0,0,0),vec2(0,0)));
-	loadBuffer();
+	Vertices.push_back(Vertex(0,0,0));
+	Vertices.push_back(Vertex(0,0,0));
+	Vertices.push_back(Vertex(0,0,0));
 }

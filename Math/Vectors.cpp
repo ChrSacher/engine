@@ -1,5 +1,5 @@
 #include "Vectors.h"
-
+const float DEG2RAD = 3.141593f / 180;
 // fast math routines from Doom3 SDK
 float invSqrt(float x)
 {
@@ -195,6 +195,21 @@ bool Vector3::operator<(const Vector3& rhs) const {
     return false;
 }
 
+Vector3 Vector3::rotate(float angle,Vector3 axis)
+{
+	float sinhalfangle = sin(angle/2 * DEG2RAD);
+	float coshalfangle = cos(angle/2 * DEG2RAD);
+
+	float rX = axis[0] *sinhalfangle;
+	float rY = axis[1] *sinhalfangle;
+	float rZ = axis[2] *sinhalfangle;
+	float rW = coshalfangle;
+
+
+	return *this;
+
+};
+
 float Vector3::operator[](int index) const {
     return (&x)[index];
 }
@@ -244,6 +259,7 @@ bool Vector3::equal(const Vector3& rhs, float epsilon) const {
 Vector3 operator*(const float a, const Vector3 vec) {
     return Vector3(a*vec.x, a*vec.y, a*vec.z);
 }
+
 
 std::ostream& operator<<(std::ostream& os, const Vector3& vec) {
     os << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";

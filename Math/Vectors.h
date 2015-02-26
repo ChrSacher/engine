@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <iostream>
-
 ///////////////////////////////////////////////////////////////////////////////
 // 2D vector
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,7 +67,7 @@ struct Vector3
     float       dot(const Vector3& vec) const;          // dot product
     Vector3     cross(const Vector3& vec) const;        // cross product
     bool        equal(const Vector3& vec, float e) const; // compare with epsilon
-
+	Vector3     rotate(float angle,Vector3 axis);
     // operators
     Vector3     operator-() const;                      // unary operator (negate)
     Vector3     operator+(const Vector3& rhs) const;    // add rhs
@@ -129,7 +128,7 @@ struct Vector4
     bool        operator<(const Vector4& rhs) const;    // comparison for sort
     float       operator[](int index) const;            // subscript operator v[0], v[1]
     float&      operator[](int index);                  // subscript operator v[0], v[1]
-
+	
     friend Vector4 operator*(const float a, const Vector4 vec);
     friend std::ostream& operator<<(std::ostream& os, const Vector4& vec);
 };

@@ -160,7 +160,7 @@ public:
     Matrix4&    invertProjective();                     // inverse of projective matrix using partitioning
     Matrix4&    invertGeneral();                        // inverse of generic matrix
 	//projection
-	Matrix4& initProjection(float newfov,float newwidth,float newheight,float newznear,float newzfar);
+	
     // transform matrix
     Matrix4&    translate(float x, float y, float z);   // translation by (x,y,z)
     Matrix4&    translate(const Vector3& v);            //
@@ -192,6 +192,11 @@ public:
     friend Vector4 operator*(const Vector4& vec, const Matrix4& m); // pre-multiplication
     friend std::ostream& operator<<(std::ostream& os, const Matrix4& m);
 
+
+	Matrix4& InitRotationFromVectors(const Vector3& n, const Vector3& v, const Vector3& u);
+	Matrix4& perspective(float newfov,float aspect,float newznear,float newzfar);
+	Matrix4& InitRotationFromDirection(Vector3& forward,Vector3& up);
+	Matrix4& InitOrthographic(float left, float right, float bottom, float top, float near, float far);
 protected:
 
 private:
