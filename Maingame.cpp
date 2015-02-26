@@ -220,7 +220,7 @@ void Maingame::createObjects()
 {
 	shader = new Shader();
 	mesh2 = new Mesh("models/test.obj");
-	material = new Material("",Vector3(1,1,1));
+	material = new Material("Texture/AngryCloud.png",Vector3(1,1,1));
 	transform = new Transform(Vector3(0,0,0),Vector3(0,0,0),Vector3(0.5f,0.5f,0.5f));
 	camera = new Camera3d(Vector3(0,0,1.5),70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1,1000);
 	light = new AmbientLight(Vector3(0.1f,0.1f,0.1f),*shader);
