@@ -5,7 +5,7 @@
 #include <SDL_opengl.h>
 #include <GL/GLu.h>
 
-static class RenderUtil
+class RenderUtil
 {
 public:
 	RenderUtil(void);

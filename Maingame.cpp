@@ -69,9 +69,9 @@ void Maingame::init()
 	//SDL_SetRelativeMouseMode(SDL_TRUE);
 
 
-	//reshape();
-	createObjects();
 	initShaders();
+	createObjects();
+	
 	fpsLimiter.init(maxFPS);
 
 	return ;
@@ -110,14 +110,14 @@ void Maingame::handleKeys()
 					{
 						SCREEN_WIDTH = event.window.data1;
 						SCREEN_HEIGHT = event.window.data2 ;
-						camera->updatePerspectiveMatrix(70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1,1000);
+						camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000.0f);
 					};break;
 					case SDL_WINDOWEVENT_MAXIMIZED:
 					{
 						SCREEN_WIDTH= event.window.data1;
 						SCREEN_HEIGHT = event.window.data2;
-						SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-						camera->updatePerspectiveMatrix(70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1,1000);
+						//SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+						//camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000.0f);
 						windowed=false;
 					};break;
 				}
@@ -132,7 +132,30 @@ void Maingame::handleKeys()
 			};break;
 		}
 	}
-
+	if(input.isKeyDown(SDLK_w))
+	{
+		camera->setPos(Vector3(camera->getPos()[0]+0.2,camera->getPos()[1],camera->getPos()[2]));
+	}
+	if(input.isKeyDown(SDLK_s))
+	{
+		camera->setPos(Vector3(camera->getPos()[0]-0.2,camera->getPos()[1],camera->getPos()[2]));
+	}
+	if(input.isKeyDown(SDLK_q))
+	{
+		camera->setPos(Vector3(camera->getPos()[0],camera->getPos()[1]+0.2,camera->getPos()[1]));
+	}
+	if(input.isKeyDown(SDLK_e))
+	{
+		camera->setPos(Vector3(camera->getPos()[0],(camera->getPos())[1]-0.2,camera->getPos()[1]));
+	}
+	if(input.isKeyDown(SDLK_a))
+	{
+		camera->setRot(Vector3(camera->getRot()[0],(camera->getRot())[1]+1,camera->getRot()[2]));
+	}
+	if(input.isKeyDown(SDLK_d))
+	{
+		camera->setRot(Vector3(camera->getRot()[0],(camera->getRot())[1]-1,camera->getRot()[2]));
+	}
 	if(input.isKeyDown(SDLK_ESCAPE))
 	{
 		close();
@@ -156,16 +179,23 @@ void Maingame::render()
 	glClearDepth(1000);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
+	
+	
 	shader->use();
-	glColor3f(1,0,0);
+	
+	glColor3f(1,1,1);
 	static int counter;
 	counter++;
-	transform->setRot(Vector3(0,counter,0));
-	shader->update(*transform,*camera,*material);
+	glBegin(GL_TRIANGLES);
+	glVertex3f(-1,-1,0);
+	glVertex3f(0,1,0);
+	glVertex3f(1,1,0);
+	glEnd();
+	object->transform.setRot(Vector3(0,counter/2,0));
+	shader->updateCamera(*camera);
+	shader->updateObjekt(*object);
 	light->update();
 	light2->update();
-	mesh2->draw();
-	
 	shader->unuse();
 	SDL_GL_SwapWindow(_window);
 	
@@ -180,9 +210,6 @@ void Maingame::gameloop()
 		update();
 		
 		render();	
-		
-
-
 		fps = fpsLimiter.end();
 		static int frameCounter = 0;
 		frameCounter++;
@@ -203,6 +230,7 @@ void Maingame::gameloop()
 void Maingame::close()
 {
 	SDL_DestroyWindow( _window);
+	delete(camera,light,light2,object);
 	_window = NULL;
 	SDL_Quit();
 	exit(0);
@@ -218,20 +246,17 @@ void Maingame::run()
 
 void Maingame::createObjects()
 {
-	shader = new Shader();
-	mesh2 = new Mesh("models/test.obj");
-	material = new Material("Texture/AngryCloud.png",Vector3(1,1,1));
-	transform = new Transform(Vector3(0,0,0),Vector3(0,0,0),Vector3(0.5f,0.5f,0.5f));
-	camera = new Camera3d(Vector3(0,0,1.5),70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1,1000);
-	light = new AmbientLight(Vector3(0.1f,0.1f,0.1f),*shader);
-	light2 = new DirectionalLight(BaseLight(Vector3(1,1,1),0.5f),Vector3(1,1,1),*shader);
-	object = new Objekt("models/test.obj",Vector3(0,0,0),Vector3(0,0,0),"",Vector3(1,1,1),*shader);
+	
+	camera = new Camera3d(Vector3(0,0,5.5),70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000000.0f);
+	light = new AmbientLight(Vector3(0.1,0.1,0.1) ,*shader);
+	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.5f),Vector3(1.0f,1.0f,1.0f),*shader);
+	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0.5,1));
 
 }
 
 void Maingame::initShaders()
 {
-
+	shader = new Shader();
 	shader->addVertexShader("Shaders/textureShading.vert");
 	shader->addFragmentShader( "Shaders/textureShading.frag");
 	shader->addAttribute("position");

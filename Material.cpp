@@ -1,12 +1,13 @@
 #include "Material.h"
 
 
-Material::Material(std::string path,Vector3 Color)
+Material::Material(std::string path,Vector3 Color,float intensity ,float power)
 {
 	
-	texture = new Texture(path);
+	texture= Texture(path);
 	color=Color;
-
+	specularIntensity=intensity;
+	specularPower= power;
 }
 
 

@@ -9,18 +9,16 @@ Mesh::~Mesh(void)
 
 void Mesh::draw()
 {
+	glBindVertexArray(vao);
 	if(!indiced)
 	{
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES,0,model.Vertices.size());
-		glBindVertexArray(0);
+		glDrawArrays(GL_TRIANGLES,0,model.Vertices.size());		
 	}
 	else
-	{
-		glBindVertexArray(vao);
+	{	
 		glDrawElementsBaseVertex(GL_TRIANGLES,model.Indices.size(),GL_UNSIGNED_INT,0,0);
-		glBindVertexArray(0);
 	}
+	glBindVertexArray(0);
 }
 
 Mesh::Mesh(std::vector<Vertex> vertices)
@@ -77,6 +75,8 @@ void Mesh::loadOBJ(std::string path)
 void Mesh::loadBufferVertex()
 {
 	indiced=false;
+	if(model.Vertices.size() != 0)
+	{
 	std::vector<Vector3> positions;
 	std::vector<Vector2> uvs;
 	std::vector<Vector3> normals;
@@ -106,14 +106,13 @@ void Mesh::loadBufferVertex()
 	glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(normals[0]),&normals[0],GL_STATIC_DRAW);
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
-
 	glBindVertexArray(0);
+	}
 }
 
 void Mesh::clearData()
 {
 	model.Vertices.clear();
-	loadBuffer();
 }
 
 void Mesh::loadBuffer()
@@ -139,7 +138,7 @@ void Mesh::loadBuffer()
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vab[INDICESVB]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,model.Indices.size() * sizeof(model.Indices[0]),&model.Indices[0],GL_STATIC_DRAW);
-
+	
 	glBindVertexArray(0);
 }
 
@@ -226,27 +225,27 @@ Model OBJLoader::loadOBJ(std::string path)
 
 	}
 	Model model;
-	for(int i=0;i<temp_vertices.size();i++)
+	for(unsigned int i=0;i<temp_vertices.size();i++)
 	{
 		model.vertices.push_back(temp_vertices[i]);
 	}
-	for(int i=0;i<temp_uvs.size();i++)
+	for(unsigned int i=0;i<temp_uvs.size();i++)
 	{
 		model.uvs.push_back(temp_uvs[i]);
 	}
-	for(int i=0;i<temp_normals.size();i++)
+	for(unsigned int i=0;i<temp_normals.size();i++)
 	{
 		model.normals.push_back(temp_normals[i]);
 	}
-	for(int i = 0;i<vertexIndices.size();i++)
+	for(unsigned int i = 0;i<vertexIndices.size();i++)
 	{
 		model.Indices.push_back(vertexIndices[i] - 1);
 	}
-	for(int i = 0;i<uvIndices.size();i++)
+	for(unsigned int i = 0;i<uvIndices.size();i++)
 	{
 		model.Indices.push_back(uvIndices[i] - 1);
 	}
-	for(int i = 0;i<normalIndices.size();i++)
+	for(unsigned int i = 0;i<normalIndices.size();i++)
 	{
 		model.Indices.push_back(normalIndices[i] - 1);
 	}
@@ -266,7 +265,5 @@ Model OBJLoader::loadOBJ(std::string path)
 
 Model::Model()
 {
-	Vertices.push_back(Vertex(0,0,0));
-	Vertices.push_back(Vertex(0,0,0));
-	Vertices.push_back(Vertex(0,0,0));
+	
 }

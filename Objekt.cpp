@@ -1,15 +1,13 @@
 #include "Objekt.h"
 
 
-Objekt::Objekt(std::string objektpath,Vector3 pos,Vector3 rot,std::string texturepath,Vector3 color,Shader &rshader)
+Objekt::Objekt(std::string objektpath,Vector3 pos,Vector3 rot,std::string texturepath,Vector3 color)
 {
-	material = Material(texturepath,color);
+	material = Material(texturepath,color,2,32);
 	transform.setPos(pos);
 	transform.setRot(rot);
-	mesh=Mesh(objektpath);
-	
-	shader=rshader;
-	transform.setPos(Vector3(0,0,0));
+	mesh.loadOBJ(objektpath);
+	transform.setScale(Vector3(1,1,1));
 }
 
 
@@ -19,5 +17,5 @@ Objekt::~Objekt(void)
 
 void Objekt::draw()
 {
-	shader.setUniform("ambientLight",Vector3(1,1,1));
+	
 };

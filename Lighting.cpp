@@ -27,7 +27,7 @@ void AmbientLight::update()
 
 void DirectionalLight::update()
 {
-		shader.setUniform("directionalLight.direction",direction);
-		shader.setUniform("directionalLight.base.color",base.color);
-		shader.setUniform("directionalLight.base.intensity",base.intensity);
+	shader.setUniform("directionalLight.direction",direction);
+	shader.setUniform("directionalLight.base.color",base.color);
+	shader.setUniform("directionalLight.base.intensity",base.intensity);
 }

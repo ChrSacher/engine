@@ -15,14 +15,13 @@
 #include "Transform.h"
 #include "Camera3d.h"
 #include "Material.h"
- 
+#include "Objekt.h"
+
 class Shader
 {
 public:
-	Shader(void);
+	Shader();
 	~Shader(void);
-	Shader(const Shader& other);
-	std::unordered_map<std::string,int> _uniforms;
 
     void compileShaders(const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilepath);
     void linkShaders();
@@ -46,6 +45,11 @@ public:
 	void setmodelMatrix(Transform &transform);
 	void setviewMatrix(Camera3d &view);
 	void setbaseColor(Vector3 Color);
+	void setSpecular(Material &material);
+	void setCameraPos(Camera3d &view);
+	void updateMaterial(Material &material);
+	void updateCamera(Camera3d &camera);
+	void updateObjekt(Objekt &object);
 	//
 	void update(Transform &transform,Camera3d &view,Material &material);
 
@@ -64,14 +68,14 @@ public:
 	GLuint uniforms[NUM_UNIFORMS];
 };
 
-static class BasicShader
+class BasicShader
 {
 	BasicShader();
 	~BasicShader();
-	static void addProgram(std::string path,int type);
-	static void use();
-	static void unuse();
+	void addProgram(std::string path,int type);
+	void use();
+	void unuse();
 	GLuint _programID;
-	 int _numAttributes;
+	int _numAttributes;
 };
 #endif

@@ -5,7 +5,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <GL/GLu.h>
-#include "stb_image.h"
+
 #include <stdio.h>
 #include <string>
 #include <iostream>

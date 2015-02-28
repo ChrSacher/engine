@@ -16,6 +16,7 @@ Shader::Shader(const Shader& other)
 }
 Shader::~Shader()
 {
+	glDeleteProgram(_programID);
 }
 
 void Shader::addVertexShader(std::string path)
@@ -210,15 +211,44 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	{
 		setUniform("baseColor",Color);
 	}
-	void Shader::update(Transform &transform,Camera3d &view,Material &material)
+	void Shader::setSpecular(Material &material)
+	{
+		setUniform("specularIntensity",material.getIntensity());
+		setUniform("specularPower",material.getPower());
+	}
+	void Shader::setCameraPos(Camera3d &view)
+	{
+		setUniform("eyePos",view.getPos());
+	}
+	void Shader::updateCamera(Camera3d &view)
+	{
+		setCameraPos(view);
+		setviewMatrix(view);
+		
+	}
+	void Shader::updateMaterial(Material &material)
+	{
+		material.texture.bind();
+		setSpecular(material);
+		setbaseColor(material.color);
+		
+	}
+	void Shader::updateObjekt(Objekt &object)
+	{
+		setmodelMatrix(object.transform);
+		updateMaterial(object.material);
+		object.mesh.draw();
+	}
+
+		void Shader::update(Transform &transform,Camera3d &view,Material &material)
 	{
 		setmodelMatrix(transform);
 		setviewMatrix(view);
+		setCameraPos(view);
+		setSpecular(material);
 		setbaseColor(material.color);
-		material.texture->bind();
+		material.texture.bind();
 	}
-
-
 
 
 

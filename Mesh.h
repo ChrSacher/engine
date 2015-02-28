@@ -45,7 +45,7 @@ struct Model
 
 };
 
-static class OBJLoader
+class OBJLoader
 {
 public:
 	OBJLoader(void);
