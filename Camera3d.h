@@ -8,6 +8,9 @@
 #include "Math/Vectors.h" 
 #include "Math/Matrices.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include "Transform.h"
+
+#define PI 3.14159265358979323846f
  
 class Camera3d
 {
@@ -17,20 +20,30 @@ public:
 	Matrix4 perspectiveMatrix;
 	Matrix4 viewMatrix;
 
-	Vector3 pos,dir,up;
+	void set(Vector3 Pos,Vector3 Rot){transform.setPos(Pos);transform.setRot(Rot);};
+	void setPos(Vector3 newpos){transform.setPos(newpos);};
+	void setPos(float newx,float newy,float newz){transform.setPos(Vector3(newx,newy,newz));};
+	
+	void setRot(Vector3 newrot){transform.setRot(newrot);};
+	void setRot(float newx,float newy,float newz){transform.setRot(Vector3(newx,newy,newz));};
+
+	Vector3 getPos(){return transform.pos;};
+	Vector3 getRot(){return transform.rot;};
+	Transform transform;
 	float cameraspeed;
 	bool updateneeded;
 
-	Matrix4 GetViewProjection();
+	Matrix4& GetViewProjection();
 	void updatePerspectiveMatrix(float fov,float aspect,float zNear,float zFar);
-	void moveforward();
-	void movebackward();
-	void turnright();
-	void turnleft();
-	void straferight();
-	void strafeleft();
-	void lookup();
-	void lookdown();
 
+	//movement
+	void moveforward(float distance = 0);
+	void movebackward(float distance = 0);
+	void raise(float distance = 0);
+	void sink(float distance = 0);
+	void turnright(float distance = 0);
+	void turnleft(float distance = 0);
+	void strafeleft(float distance = 0);
+	void straferight(float distance = 0);
 
 };
