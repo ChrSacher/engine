@@ -22,6 +22,6 @@ public:
 	bool update;
 	Matrix4 getMatrix() {if(update){ calculateMatrix();}return modelMatrix;};
 
-	void calculateMatrix() ;
+	void calculateMatrix();
 };
 
