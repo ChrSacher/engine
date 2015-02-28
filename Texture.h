@@ -14,6 +14,8 @@ class Texture
 {
 public:
 	Texture(std::string path = "Texture/white.png");
+	Texture(const Texture &other);
+	void operator=(const Texture &other){};
 	virtual ~Texture(void);
 	void bind();
 	void unbind();

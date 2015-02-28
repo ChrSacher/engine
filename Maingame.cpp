@@ -182,15 +182,8 @@ void Maingame::render()
 	
 	
 	shader->use();
-	
-	glColor3f(1,1,1);
 	static int counter;
 	counter++;
-	glBegin(GL_TRIANGLES);
-	glVertex3f(-1,-1,0);
-	glVertex3f(0,1,0);
-	glVertex3f(1,1,0);
-	glEnd();
 	object->transform.setRot(Vector3(0,counter/2,0));
 	shader->updateCamera(*camera);
 	shader->updateObjekt(*object);
@@ -250,7 +243,7 @@ void Maingame::createObjects()
 	camera = new Camera3d(Vector3(0,0,5.5),70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000000.0f);
 	light = new AmbientLight(Vector3(0.1,0.1,0.1) ,*shader);
 	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.5f),Vector3(1.0f,1.0f,1.0f),*shader);
-	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0.5,1));
+	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1));
 
 }
 

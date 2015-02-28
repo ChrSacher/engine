@@ -10,10 +10,7 @@ Shader::Shader() : _numAttributes(0)
 	 }
 }
 
-Shader::Shader(const Shader& other)
-{
-	*this=other;
-}
+
 Shader::~Shader()
 {
 	glDeleteProgram(_programID);
