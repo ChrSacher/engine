@@ -232,9 +232,9 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	}
 	void Shader::updateObjekt(Objekt &object)
 	{
-		setmodelMatrix(object.transform);
-		updateMaterial(object.material);
-		object.mesh.draw();
+		setmodelMatrix(*object.transform);
+		updateMaterial(*object.material);
+		object.mesh->draw();
 	}
 
 		void Shader::update(Transform &transform,Camera3d &view,Material &material)

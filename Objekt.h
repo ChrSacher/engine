@@ -24,11 +24,10 @@ class Objekt
 {
 public:
 	Objekt(std::string objektpath,Vector3 pos,Vector3 rot,std::string texturepath,Vector3 color);
-	void operator=(const Objekt &other){};
 	~Objekt(void);
 	void draw();
-	Material material;
-	Mesh mesh;
-	Transform transform;
+	Material *material;
+	Mesh *mesh;
+	Transform *transform;
 };
 

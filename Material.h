@@ -12,6 +12,7 @@ class Material
 {
 public:
 	Material(std::string = "Texture/white.png",Vector3 Color = Vector3(1,1,1),float intensity = 2,float exponent = 32);
+	Material(const Material &other);
 	~Material(void);
 
 	Texture texture;

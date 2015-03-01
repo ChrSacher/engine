@@ -3,16 +3,15 @@
 
 Objekt::Objekt(std::string objektpath,Vector3 pos,Vector3 rot,std::string texturepath,Vector3 color)
 {
-	material = Material(texturepath,color,2,32);
-	transform.setPos(pos);
-	transform.setRot(rot);
-	mesh.loadOBJ(objektpath);
-	transform.setScale(Vector3(1,1,1));
+	material = new Material(texturepath,color,2,32);
+	transform = new Transform(pos,rot,Vector3(1,1,1));
+	mesh = new Mesh(objektpath);
 }
 
 
 Objekt::~Objekt(void)
 {
+	delete(material,transform,mesh);
 }
 
 void Objekt::draw()

@@ -7,7 +7,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <GL/GLu.h>
-
+#include <algorithm>
 #include <iostream>
 #include "Errors.h"
 class Texture
@@ -15,7 +15,7 @@ class Texture
 public:
 	Texture(std::string path = "Texture/white.png");
 	Texture(const Texture &other);
-	void operator=(const Texture &other){};
+	void operator=(const Texture &other){}; //macht kein bild wenn nicht da
 	virtual ~Texture(void);
 	void bind();
 	void unbind();
