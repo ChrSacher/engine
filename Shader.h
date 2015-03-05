@@ -64,6 +64,7 @@ public:
 	void updatePointLights(std::vector<PointLight> point);
 	void updateSpotLight(std::string uniformname ,SpotLight spot);
 	void updateSpotLights(std::vector<SpotLight> spot);
+	void updateFog(Fog fog);
 	//
 
     int _numAttributes;

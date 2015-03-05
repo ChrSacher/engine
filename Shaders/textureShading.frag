@@ -39,6 +39,7 @@ struct Fog
    float start;
    float end;
    float density;
+   bool type;
 };
 
 varying vec2 uv0;
@@ -113,12 +114,18 @@ vec4 calcSpotLight(SpotLight spotLight,vec3 normal)
 	return color;
 }
 
-float getFogFactor(Fog params, float fFogCoord) 
+float getFogFactor(Fog params, float dist) 
 { 
    float fResult = 0.0; 
-   fResult = exp(-params.density*fFogCoord);       
-   fResult = 1.0 - clamp(fResult, 0.0, 1.0);     
-   return fResult; 
+   if(params.type == true)
+   {
+	   fResult = exp(-params.density*dist);       
+	   fResult = 1.0 - clamp(fResult, 0.0, 1.0);     
+	   return fResult; 
+   }
+    fResult = (params.end - dist)/(params.end - params.start);
+	fResult =1.0 - clamp( fResult, 0.0, 1.0 );
+	return fResult;
 }
 
 void main()
@@ -140,8 +147,8 @@ void main()
 		totalLight += calcSpotLight(spotLights[i],normal);
 	}
 	gl_FragColor = color * totalLight;
-	float fFogCoord = length(viewworldPos0);
-	gl_FragColor = mix(gl_FragColor, fog.color, getFogFactor(fog, fFogCoord)); 
+	float dist = abs(viewworldPos0.z);
+	gl_FragColor = mix(gl_FragColor, fog.color, getFogFactor(fog, dist)); 
 
 	
 

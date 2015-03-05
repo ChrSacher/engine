@@ -269,6 +269,14 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 
 
 	}
+	void Shader::updateFog(Fog fog)
+	{
+		setUniform("fog.density",fog.density);
+		setUniform("fog.color",fog.color);
+		setUniform("fog.start",fog.start);
+		setUniform("fog.type",fog.type);
+		setUniform("fog.end",fog.end);
+	}
 
 	void Shader::updatePointLights(std::vector<PointLight> point)
 	{
