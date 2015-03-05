@@ -91,5 +91,6 @@ class Maingame
 		Objekt *object;
 		PointLight *point;
 		ParticleSystem *particle2;
+		Fog *fog;
 };
 

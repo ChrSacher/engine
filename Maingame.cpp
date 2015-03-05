@@ -190,9 +190,8 @@ void Maingame::render()
 	shader->use();
 	static int counter;
 	counter++;
-	//shader->setUniform("fog.density",0.04f);
-	//shader->setUniform("fog.color",Vector4(0.5f,0.5f,0.5f,1));
-	object->transform->setRot(Vector3(0,counter/2,0));
+	shader->updateFog(*fog);
+	//object->transform->setRot(Vector3(0,counter/2,0));
 	shader->updateCamera(*camera);
 	shader->updateObjekt(*object);
 	shader->updateAmbientLight(*light);
@@ -247,6 +246,7 @@ void Maingame::createObjects()
 	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.5f),Vector3(1.0f,1.0f,1.0f));
 	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0.5,1));
 	point = new PointLight(Vector3(0,0,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
+	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,1),20,50,false);
 	
 
 }
