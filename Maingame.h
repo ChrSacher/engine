@@ -26,6 +26,9 @@
 #include "Material.h"
 #include "Lighting.h"
 #include "Objekt.h"
+#include "ParticleSystem.h"
+
+
 struct GameState
 {
 	bool playing;
@@ -86,5 +89,7 @@ class Maingame
 		AmbientLight *light;
 		DirectionalLight *light2;
 		Objekt *object;
+		PointLight *point;
+		ParticleSystem *particle2;
 };
 

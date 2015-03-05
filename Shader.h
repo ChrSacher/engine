@@ -1,6 +1,7 @@
 #ifndef SHADER_INCLUDED_H
 #define SHADER_INCLUDED_H
 
+
 #include <glew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -16,6 +17,11 @@
 #include "Camera3d.h"
 #include "Material.h"
 #include "Objekt.h"
+#include "Lighting.h"
+
+const int static MAXPOINTLIGHTS = 4;
+const int static MAXSPOTLIGHTS = 4;
+
 
 class Shader
 {
@@ -41,17 +47,23 @@ public:
 	void setUniform(std::string uniformName, float value);
 	void setUniform(std::string uniformName, Vector3 value);
 	void setUniform(std::string uniformName, Matrix4 value);
+	void setUniform(std::string uniformName,BaseLight value);
 	//uniforms setters
 	void setmodelMatrix(Transform &transform);
 	void setviewMatrix(Camera3d &view);
 	void setbaseColor(Vector3 Color);
 	void setSpecular(Material &material);
 	void setCameraPos(Camera3d &view);
-	void updateMaterial(Material &material);
+	void updateMaterial(Material &material); //kann man auch überladen übersichtshalber mach ich das erst später
 	void updateCamera(Camera3d &camera);
 	void updateObjekt(Objekt &object);
+	void updateDirectionLight(DirectionalLight light);
+	void updateAmbientLight(AmbientLight ambient);
+	void updatePointLight(std::string uniformname ,PointLight point);
+	void updatePointLights(std::vector<PointLight> point);
+	void updateSpotLight(std::string uniformname ,SpotLight spot);
+	void updateSpotLights(std::vector<SpotLight> spot);
 	//
-	void update(Transform &transform,Camera3d &view,Material &material);
 
     int _numAttributes;
 

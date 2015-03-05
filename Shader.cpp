@@ -194,6 +194,12 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		glUniformMatrix4fv(getUniformLocation(uniformName),1,GL_FALSE,&value[0]);
 	}
 
+	void Shader::setUniform(std::string uniformName,BaseLight value)
+	{
+		setUniform(uniformName + ".base.intensity",value.getIntensity());
+		setUniform(uniformName + ".base.color",value.getColor());
+	}
+
 	void Shader::setmodelMatrix(Transform &transform) 
 	{
 		setUniform("modelMatrix",transform.getMatrix());
@@ -237,15 +243,78 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		object.mesh->draw();
 	}
 
-		void Shader::update(Transform &transform,Camera3d &view,Material &material)
+	void Shader::updateDirectionLight(DirectionalLight light)
 	{
-		setmodelMatrix(transform);
-		setviewMatrix(view);
-		setCameraPos(view);
-		setSpecular(material);
-		setbaseColor(material.color);
-		material.texture.bind();
+		setUniform("directionalLight.direction",light.direction);
+		setUniform("directionalLight.base.color",light.base.color);
+		setUniform("directionalLight.base.intensity",light.base.intensity);
 	}
+	void Shader::updateAmbientLight(AmbientLight ambient)
+	{
+		setUniform("ambientLight",ambient.ambientLight);
+	}
+
+	void Shader::updatePointLight(std::string uniformname ,PointLight point)
+	{
+		setUniform(uniformname		   ,point.base);
+		setUniform(uniformname + ".pos",point.pos);
+		setUniform(uniformname + ".atten.constant",point.attenuation.constant);
+		setUniform(uniformname + ".atten.exponent",point.attenuation.exponent);
+		setUniform(uniformname + ".atten.linear",point.attenuation.linear);
+		setUniform(uniformname + ".range",point.range);
+
+
+	}
+
+	void Shader::updatePointLights(std::vector<PointLight> point)
+	{
+		if(point.size() > MAXPOINTLIGHTS)
+		{
+			fatalError("Too many PointLights passed in\n");
+			return;
+		}
+		for(unsigned int i =0;i<point.size();i++)
+		{
+			std::string string("pointLights[");
+			string.append(std::to_string(i));
+			string = string  + "]";
+			updatePointLight(string,point[i]);
+		}
+
+
+	}
+
+	void Shader::updateSpotLight(std::string uniformname ,SpotLight spot)
+	{
+		setUniform(uniformname		   ,spot.pointLight.base);
+		setUniform(uniformname + ".pos",spot.pointLight.pos);
+		setUniform(uniformname + ".atten.constant",spot.pointLight.attenuation.constant);
+		setUniform(uniformname + ".atten.exponent",spot.pointLight.attenuation.exponent);
+		setUniform(uniformname + ".atten.linear",spot.pointLight.attenuation.linear);
+		setUniform(uniformname + ".range",spot.pointLight.range);
+		setUniform(uniformname + ".cutoff",spot.cutoff);
+		setUniform(uniformname + ".dir",spot.dir.normalize());
+
+
+	}
+
+	void Shader::updateSpotLights(std::vector<SpotLight> spot)
+	{
+		if(spot.size() > MAXPOINTLIGHTS)
+		{
+			fatalError("Too many PointLights passed in\n");
+			return;
+		}
+		for(unsigned int i =0;i<spot.size();i++)
+		{
+			std::string string("spotLights[");
+			string.append(std::to_string(i));
+			string = string  + "]";
+		}
+
+
+	}
+
 
 
 

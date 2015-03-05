@@ -1,4 +1,4 @@
-
+﻿
 #include "Maingame.h"
 
 Maingame::Maingame(void)
@@ -62,10 +62,14 @@ void Maingame::init()
 	glDrawBuffer(GL_BACK);
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
+	glEnable (GL_POINT_SMOOTH);	// Antialiasing für Punkte einschalten
+	glEnable (GL_LINE_SMOOTH);	// Antialiasing für Linien einschalten
+	glEnable(GL_MULTISAMPLE);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LESS);
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     //Set the background color to blue
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	//SDL_SetRelativeMouseMode(SDL_TRUE);
 
 
@@ -111,13 +115,14 @@ void Maingame::handleKeys()
 						SCREEN_WIDTH = event.window.data1;
 						SCREEN_HEIGHT = event.window.data2 ;
 						camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000.0f);
+						glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 					};break;
 					case SDL_WINDOWEVENT_MAXIMIZED:
 					{
 						SCREEN_WIDTH= event.window.data1;
 						SCREEN_HEIGHT = event.window.data2;
 						//SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-						//camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000.0f);
+						camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000.0f);
 						windowed=false;
 					};break;
 				}
@@ -142,11 +147,11 @@ void Maingame::handleKeys()
 	}
 	if(input.isKeyDown(SDLK_q))
 	{
-		camera->setPos(Vector3(camera->getPos()[0],camera->getPos()[1]+0.2,camera->getPos()[1]));
+		camera->setPos(Vector3(camera->getPos()[0],camera->getPos()[1]+0.2,camera->getPos()[2]));
 	}
 	if(input.isKeyDown(SDLK_e))
 	{
-		camera->setPos(Vector3(camera->getPos()[0],(camera->getPos())[1]-0.2,camera->getPos()[1]));
+		camera->setPos(Vector3(camera->getPos()[0],(camera->getPos())[1]-0.2,camera->getPos()[2]));
 	}
 	if(input.isKeyDown(SDLK_a))
 	{
@@ -180,15 +185,17 @@ void Maingame::render()
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	
-	
+	std::vector<PointLight> points;
+	points.push_back(*point);
 	shader->use();
 	static int counter;
 	counter++;
 	object->transform->setRot(Vector3(0,counter/2,0));
 	shader->updateCamera(*camera);
 	shader->updateObjekt(*object);
-	light->update();
-	light2->update();
+	shader->updateAmbientLight(*light);
+	shader->updateDirectionLight(*light2);
+	shader->updatePointLights(points);
 	shader->unuse();
 	SDL_GL_SwapWindow(_window);
 	
@@ -204,13 +211,6 @@ void Maingame::gameloop()
 		
 		render();	
 		fps = fpsLimiter.end();
-		static int frameCounter = 0;
-		frameCounter++;
-        if (frameCounter == 1000) 
-		{
-            std::cout << fps << std::endl;
-            frameCounter = 0;
-		}
 	}
 	SDL_StopTextInput();	//Text Eingabe anhalten
 	close(); //SDL beenden und Resourcen freigeben
@@ -241,9 +241,11 @@ void Maingame::createObjects()
 {
 	
 	camera = new Camera3d(Vector3(0,0,5.5),70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000000.0f);
-	light = new AmbientLight(Vector3(0.1,0.1,0.1) ,*shader);
-	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.5f),Vector3(1.0f,1.0f,1.0f),*shader);
+	light = new AmbientLight(Vector3(0.1,0.1,0.1));
+	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.5f),Vector3(1.0f,1.0f,1.0f));
 	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0.5,1));
+	point = new PointLight(Vector3(0,0,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
+	
 
 }
 
