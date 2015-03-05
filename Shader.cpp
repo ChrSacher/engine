@@ -164,7 +164,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	GLint location =glGetUniformLocation(_programID, uniformName.c_str());
 	if(location == GL_INVALID_INDEX)
 	{
-		fatalError("Uniform " + uniformName + " not found");
+		//fatalError("Uniform " + uniformName + " not found");
 	}
 	return location;
 }
@@ -187,6 +187,10 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	void Shader::setUniform(std::string uniformName, Vector3 value)
 	{
 		glUniform3f(getUniformLocation(uniformName), value[0],value[1],value[2]);
+	}
+	void Shader::setUniform(std::string uniformName, Vector4 value)
+	{
+		glUniform4f(getUniformLocation(uniformName), value[0],value[1],value[2],value[3]);
 	}
 	
 	void Shader::setUniform(std::string uniformName, Matrix4 value)

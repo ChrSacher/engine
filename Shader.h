@@ -46,6 +46,7 @@ public:
 	void setUniform(std::string uniformName, bool value);
 	void setUniform(std::string uniformName, float value);
 	void setUniform(std::string uniformName, Vector3 value);
+	void setUniform(std::string uniformName, Vector4 value);
 	void setUniform(std::string uniformName, Matrix4 value);
 	void setUniform(std::string uniformName,BaseLight value);
 	//uniforms setters

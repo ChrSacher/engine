@@ -33,10 +33,18 @@ struct SpotLight
 	vec3 dir;
 	float cutoff;
 };
+struct Fog
+{
+   vec4 color;
+   float start;
+   float end;
+   float density;
+};
 
 varying vec2 uv0;
 varying vec3 normal0;
-varying vec3 worldPos0;
+varying vec4 worldPos0;
+varying vec4 viewworldPos0;
 
 uniform sampler2D diffuse;
 uniform vec3 baseColor;
@@ -47,6 +55,7 @@ uniform float specularPower;
 uniform vec3 eyePos;
 uniform PointLight pointLights[MAXPOINTLIGHTS];
 uniform SpotLight spotLights[MAXSPOTLIGHTS];
+uniform Fog fog;
 
 vec4 calcLight(BaseLight base,vec3 direction,vec3 normal)
 {
@@ -58,7 +67,7 @@ vec4 calcLight(BaseLight base,vec3 direction,vec3 normal)
 
 		diffuseColor = vec4(base.color,1) * base.intensity * diffuseFactor;
 
-		vec3 directionToEye = normalize(eyePos - worldPos0);
+		vec3 directionToEye = normalize(eyePos - worldPos0.xyz);
 		vec3 reflectionDirection = normalize(reflect(direction,normal));
 
 		float specularFactor = dot(directionToEye,reflectionDirection);
@@ -79,7 +88,7 @@ vec4 calcDirectionalLight(DirectionalLight light,vec3 normal)
 
 vec4 calcPointLight(PointLight light,vec3 normal)
 {
-	vec3 lightDirection = worldPos0 - light.pos;
+	vec3 lightDirection = worldPos0.xyz - light.pos;
 	float distanceToPoint = length(lightDirection);
 	if(distanceToPoint > light.range )
 	{return vec4(0,0,0,0);}
@@ -90,9 +99,10 @@ vec4 calcPointLight(PointLight light,vec3 normal)
 					   light.atten.exponent * distanceToPoint + 0.0001f;
 	return color/attenuation;
 }
+
 vec4 calcSpotLight(SpotLight spotLight,vec3 normal)
 {
-	vec3 lightDirection = normalize(worldPos0 - spotLight.pointLight.pos);
+	vec3 lightDirection = normalize(worldPos0.xyz - spotLight.pointLight.pos);
 	float spotFactor = dot(lightDirection , spotLight.dir);
 	vec4 color=vec4(0,0,0,0);
 	if(spotFactor > spotLight.cutoff)
@@ -101,6 +111,14 @@ vec4 calcSpotLight(SpotLight spotLight,vec3 normal)
 		color = calcPointLight(spotLight.pointLight,normal) * (1.0 - (1.0 - spotFactor)/(1.0 - spotLight.cutoff));
 	}
 	return color;
+}
+
+float getFogFactor(Fog params, float fFogCoord) 
+{ 
+   float fResult = 0.0; 
+   fResult = exp(-params.density*fFogCoord);       
+   fResult = 1.0 - clamp(fResult, 0.0, 1.0);     
+   return fResult; 
 }
 
 void main()
@@ -122,4 +140,10 @@ void main()
 		totalLight += calcSpotLight(spotLights[i],normal);
 	}
 	gl_FragColor = color * totalLight;
+	float fFogCoord = length(viewworldPos0);
+	gl_FragColor = mix(gl_FragColor, fog.color, getFogFactor(fog, fFogCoord)); 
+
+	
+
+	
 }

@@ -69,7 +69,7 @@ void Maingame::init()
 	glDepthFunc(GL_LESS);
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     //Set the background color to blue
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//SDL_SetRelativeMouseMode(SDL_TRUE);
 
 
@@ -190,6 +190,8 @@ void Maingame::render()
 	shader->use();
 	static int counter;
 	counter++;
+	//shader->setUniform("fog.density",0.04f);
+	//shader->setUniform("fog.color",Vector4(0.5f,0.5f,0.5f,1));
 	object->transform->setRot(Vector3(0,counter/2,0));
 	shader->updateCamera(*camera);
 	shader->updateObjekt(*object);
