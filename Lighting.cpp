@@ -1,10 +1,9 @@
 #include "Lighting.h"
 
 
-AmbientLight::AmbientLight(Vector3 ambient,const Shader &rshader)
+AmbientLight::AmbientLight(Vector3 ambient)
 {
 	ambientLight=ambient;
-	shader=rshader;
 }
 AmbientLight::~AmbientLight(void)
 {
@@ -20,14 +19,16 @@ Vector3 AmbientLight::getAmbient()
 	return ambientLight;
 };
 
-void AmbientLight::update()
+PointLight::PointLight(Vector3 Pos,BaseLight Base,Attenuation Atten,float Range)
 {
-	shader.setUniform("ambientLight",ambientLight);
+	pos=Pos;
+	base=Base;
+	attenuation=Atten;
+	range=Range;
 }
-
-void DirectionalLight::update()
+SpotLight::SpotLight(PointLight point,Vector3 Dir,float Cutoff)
 {
-	shader.setUniform("directionalLight.direction",direction);
-	shader.setUniform("directionalLight.base.color",base.color);
-	shader.setUniform("directionalLight.base.intensity",base.intensity);
+	pointLight = point;
+	dir=Dir.normalize();
+	cutoff=Cutoff;
 }
