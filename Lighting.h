@@ -103,3 +103,12 @@ public:
 	Vector3& getDir(){return dir;}
 	float& getcutoff(){return cutoff;}
 };
+
+class Fog
+{
+	Fog(float Density,float Start = 0,float End = 0){density=Density;start=Start;end=End;}
+	float density; //exp fog
+	float start; //linear fog only
+	float end; //linear fog only
+	Vector4 color;
+};
