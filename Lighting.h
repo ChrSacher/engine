@@ -106,9 +106,17 @@ public:
 
 class Fog
 {
-	Fog(float Density,float Start = 0,float End = 0){density=Density;start=Start;end=End;}
+public:
+	Fog(float Density,Vector4 Color = Vector4(0.5,0.5,0.5,1),float Start = 0,float End = 0,bool Type = true){density=Density;start=Start;end=End;color=Color;type=Type;}
 	float density; //exp fog
 	float start; //linear fog only
 	float end; //linear fog only
 	Vector4 color;
+	int type; //0 = fog disabled 1 = linear 2 = exp 
+
+	void setDensity(float Density){density=Density;}
+	void setStart(float Start){start=Start;}
+	void setEnd(float End){end=End;}
+	void setColor(Vector4 Color){color=Color;}
+	void setType(int Type){type=Type;}
 };

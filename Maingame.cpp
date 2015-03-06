@@ -184,9 +184,6 @@ void Maingame::render()
 	glClearDepth(1000);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	
-	std::vector<PointLight> points;
-	points.push_back(*point);
 	shader->use();
 	static int counter;
 	counter++;
@@ -196,7 +193,7 @@ void Maingame::render()
 	shader->updateObjekt(*object);
 	shader->updateAmbientLight(*light);
 	shader->updateDirectionLight(*light2);
-	shader->updatePointLights(points);
+	shader->updatePointLight("pointLights[0]",*point);
 	shader->unuse();
 	SDL_GL_SwapWindow(_window);
 	
@@ -246,7 +243,8 @@ void Maingame::createObjects()
 	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.5f),Vector3(1.0f,1.0f,1.0f));
 	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0.5,1));
 	point = new PointLight(Vector3(0,0,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
-	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,1),20,50,false);
+	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,1),20,50,0);
+	light3 = new SpotLight(PointLight(Vector3(0,0,0),BaseLight(),Attenuation(),60),Vector3(0,1,1),20);
 	
 
 }

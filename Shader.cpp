@@ -298,14 +298,14 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 
 	void Shader::updateSpotLight(std::string uniformname ,SpotLight spot)
 	{
-		setUniform(uniformname		   ,spot.pointLight.base);
-		setUniform(uniformname + ".pos",spot.pointLight.pos);
-		setUniform(uniformname + ".atten.constant",spot.pointLight.attenuation.constant);
-		setUniform(uniformname + ".atten.exponent",spot.pointLight.attenuation.exponent);
-		setUniform(uniformname + ".atten.linear",spot.pointLight.attenuation.linear);
-		setUniform(uniformname + ".range",spot.pointLight.range);
-		setUniform(uniformname + ".cutoff",spot.cutoff);
-		setUniform(uniformname + ".dir",spot.dir.normalize());
+		setUniform(uniformname + ".pointLight"	   ,spot.pointLight.base);
+		setUniform(uniformname + ".pointLight.pos",spot.pointLight.pos);
+		setUniform(uniformname + ".pointLight.atten.constant",spot.pointLight.attenuation.constant);
+		setUniform(uniformname + ".pointLight.atten.exponent",spot.pointLight.attenuation.exponent);
+		setUniform(uniformname + ".pointLight.atten.linear",spot.pointLight.attenuation.linear);
+		setUniform(uniformname + ".pointLight.range",spot.pointLight.range);
+		setUniform(uniformname + ".pointLight.cutoff",spot.cutoff);
+		setUniform(uniformname + ".pointLight.dir",spot.dir.normalize());
 
 
 	}
