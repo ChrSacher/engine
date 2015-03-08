@@ -199,7 +199,7 @@ void Maingame::render()
 	shader->updateDirectionLight(*light2);
 	shader->updatePointLight("pointLights[0]",*point);
 	shader->unuse();
-	ui->draw();
+	//ui->draw();
 	SDL_GL_SwapWindow(_window);
 	
 }
@@ -253,7 +253,7 @@ void Maingame::createObjects()
 	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,1),20,50,0);
 	light3 = new SpotLight(PointLight(Vector3(0,0,1),BaseLight(Vector3(1,1,1),1),Attenuation(1,0,0),10),Vector3(1,1,0),0.7);
 	ui = new UIrenderer();
-	ui->addButton(Button(Vector2(0,0),Vector2(200,200),Vector3(1,0,0),true));
+	ui->addButton(Button(Vector2(0,0),Vector2(200,200),Vector4(1,0,0,1),true));
 
 }
 

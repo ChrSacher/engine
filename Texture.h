@@ -10,19 +10,36 @@
 #include <algorithm>
 #include <iostream>
 #include "Errors.h"
+#include <vector>
 class Texture
 {
 public:
-	Texture(std::string path = "Texture/white.png");
-	Texture(const Texture &other);
+	Texture(){}
+	Texture(std::string path );
 	
 	virtual ~Texture(void);
 	void bind(int unit = 0);
 	void unbind();
-	GLuint texture;
+	GLuint ID;
+	int width,height;
 	std::string texturepath;
 	void drawTexture(bool check);
 	void addTexture(std::string path);
 };
 
+class TextureCache
+{
+public:
 
+    static Texture getTexture(std::string texturePath);
+
+private:
+    static std::map<std::string, Texture> _textureMap;
+};
+
+
+class TextureLoader
+{
+	public:
+	static Texture load(std::string filepath);
+};

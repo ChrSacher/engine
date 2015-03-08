@@ -4,7 +4,7 @@
 Material::Material(std::string path,Vector3 Color,float intensity ,float power)
 {
 	
-	texture.addTexture(path);
+	texture = TextureCache::getTexture(path);
 	color=Color;
 	specularIntensity=intensity;
 	specularPower= power;

@@ -243,6 +243,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		setmodelMatrix(*object.transform);
 		updateMaterial(*object.material);
 		object.mesh->draw();
+		object.material->texture.unbind();
 	}
 
 	void Shader::updateDirectionLight(DirectionalLight light)
