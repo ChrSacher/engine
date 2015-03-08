@@ -107,22 +107,21 @@ vec4 calcSpotLight(SpotLight spotLight,vec3 normal)
 	float spotFactor = dot(lightDirection , spotLight.dir);
 	vec4 color=vec4(0,0,0,0);
 	if(spotFactor > spotLight.cutoff)
-	{
-		
+	{	
 		color = calcPointLight(spotLight.pointLight,normal) * (1.0 - (1.0 - spotFactor)/(1.0 - spotLight.cutoff));
 	}
+
 	return color;
 }
 
 float getFogFactor(Fog params, float dist) 
 { 
-   float fResult = 0.0;
-   if(params.type == 1)
-   {
-	fResult = (params.end - dist)/(params.end - params.start);
-	fResult =1.0 - clamp( fResult, 0.0, 1.0 );
-	return fResult;
-	   
+   	float fResult = 0.0;
+   	if(params.type == 1 && (params.end != params.start))
+   	{
+		fResult = (params.end - dist)/(params.end - params.start);
+		fResult =1.0 - clamp( fResult, 0.0, 1.0 );
+		return fResult;	   
 	}
 	if(params.type == 2)
 	{
@@ -155,8 +154,5 @@ void main()
 	gl_FragColor = color * totalLight;
 	float dist = length(viewworldPos0);
 	gl_FragColor = mix(gl_FragColor, fog.color,getFogFactor(fog, dist) ); 
-
-	
-
 	
 }
