@@ -181,9 +181,11 @@ void Maingame::render()
 {
 
 	//Color buffer leer machen
-	glClearDepth(1000);
+	
+	glClearDepth(10000000);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
+	
 	shader->use();
 	static int counter;
 	counter++;
@@ -191,10 +193,13 @@ void Maingame::render()
 	//object->transform->setRot(Vector3(0,counter/2,0));
 	shader->updateCamera(*camera);
 	shader->updateObjekt(*object);
-	shader->updateAmbientLight(*light);
+	shader->updateObjekt(*object2);
+	shader->updateAmbientLight(*light);;
+	shader->updateSpotLight("spotLights[0]",*light3);
 	shader->updateDirectionLight(*light2);
 	shader->updatePointLight("pointLights[0]",*point);
 	shader->unuse();
+	ui->draw();
 	SDL_GL_SwapWindow(_window);
 	
 }
@@ -241,11 +246,14 @@ void Maingame::createObjects()
 	camera = new Camera3d(Vector3(0,0,5.5),70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000000.0f);
 	light = new AmbientLight(Vector3(0.1,0.1,0.1));
 	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.5f),Vector3(1.0f,1.0f,1.0f));
-	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0.5,1));
+	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1));
+	object2 = new Objekt("models/test.obj",Vector3(-70.0f,-3.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,1,0));
+	object2->transform->setScale(Vector3(100.0f,0.01,100));
 	point = new PointLight(Vector3(0,0,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
 	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,1),20,50,0);
-	light3 = new SpotLight(PointLight(Vector3(0,0,0),BaseLight(),Attenuation(),60),Vector3(0,1,1),20);
-	
+	light3 = new SpotLight(PointLight(Vector3(0,0,1),BaseLight(Vector3(1,1,1),1),Attenuation(1,0,0),10),Vector3(1,1,0),0.7);
+	ui = new UIrenderer();
+	ui->addButton(Button(Vector2(0,0),Vector2(200,200),Vector3(1,0,0),true));
 
 }
 
@@ -257,5 +265,6 @@ void Maingame::initShaders()
 	shader->addAttribute("position");
 	shader->addAttribute("uv");
 	shader->addAttribute("normal");
+	
 	shader->linkShaders();
 }

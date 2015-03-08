@@ -45,15 +45,16 @@ Texture::~Texture(void)
 	glDeleteTextures(1,&texture);
 }
 
-void Texture::bind()
+void Texture::bind(int unit)
 {
-	
+	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(GL_TEXTURE_2D,texture);
 }
 
 void Texture::unbind()
 {
-	glBindTexture(GL_TEXTURE_2D, 0) ;
+	//glDisable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void Texture::drawTexture(bool check)

@@ -17,7 +17,7 @@ Transform::~Transform(void)
 
 void Transform::calculateMatrix()
 {
-	modelMatrix = Matrix4().identity().translate(pos).scale(sca).rotateX(rot.x).rotateY(rot.y).rotateZ(rot.z);
+	modelMatrix = Matrix4().identity().scale(sca).translate(pos).rotateX(rot.x).rotateY(rot.y).rotateZ(rot.z);
 }
 
 void Transform::setPos(Vector3& Pos)

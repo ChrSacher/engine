@@ -123,8 +123,6 @@ void Shader::linkShaders()
         std::printf("%s\n", &(errorLog[0]));
         fatalError("Shaders failed to link!");
     }
-	 uniforms[TRANSFORM_U] = getUniformLocation("modelMatrix");
-	 uniforms[VIEW_MATRIX] = getUniformLocation("viewMatrix");
 }
 
 //Adds an attribute to our shader. SHould be called between compiling and linking.
@@ -164,7 +162,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	GLint location =glGetUniformLocation(_programID, uniformName.c_str());
 	if(location == GL_INVALID_INDEX)
 	{
-		//fatalError("Uniform " + uniformName + " not found");
+		fatalError("Uniform " + uniformName + " not found");
 	}
 	return location;
 }
@@ -304,8 +302,8 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		setUniform(uniformname + ".pointLight.atten.exponent",spot.pointLight.attenuation.exponent);
 		setUniform(uniformname + ".pointLight.atten.linear",spot.pointLight.attenuation.linear);
 		setUniform(uniformname + ".pointLight.range",spot.pointLight.range);
-		setUniform(uniformname + ".pointLight.cutoff",spot.cutoff);
-		setUniform(uniformname + ".pointLight.dir",spot.dir.normalize());
+		setUniform(uniformname + ".cutoff",spot.cutoff);
+		setUniform(uniformname + ".dir",spot.dir);
 
 
 	}

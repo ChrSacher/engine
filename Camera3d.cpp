@@ -1,5 +1,5 @@
 #include "Camera3d.h"
-
+const float DEG2RAD = 3.141593f / 180;
 
 Camera3d::Camera3d(Vector3 Pos,float fov,float aspect,float zNear,float zFar)
 {
@@ -55,4 +55,10 @@ void Camera3d::strafeleft(float distance )
 }
 void Camera3d::straferight(float distance )
 {
+
+}
+
+Vector3 Camera3d::getDir()
+{
+	return Vector3(0,0,0);
 }

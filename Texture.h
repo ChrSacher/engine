@@ -15,9 +15,9 @@ class Texture
 public:
 	Texture(std::string path = "Texture/white.png");
 	Texture(const Texture &other);
-	void operator=(const Texture &other){}; //macht kein bild wenn nicht da
+	
 	virtual ~Texture(void);
-	void bind();
+	void bind(int unit = 0);
 	void unbind();
 	GLuint texture;
 	std::string texturepath;

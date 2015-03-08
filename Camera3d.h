@@ -29,6 +29,7 @@ public:
 
 	Vector3 getPos(){return transform.pos;};
 	Vector3 getRot(){return transform.rot;};
+	Vector3 getDir();
 	Transform transform;
 	float cameraspeed;
 	bool updateneeded;

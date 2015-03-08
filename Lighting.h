@@ -16,6 +16,23 @@
 #include "Mesh.h"
 #include "Transform.h"
 
+class ShadowMapFBO //funktioniert irgentwie nicht 
+{
+    public:
+        ShadowMapFBO();
+
+        ~ShadowMapFBO();
+
+        bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
+
+        void BindForWriting();
+
+        void BindForReading(GLenum TextureUnit);
+		Matrix4 biasMatrix;
+        GLuint m_fbo;
+        GLuint m_shadowMap;
+};
+
 class AmbientLight
 {
 public:
@@ -33,7 +50,6 @@ public:
 	BaseLight(Vector3 Color = Vector3(0.3,0.4,0.1),float Intensity = 1.0f){color=Color;intensity=Intensity;}
 	Vector3 color;
 	float intensity;
-
 	//setters
 	void setColor(Vector3 Color){color=Color;};
 	void setIntensity(float Intensity){intensity=Intensity;};
@@ -96,7 +112,7 @@ public:
 	~SpotLight(){};
 	//setters
 	void setPointLight(PointLight &light){pointLight=light;}
-	void setDir(Vector3 Dir){dir=Dir.normalize();}
+	void setDir(Vector3 Dir){dir=Dir;}
 	void setCutOff(float Cutoff){cutoff=Cutoff;}
 	//getters
 	PointLight& getPointLight(){return pointLight;}
@@ -115,8 +131,8 @@ public:
 	int type; //0 = fog disabled 1 = linear 2 = exp 
 
 	void setDensity(float Density){density=Density;}
-	void setStart(float Start){start=Start;}
-	void setEnd(float End){end=End;}
+	void setStart(float Start){if(Start != end)start=Start;else fatalError("Fog start = Fog end");}
+	void setEnd(float End){if(End != start)end=End;else fatalError("Fog start = Fog end");}
 	void setColor(Vector4 Color){color=Color;}
 	void setType(int Type){type=Type;}
 };

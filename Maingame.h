@@ -27,7 +27,7 @@
 #include "Lighting.h"
 #include "Objekt.h"
 #include "ParticleSystem.h"
-
+#include "UIrenderer.h"
 
 struct GameState
 {
@@ -89,9 +89,12 @@ class Maingame
 		AmbientLight *light;
 		DirectionalLight *light2;
 		Objekt *object;
+		Objekt *object2;
 		PointLight *point;
 		ParticleSystem *particle2;
 		Fog *fog;
 		SpotLight *light3;
+		UIrenderer *ui;
+
 };
 
