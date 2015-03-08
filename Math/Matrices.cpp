@@ -23,7 +23,15 @@
 const float DEG2RAD = 3.141593f / 180;
 const float EPSILON = 0.00001f;
 
+Vector3 Rotate(Vector3 newrt,Quaternion rotation) 
+{
+	Quaternion conjugateQ = rotation.Conjugate();
+	Quaternion w = rotation * (newrt) * conjugateQ;
 
+	Vector3 ret(w.x, w.y, w.z);
+
+	return ret;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // transpose 2x2 matrix
@@ -1284,18 +1292,19 @@ Matrix4& Matrix4::perspective(float newfov,float aspect,float newznear,float new
 	float tanHalfFov= (float)tanf(((newfov/2) * DEG2RAD));
 	float zRange = newznear - newzfar;
 	m[0] = 1.0f / (tanHalfFov * aspect);	m[4] = 0;					m[8] = 0;									 m[12] = 0;
-    m[1] = 0;					            m[5] =1.0f / tanHalfFov;	m[9] = 0;									 m[13] = 0;
-    m[2] = 0;					            m[6] =0;					m[10]=(-newznear - newzfar) / zRange;		 m[14]= 2 * newzfar * newznear / zRange;
-    m[3]= 0;			                    m[7]=0 ;					m[11]= 1;									 m[15]= 0;
+    m[1] = 0;					m[5] =1.0f / tanHalfFov;	m[9] = 0;									 m[13] = 0;
+    m[2] = 0;					m[6] =0;					m[10]=(-newznear - newzfar) / zRange;		 m[14]= 2 * newzfar * newznear / zRange;
+    m[3]= 0;					m[7]=0 ;					m[11]= 1;									 m[15]= 0;
+
 	return *this;
 }
 
 Matrix4& Matrix4::InitRotationFromVectors(const Vector3& n, const Vector3& v, const Vector3& u)
 	{
-		m[0] = u[0];	 m[4] =  u[1];		m[8] = u[2];		 m[11] = 0;
-		m[1] = v[0];	 m[5] = v[1];		m[9] = v[2];		 m[12] = 0;
-		m[2] = n[0];	 m[6] = n[1];		m[10] = n[2];		 m[13] = 0;
-		m[3] = 0;		 m[7] = 0;          m[14] = 0;		     m[14] = 1;  
+		m[0] = u[0];	 m[4] =  u[1];		m[8] = u[2];		 m[12] = 0;
+		m[1] = v[0];	 m[5] = v[1];		m[9] = v[2];		 m[13] = 0;
+		m[2] = n[0];	 m[6] = n[1];		m[10] = n[2];		 m[14] = 0;
+		m[3] = 0;		 m[7] = 0;			m[11] = 0;			 m[15] = 1;  
 		
 		return *this;
 	}
@@ -1315,11 +1324,184 @@ Matrix4& Matrix4::InitOrthographic(float left, float right, float bottom, float 
 		const float height = (top - bottom);
 		const float depth = (far - near);
 
-		m[0] = (2)/width;	m[4] = 0;        m[8] = 0;          m[12] = -(right + left)/width;
-		m[1] = 0;			m[5] = 2/height; m[9] = 0;          m[13] = -(top + bottom)/height;
-		m[2] = 0;			m[6] = 0;        m[10] = -2/depth;  m[14] = -(far + near)/depth;
-		m[3] = 0;			m[7] = 0;        m[11] = 0;         m[15] = 1; 
+		m[0] = (2)/width;	m[4] = 0;        m[8] = 0;       m[12] = -(right + left)/width;
+		m[1] = 0;			m[5] = 2/height; m[9] = 0;       m[13] = -(top + bottom)/height;
+		m[2] = 0;			m[6] = 0;        m[10] = -2/depth; m[14] = -(far + near)/depth;
+		m[3] = 0;			m[7] = 0;        m[11] = 0;        m[15] = 1; 
 		
 		return *this;
-	}
+	};
+
 // END OF MATRIX4 //////////////////////////////////////////////////////
+
+	Quaternion::Quaternion(float x, float y, float z, float w)
+	{
+		(*this)[0] = x;
+		(*this)[1] = y;
+		(*this)[2] = z;
+		(*this)[3] = w;
+	}
+	
+	Quaternion::Quaternion(const Vector4& r)
+	{
+		(*this)[0] = r[0];
+		(*this)[1] = r[1];
+		(*this)[2] = r[2];
+		(*this)[3] = r[3];
+	}
+	
+	Quaternion::Quaternion(const Vector3& axis, float angle)
+	{
+		float sinHalfAngle = sinf(angle/2);
+		float cosHalfAngle = cosf(angle/2);
+		
+		(*this)[0] = axis.x * sinHalfAngle;
+		(*this)[1] = axis.y * sinHalfAngle;
+		(*this)[2] = axis.z * sinHalfAngle;
+		(*this)[3] = cosHalfAngle;
+	}
+	
+	Quaternion::Quaternion(const Matrix4& m)
+	{
+		float trace = m[0] + m[5] + m[10];
+		
+		if(trace > 0)
+		{
+			float s = 0.5f / sqrtf(trace + 1.0f);
+			z = 0.25f / s;
+			(*this)[0] = (m[6] - m[9]) * s;
+			(*this)[1] = (m[8] - m[2]) * s;
+			(*this)[2] = (m[1] - m[4]) * s;
+		}
+		else if(m[0] > m[5] && m[0] > m[10])
+		{
+			float s = 2.0f * sqrtf(1.0f + m[0] - m[5] - m[10]);
+			(*this)[3] = (m[6] - m[9]) / s;
+			(*this)[0] = 0.25f * s;
+			(*this)[1] = (m[4] + m[1]) / s;
+			(*this)[2] = (m[8] + m[2]) / s;
+		}
+		else if(m[5] > m[10])
+		{
+			float s = 2.0f * sqrtf(1.0f + m[5] - m[0] - m[10]);
+			(*this)[3] = (m[8] - m[2]) / s;
+			(*this)[0] = (m[4] + m[1]) / s;
+			(*this)[1] = 0.25f * s;
+			(*this)[2] = (m[9] + m[6]) / s;
+		}
+		else
+		{
+			float s = 2.0f * sqrtf(1.0f + m[10] - m[5] - m[0]);
+			(*this)[3] = (m[1] - m[4]) / s;
+			(*this)[0] = (m[8] + m[2]) / s;
+			(*this)[1] = (m[6] + m[9]) / s;
+			(*this)[2] = 0.25f * s;
+		}
+		
+		float length = (*this).length();
+		(*this)[3] = (*this)[3] / length;
+		(*this)[0] = (*this)[0] / length;
+		(*this)[1] = (*this)[1] / length;
+		(*this)[2] = (*this)[2] / length;
+	}
+	
+	inline Quaternion Quaternion::NLerp(const Quaternion& r, float lerpFactor, bool shortestPath) 
+	{
+		Quaternion correctedDest;
+		
+		if(shortestPath && this->dot(r) < 0)
+			correctedDest = r * -1;
+		else
+			correctedDest = r;
+	
+		return Quaternion(Lerp(correctedDest, lerpFactor).normalize());
+	}
+	inline Vector4 Quaternion::Lerp(const Vector4& r, float lerpFactor){ return (r - *this) * lerpFactor + *this; }
+	inline Quaternion Quaternion::SLerp(const Quaternion& r, float lerpFactor, bool shortestPath)
+	{
+		static const float EPSILON = 1e3;
+	
+		float cos = this->dot(r);
+		Quaternion correctedDest;
+		
+		if(shortestPath && cos < 0)
+		{
+			cos *= -1;
+			correctedDest = r * -1;
+		}
+		else
+			correctedDest = r;
+			
+		if(fabs(cos) > (1 - EPSILON))
+			return NLerp(correctedDest, lerpFactor, false);
+		
+		float sin = (float)sqrtf(1.0f - cos * cos);
+		float angle = atan2(sin, cos);
+		float invSin = 1.0f/sin;
+		
+		float srcFactor = sinf((1.0f - lerpFactor) * angle) * invSin;
+		float destFactor = sinf((lerpFactor) * angle) * invSin;
+		
+		return Quaternion((*this) * srcFactor + correctedDest * destFactor);
+	}
+	
+	inline Matrix4 Quaternion::ToRotationMatrix() const
+	{
+		Vector3 forward = Vector3(2.0f * (x * z - w * y), 2.0f * (y * z + w * x), 1.0f - 2.0f * (x * x + y * y));
+		Vector3 up = Vector3(2.0f * (x*y + w*z), 1.0f - 2.0f * (x*x + z*z), 2.0f * (y*z - w*x));
+		Vector3 right = Vector3(1.0f - 2.0f * (y*y + z*z), 2.0f * (x*y - w*z), 2.0f * (x*z + w*y));
+	
+		return Matrix4().InitRotationFromVectors(forward,up,right);
+	}
+	
+	inline Vector3 Quaternion::GetForward() const
+	{ 
+		return Rotate(Vector3(0,0,1),*this); 
+	}
+	
+	inline Vector3 Quaternion::GetBack() const
+	{ 
+		return Rotate(Vector3(0,0,-1),*this); 
+	}
+	
+	inline Vector3 Quaternion::GetUp() const
+	{ 
+		return Rotate(Vector3(0,1,0),*this); 
+	}
+	
+	inline Vector3 Quaternion::GetDown() const
+	{ 
+		return  Rotate(Vector3(0,-1,0),*this); 
+	}
+	
+	inline Vector3 Quaternion::GetRight() const
+	{ 
+		return Rotate(Vector3(1,0,0),*this); 
+	}
+	
+	inline Vector3 Quaternion::GetLeft() const
+	{ 
+		return Rotate(Vector3(-1,0,0),*this);  
+	}
+
+	inline Quaternion Quaternion::Conjugate(){ return Quaternion(-x, -y, -z, w); }
+
+	inline Quaternion Quaternion::operator*(const Quaternion& r) const
+	{
+		const float _w = (w * r.w) - (x * r.x) - (y * r.y) - (z * r.z);
+		const float _x = (x * r.w) + (w * r.x) + (y * r.z) - (z * r.y);
+		const float _y = (y * r.w) + (w * r.y) + (z * r.x) - (x * r.z);
+		const float _z = (z * r.w) + (w * r.z) + (x * r.y) - (y * r.x);
+
+		return Quaternion(_x, _y, _z, _w);
+	}
+	
+	inline Quaternion Quaternion::operator*(const Vector3& v) const
+	{
+		const float _w = - (x * v.x) - (y * v.y) - (z * v.z);
+		const float _x =   (w * v.x) + (y * v.z) - (z * v.y);
+		const float _y =   (w * v.y) + (z * v.x) - (x * v.z);
+		const float _z =   (w * v.z) + (x * v.y) - (y * v.x);
+
+		return Quaternion(_x, _y, _z, _w);
+	}

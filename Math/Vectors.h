@@ -85,7 +85,7 @@ struct Vector3
     bool        operator<(const Vector3& rhs) const;    // comparison for sort
     float       operator[](int index) const;            // subscript operator v[0], v[1]
     float&      operator[](int index);                  // subscript operator v[0], v[1]
-
+	
     friend Vector3 operator*(const float a, const Vector3 vec);
     friend std::ostream& operator<<(std::ostream& os, const Vector3& vec);
 };

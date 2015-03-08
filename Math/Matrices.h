@@ -14,6 +14,9 @@
 #include <iostream>
 #include <iomanip>
 #include "Vectors.h"
+
+
+
 ///////////////////////////////////////////////////////////////////////////
 // 2x2 matrix
 ///////////////////////////////////////////////////////////////////////////
@@ -197,6 +200,7 @@ public:
 	Matrix4& perspective(float newfov,float aspect,float newznear,float newzfar);
 	Matrix4& InitRotationFromDirection(Vector3& forward,Vector3& up);
 	Matrix4& InitOrthographic(float left, float right, float bottom, float top, float near, float far);
+	Matrix4 ToRotationMatrix() const;
 protected:
 
 private:
@@ -208,3 +212,26 @@ private:
     float tm[16];                                       // transpose m
 
 };
+
+class Quaternion : public Vector4
+{
+public:
+	Quaternion(float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 1.0f);
+	Quaternion(const Vector4& r);
+	Quaternion(const Vector3& axis, float angle);
+	Quaternion(const Matrix4& m);
+	inline Quaternion NLerp(const Quaternion& r, float lerpFactor, bool shortestPath);
+	inline Vector4 Lerp(const Vector4& r, float lerpFactor);
+	inline Quaternion SLerp(const Quaternion& r, float lerpFactor, bool shortestPath);
+	inline Matrix4 ToRotationMatrix() const;
+	inline Vector3 GetForward() const;
+	inline Vector3 GetBack() const;
+	inline Vector3 GetUp() const;
+	inline Vector3 GetDown() const;
+	inline Vector3 GetRight() const;
+	inline Vector3 GetLeft() const;
+	inline Quaternion Conjugate();
+	inline Quaternion operator*(const Quaternion& r) const;
+	inline Quaternion operator*(const Vector3& v) const;
+};
+
