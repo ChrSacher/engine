@@ -13,6 +13,7 @@ UIrenderer::UIrenderer()
 	ortho= Matrix4().identity().InitOrthographic(0,640,0,480,-1,1);
 	glGenVertexArrays(1,&vao);
 	glBindVertexArray(vao);
+	glGenBuffers(NUMBUFFERS,vab);
 }
 
 void UIrenderer::draw()
@@ -22,26 +23,33 @@ void UIrenderer::draw()
 	glClear(GL_DEPTH_BUFFER_BIT);
 	shader->use();
 	shader->setUniform("ortho",ortho);
-
+	int offset = 0;
 	for(int i=0;i < buttons.size();i++)
 	{
-		shader->setUniform("baseColor",buttons[i].color);
-		glBindVertexArray(vao);
-		glDrawArrays(GL_QUADS,0,buttons.size() * 4);		
-		glBindVertexArray(0);
+		if(buttons[i].render)
+		{
+			shader->setUniform("baseColor",buttons[i].color);
+			buttons[i].texture.bind();
+			glBindVertexArray(vao);
+			glDrawArrays(GL_QUADS,offset,4);		
+			glBindVertexArray(0);
+			offset += 4;
+			buttons[i].texture.unbind();
+		}
 	}
 	shader->unuse();
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 }
 
-Button::Button(Vector2 Start,Vector2 Size,Vector4 Color,bool Render)
+Button::Button(Vector2 Start,Vector2 Size,Vector4 Color,bool Render,std::string texturepath)
 {
 	start=Start;
 	size=Size;
 	color = Color;
 	render=Render;
 	ID=IDCounter;
+	texture = TextureCache::getTexture(texturepath);
 	Button::IDCounter++;
 	
 }
@@ -53,17 +61,20 @@ void UIrenderer::loadBuffer()
 	uvs.reserve(buttons.size() * 4);
 	for(int i=0;i< buttons.size();i++)
 	{
-	positions.push_back(buttons[i].start);
-	positions.push_back(Vector2(buttons[i].start.x + buttons[i].size.x,buttons[i].start.y));
-	positions.push_back(Vector2(buttons[i].start.x + buttons[i].size.x,buttons[i].start.y + buttons[i].size.y));
-	positions.push_back(Vector2(buttons[i].start.x ,buttons[i].start.y + buttons[i].size.y));
+		if(buttons[i].render)
+		{
+			positions.push_back(buttons[i].start);
+			positions.push_back(Vector2(buttons[i].start.x + buttons[i].size.x,buttons[i].start.y));
+			positions.push_back(Vector2(buttons[i].start.x + buttons[i].size.x,buttons[i].start.y + buttons[i].size.y));
+			positions.push_back(Vector2(buttons[i].start.x ,buttons[i].start.y + buttons[i].size.y));
 
-	uvs.push_back(Vector2(0,0));
-	uvs.push_back(Vector2(1,0));
-	uvs.push_back(Vector2(1,1));
-	uvs.push_back(Vector2(0,1));
+			uvs.push_back(Vector2(0,0));
+			uvs.push_back(Vector2(1,0));
+			uvs.push_back(Vector2(1,1));
+			uvs.push_back(Vector2(0,1));
+		}
 	}
-	glGenBuffers(NUMBUFFERS,vab);
+	
 
 	glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
 	glBufferData(GL_ARRAY_BUFFER,buttons.size() * 4 * sizeof(positions[0]),&positions[0],GL_STATIC_DRAW);

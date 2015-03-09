@@ -5,12 +5,12 @@
 class Button
 {
 public:
-	Button(Vector2 start,Vector2 size,Vector4 Color,bool Render);
+	Button(Vector2 start,Vector2 size,Vector4 Color,bool Render,std::string texturepath);
 	Vector2 start;
 	Vector2 size;
 	Vector2 rot;
 	Vector4 color;
-	Texture *texture;
+	Texture texture;
 	int ID;
 	static int IDCounter;
 	bool render;

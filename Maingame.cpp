@@ -199,7 +199,7 @@ void Maingame::render()
 	shader->updateDirectionLight(*light2);
 	shader->updatePointLight("pointLights[0]",*point);
 	shader->unuse();
-	//ui->draw();
+	ui->draw();
 	SDL_GL_SwapWindow(_window);
 	
 }
@@ -247,13 +247,14 @@ void Maingame::createObjects()
 	light = new AmbientLight(Vector3(0.1,0.1,0.1));
 	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.5f),Vector3(1.0f,1.0f,1.0f));
 	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1));
-	object2 = new Objekt("models/test.obj",Vector3(-70.0f,-3.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,1,0));
-	object2->transform->setScale(Vector3(100.0f,0.01,100));
+	object2 = new Objekt("models/test.obj",Vector3(0,-3,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,1,0));
+	object2->transform->setScale(Vector3(1000.0f,0.01,1000));
 	point = new PointLight(Vector3(0,0,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
-	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,1),20,50,0);
+	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,0.5),400,500,1);
 	light3 = new SpotLight(PointLight(Vector3(0,0,1),BaseLight(Vector3(1,1,1),1),Attenuation(1,0,0),10),Vector3(1,1,0),0.7);
 	ui = new UIrenderer();
-	ui->addButton(Button(Vector2(0,0),Vector2(200,200),Vector4(1,0,0,1),true));
+	ui->addButton(Button(Vector2(0,0),Vector2(200,200),Vector4(1,0,0,1),true,""));
+	ui->addButton(Button(Vector2(200,200),Vector2(100,100),Vector4(0,0,1,0.2),true,""));
 
 }
 
