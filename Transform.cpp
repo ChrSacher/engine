@@ -15,6 +15,18 @@ Transform::~Transform(void)
 {
 }
 
+Matrix4 Transform::getMatrix() 
+{
+	if(pos != oldpos || sca != oldsca || rot != oldrot)
+	{
+		calculateMatrix();
+		oldpos=pos;
+		oldrot=rot;
+		oldsca=sca;
+	}
+	return modelMatrix;
+};
+
 void Transform::calculateMatrix()
 {
 	modelMatrix = Matrix4().identity().scale(sca).translate(pos).rotateX(rot.x).rotateY(rot.y).rotateZ(rot.z);
@@ -23,15 +35,12 @@ void Transform::calculateMatrix()
 void Transform::setPos(Vector3& Pos)
 {
 	pos = Pos;
-	update=true;
 }
 void Transform::setRot(Vector3& Rot)
 {
 	rot=Rot;
-	update=true;
 }
 void Transform::setScale(Vector3& Scale)
 {
 	sca = Scale;
-	update=true;
 }

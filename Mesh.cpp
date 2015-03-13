@@ -1,12 +1,21 @@
 #include "Mesh.h"
 
 Model loadOBJ(std::string path);
+std::map<std::string, Mesh> MeshCache::_meshMap;
 
 Mesh::~Mesh(void)
 {
-	glDeleteVertexArrays(1,&vao);
+	
 }
 
+void Mesh::releaseMesh()
+{
+	glDeleteVertexArrays(1, &vao);
+	for(int i= 0;i < NUMBUFFERS;i++)
+	{
+		glDeleteBuffers(1,&vab[i]);
+	}
+}
 void Mesh::draw()
 {
 	glBindVertexArray(vao);
@@ -21,11 +30,15 @@ void Mesh::draw()
 	glBindVertexArray(0);
 }
 
+void Mesh::init()
+{
+	glGenVertexArrays(1,&vao);
+	glBindVertexArray(vao);
+}
 Mesh::Mesh(std::vector<Vertex> vertices)
 {
 	
-	glGenVertexArrays(1,&vao);
-	glBindVertexArray(vao);
+	init();
 	for(int i=0;i<vertices.size();i++)
 	{
 		model.Vertices.push_back(vertices[i]);
@@ -35,18 +48,13 @@ Mesh::Mesh(std::vector<Vertex> vertices)
 Mesh::Mesh(std::string path)
 {
 	
-	glGenVertexArrays(1,&vao);
-	glBindVertexArray(vao);
-	loadOBJ(path);
-	loadBufferVertex();
+	*this = MeshCache::getMesh(path);
 	
 }
 
 Mesh::Mesh()
 {
 	
-	glGenVertexArrays(1,&vao);
-	glBindVertexArray(vao);
 	
 }
 
@@ -77,36 +85,36 @@ void Mesh::loadBufferVertex()
 	indiced=false;
 	if(model.Vertices.size() != 0)
 	{
-	std::vector<Vector3> positions;
-	std::vector<Vector2> uvs;
-	std::vector<Vector3> normals;
-	positions.reserve(model.Vertices.size());
-	uvs.reserve(model.Vertices.size());
-	normals.reserve(model.Vertices.size());
-	for(int i = 0;i< model.Vertices.size();i++)
-	{
-		positions.push_back(*model.Vertices[i].getPos());
-		uvs.push_back(*model.Vertices[i].getUV());
-		normals.push_back(*model.Vertices[i].getNormal());
-	}
-	glGenBuffers(NUMBUFFERS,vab);
+		std::vector<Vector3> positions;
+		std::vector<Vector2> uvs;
+		std::vector<Vector3> normals;
+		positions.reserve(model.Vertices.size());
+		uvs.reserve(model.Vertices.size());
+		normals.reserve(model.Vertices.size());
+		for(int i = 0;i< model.Vertices.size();i++)
+		{
+			positions.push_back(*model.Vertices[i].getPos());
+			uvs.push_back(*model.Vertices[i].getUV());
+			normals.push_back(*model.Vertices[i].getNormal());
+		}
+		glGenBuffers(NUMBUFFERS,vab);
 
-	glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
-	glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(positions[0]),&positions[0],GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
+		glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
+		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(positions[0]),&positions[0],GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
 
 	
-	glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
-	glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(uvs[0]),&uvs[0],GL_STATIC_DRAW);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
+		glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
+		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(uvs[0]),&uvs[0],GL_STATIC_DRAW);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
 
-	glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALVB]);
-	glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(normals[0]),&normals[0],GL_STATIC_DRAW);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
-	glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALVB]);
+		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(normals[0]),&normals[0],GL_STATIC_DRAW);
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
+		glBindVertexArray(0);
 	}
 }
 
@@ -266,4 +274,41 @@ Model OBJLoader::loadOBJ(std::string path)
 Model::Model()
 {
 	
+}
+
+Mesh MeshCache::getMesh(std::string meshPath) 
+{
+
+    //lookup the texture and see if its in the map
+    auto mit = _meshMap.find(meshPath);
+    
+    //check if its not in the map
+   if (mit == _meshMap.end()) 
+	{
+        //Load the texture
+		 Mesh newMesh = MeshLoader::load(meshPath);
+		 
+        //Insert it into the map
+		_meshMap.insert(make_pair(meshPath, newMesh));
+
+        return newMesh;
+    }
+	printf("loaded cached Mesh\n");
+   return mit->second;
+}
+
+Mesh MeshLoader::load(std::string filepath)
+{
+	Mesh mesh;
+	mesh.init();
+	mesh.loadOBJ(filepath);
+	return mesh;
+};
+
+void MeshCache::deleteCache()
+{
+	for (std::map<std::string , Mesh>::iterator it = _meshMap.begin(); it != _meshMap.end(); ++it)
+	{
+		it->second.releaseMesh();
+	}
 }

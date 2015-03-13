@@ -27,7 +27,7 @@ public:
 	~Objekt(void);
 	void draw();
 	Material *material;
-	Mesh *mesh;
+	Mesh mesh;
 	Transform *transform;
 };
 

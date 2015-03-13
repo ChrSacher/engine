@@ -112,16 +112,98 @@ Texture TextureLoader::load(std::string filepath)
 	}
 	glGenTextures(1, &texture.ID);
 	glBindTexture(GL_TEXTURE_2D, texture.ID);
-	
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2); //anisotropy filtering for better quality and workload
 	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	texture.width=width;
 	texture.height=height;
 	stbi_image_free(data);
+
+	
 	return texture;
 }
 
+bool CubemapTexture::Load()
+{
+    glGenTextures(1, &textureObj);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureObj);
+	GLenum types[6];
+	types[0] = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+	types[1] = GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+	types[2] = GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+	types[3] = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+	types[4] = GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+	types[5] = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+
+    for (unsigned int i = 0 ; i < 6 ; i++) 
+	{
+		int width,height,numComponents;
+		char* data = (char*)stbi_load(fileNames[i].c_str(),&width,&height,&numComponents,4);
+        if(data ==NULL)
+		{
+			printf("Couldn't load Cube Texture %s\n",fileNames[i].c_str());
+			data = (char*)stbi_load("texture/white.png",&width,&height,&numComponents,4);
+			if(data == NULL)
+			{
+				printf("Couldn't load backup texture\n");
+				fatalError("Was not able to load basic texture\n");
+				return false;
+			}
+		}
+
+		glTexImage2D(types[i], 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		stbi_image_free(data);
+    } 
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+
+
+    return true;
+}
+
+void CubemapTexture::bind(GLenum TextureUnit)
+{
+    glActiveTexture(TextureUnit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureObj);
+}
+
+void CubemapTexture::unbind()
+{
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+void CubemapTexture::addFiles(std::string a_sDirectory, std::string a_sFront, std::string a_sBack, std::string a_sLeft, std::string a_sRight, std::string a_sTop, std::string a_sBottom)
+{
+	fileNames[0] = a_sDirectory + a_sFront;
+	fileNames[1] = a_sDirectory + a_sBack;
+	fileNames[2] = a_sDirectory +  a_sLeft;
+	fileNames[3] = a_sDirectory +  a_sRight;
+	fileNames[4] = a_sDirectory +  a_sTop;
+	fileNames[5] = a_sDirectory +  a_sBottom;
+}
+
+CubemapTexture::CubemapTexture(const std::string& Directory, const std::string& PosXFilename, const std::string& NegXFilename,
+							   const std::string& PosYFilename, const std::string& NegYFilename,  const std::string& PosZFilename, const std::string& NegZFilename)
+
+{
+	addFiles(Directory,PosXFilename,NegXFilename,PosYFilename,NegYFilename,PosZFilename, NegZFilename);
+	Load();
+}
+
+void TextureCache::deleteCache()
+{
+	for (std::map<std::string,Texture>::const_iterator it = _textureMap.begin(); it != _textureMap.end(); ++it)
+	{
+		glDeleteTextures(1,&it->second.ID);
+	}	
+}

@@ -6,7 +6,8 @@
 #include <SDL_opengl.h>
 #include <GL/GLu.h>
 #include <vector>
-
+#include <map>
+#include <string>
  
 
 
@@ -64,17 +65,16 @@ public:
 	virtual ~Mesh(void);
 	Mesh(std::vector<Vertex> vertices);
 	Mesh(std::string path);
-	
+	void init();
 	void draw();
 	void loadOBJ(std::string path);
 	void loadBuffer();
 	void loadBufferVertex();
 	void clearData();
 	Model model;
-	void operator=(const Mesh& other){};
+	void releaseMesh();
 private:
 	bool indiced;
-	Mesh(const Mesh& other);
 	
 	enum
 	{
@@ -87,6 +87,25 @@ private:
 	
 	GLuint vao,vbo;
 	GLuint vab[NUMBUFFERS];
+};
+
+
+class MeshCache
+{
+public:
+
+    static Mesh getMesh(std::string meshPath);
+	static void deleteCache();
+
+private:
+    static std::map<std::string, Mesh> _meshMap;
+};
+
+class MeshLoader
+{
+
+public:
+	static Mesh load(std::string filepath);
 };
 
 
