@@ -9,6 +9,7 @@
 #include "Math/Matrices.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "Transform.h"
+#include <math.h>
 
 #define PI 3.14159265358979323846f
  
