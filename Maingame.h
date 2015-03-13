@@ -95,6 +95,7 @@ class Maingame
 		Fog *fog;
 		SpotLight *light3;
 		UIrenderer *ui;
+		Skybox *sky;
 
 };
 

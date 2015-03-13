@@ -1,4 +1,4 @@
-#include "UIrenderer.h"
+﻿#include "UIrenderer.h"
 
 int Button::IDCounter = 0;
 UIrenderer::UIrenderer()
@@ -88,4 +88,73 @@ void UIrenderer::loadBuffer()
 	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
 
 	glBindVertexArray(0);
+}
+
+void UIrenderer::updateOrtho(float width,float height)
+{
+	ortho = Matrix4().identity().InitOrthographic(0,width,0,height,-1,1);
+}
+
+void Skybox::loadSkybox(std::string a_sDirectory, std::string a_sFront, std::string a_sBack, std::string a_sLeft, std::string a_sRight, std::string a_sTop, std::string a_sBottom) 
+{ 
+	cube.addFiles(a_sDirectory, a_sFront, a_sBack, a_sLeft, a_sRight, a_sTop, a_sBottom);
+	cube.Load();
+   glGenVertexArrays(1, &vao); 
+   glBindVertexArray(vao); 
+
+   Mesh *mesh = new Mesh("Models/box.obj");
+   
+	if(mesh->model.Vertices.size() != 0)
+	{
+		std::vector<Vector3> positions;
+		for(int i = 0;i< mesh->model.Vertices.size();i++)
+		{
+			positions.push_back(*mesh->model.Vertices[i].getPos() * 2);
+		}
+	
+		glGenBuffers(1, &vbo);
+
+
+		glBindBuffer(GL_ARRAY_BUFFER,vbo);
+		glBufferData(GL_ARRAY_BUFFER,mesh->model.Vertices.size() * sizeof(positions[0]),&positions[0],GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
+		glBindVertexArray(0);
+		delete(mesh);
+		transform.setScale(Vector3(200,200,200));
+	}
+}
+
+Skybox::Skybox(Vector4 Color)
+{
+	shader = new Shader();
+	shader->addVertexShader("Shaders/Skybox.vert");
+	shader->addFragmentShader( "Shaders/Skybox.frag");
+	shader->addAttribute("position");
+	shader->bind();
+	shader->linkShaders();
+	color = Color;
+}
+
+void Skybox::renderSkybox()
+{
+	glDepthMask(0);
+	glCullFace(GL_FRONT);
+	glBindVertexArray(vao);
+	shader->use();
+	shader->setUniform("WVP", camera->GetViewProjection() * transform.getMatrix() );
+	shader->setbaseColor(color);
+	cube.bind(GL_TEXTURE0);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	cube.unbind();
+	shader->unuse();
+	glDepthMask(1);
+	glCullFace(GL_BACK);
+	glBindVertexArray(0);
+}
+
+void Skybox::releaseSkybox()
+{
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1,&vbo);
 }

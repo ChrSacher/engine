@@ -24,6 +24,11 @@ void Maingame::init()
 	
 	//Initialize SDL
     SDL_Init(SDL_INIT_EVERYTHING);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,4); //4x multisampling     weiß nicht warum aber das muss vor create window gemacht werden obwohl es anderes vorgeschrieben wir
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     //Open an SDL window
     _window = SDL_CreateWindow("Game Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
@@ -53,26 +58,10 @@ void Maingame::init()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	//Set VSYNC
     SDL_GL_SetSwapInterval(1);
-	//alpha
 	RenderUtil::initGraphics();
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glShadeModel(GL_SMOOTH);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glReadBuffer(GL_BACK);
-	glDrawBuffer(GL_BACK);
-	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
-	glEnable (GL_POINT_SMOOTH);	// Antialiasing für Punkte einschalten
-	glEnable (GL_LINE_SMOOTH);	// Antialiasing für Linien einschalten
-	glEnable(GL_MULTISAMPLE);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     //Set the background color to blue
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//SDL_SetRelativeMouseMode(SDL_TRUE);
-
-
 	initShaders();
 	createObjects();
 	
@@ -115,14 +104,17 @@ void Maingame::handleKeys()
 						SCREEN_WIDTH = event.window.data1;
 						SCREEN_HEIGHT = event.window.data2 ;
 						camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000.0f);
+						ui->updateOrtho(SCREEN_WIDTH,SCREEN_HEIGHT);
 						glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 					};break;
 					case SDL_WINDOWEVENT_MAXIMIZED:
 					{
-						SCREEN_WIDTH= event.window.data1;
-						SCREEN_HEIGHT = event.window.data2;
-						//SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+						SDL_MaximizeWindow(_window);
+						SDL_GetWindowSize(_window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
 						camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000.0f);
+						ui->updateOrtho(SCREEN_WIDTH,SCREEN_HEIGHT);
+						glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+						SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
 						windowed=false;
 					};break;
 				}
@@ -139,27 +131,31 @@ void Maingame::handleKeys()
 	}
 	if(input.isKeyDown(SDLK_w))
 	{
-		camera->setPos(Vector3(camera->getPos()[0]+0.2,camera->getPos()[1],camera->getPos()[2]));
+		camera->moveforward();
 	}
 	if(input.isKeyDown(SDLK_s))
 	{
-		camera->setPos(Vector3(camera->getPos()[0]-0.2,camera->getPos()[1],camera->getPos()[2]));
+		camera->movebackward();
 	}
 	if(input.isKeyDown(SDLK_q))
 	{
-		camera->setPos(Vector3(camera->getPos()[0],camera->getPos()[1]+0.2,camera->getPos()[2]));
+		camera->raise();
 	}
 	if(input.isKeyDown(SDLK_e))
 	{
-		camera->setPos(Vector3(camera->getPos()[0],(camera->getPos())[1]-0.2,camera->getPos()[2]));
+		camera->sink();
 	}
 	if(input.isKeyDown(SDLK_a))
 	{
-		camera->setRot(Vector3(camera->getRot()[0],(camera->getRot())[1]+1,camera->getRot()[2]));
+		camera->turnleft();
 	}
 	if(input.isKeyDown(SDLK_d))
 	{
-		camera->setRot(Vector3(camera->getRot()[0],(camera->getRot())[1]-1,camera->getRot()[2]));
+		camera->turnright();
+	}
+	if(input.isKeyDown(SDLK_g))
+	{
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,0);
 	}
 	if(input.isKeyDown(SDLK_ESCAPE))
 	{
@@ -185,7 +181,7 @@ void Maingame::render()
 	glClearDepth(10000000);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	
+	sky->renderSkybox();
 	shader->use();
 	static int counter;
 	counter++;
@@ -227,6 +223,8 @@ void Maingame::close()
 {
 	SDL_DestroyWindow( _window);
 	delete(camera,light,light2,object);
+	TextureCache::deleteCache();
+	MeshCache::deleteCache();
 	_window = NULL;
 	SDL_Quit();
 	exit(0);
@@ -246,8 +244,8 @@ void Maingame::createObjects()
 	camera = new Camera3d(Vector3(0,0,5.5),70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000000.0f);
 	light = new AmbientLight(Vector3(0.1,0.1,0.1));
 	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.5f),Vector3(1.0f,1.0f,1.0f));
-	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1));
-	object2 = new Objekt("models/test.obj",Vector3(0,-3,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,1,0));
+	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,1,1));
+	object2 = new Objekt("models/box.obj",Vector3(0,-3,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1));
 	object2->transform->setScale(Vector3(1000.0f,0.01,1000));
 	point = new PointLight(Vector3(0,0,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
 	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,0.5),400,500,1);
@@ -255,6 +253,9 @@ void Maingame::createObjects()
 	ui = new UIrenderer();
 	ui->addButton(Button(Vector2(0,0),Vector2(200,200),Vector4(1,0,0,1),true,""));
 	ui->addButton(Button(Vector2(200,200),Vector2(100,100),Vector4(0,0,1,0.2),true,""));
+	sky= new Skybox(Vector4(1,0,0,1));
+	sky->loadSkybox("","","","","","","");
+	sky->setCamera(camera);
 
 }
 
