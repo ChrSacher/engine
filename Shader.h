@@ -53,6 +53,7 @@ public:
 	void setmodelMatrix(Transform &transform);
 	void setviewMatrix(Camera3d &view);
 	void setbaseColor(Vector3 Color);
+	void setbaseColor(Vector4 Color);
 	void setSpecular(Material &material);
 	void setCameraPos(Camera3d &view);
 	void updateMaterial(Material &material); //kann man auch überladen übersichtshalber mach ich das erst später

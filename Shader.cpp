@@ -216,6 +216,10 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	{
 		setUniform("baseColor",Color);
 	}
+	void Shader::setbaseColor(Vector4 Color)
+	{
+		setUniform("baseColor",Color);
+	}
 	void Shader::setSpecular(Material &material)
 	{
 		setUniform("specularIntensity",material.getIntensity());
@@ -234,15 +238,18 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	void Shader::updateMaterial(Material &material)
 	{
 		material.texture.bind();
+		setUniform("Texture[0]",0);
+		setUniform("numTextures",1);
 		setSpecular(material);
 		setbaseColor(material.color);
+		material.texture.unbind();
 		
 	}
 	void Shader::updateObjekt(Objekt &object)
 	{
 		setmodelMatrix(*object.transform);
 		updateMaterial(*object.material);
-		object.mesh->draw();
+		object.mesh.draw();
 		object.material->texture.unbind();
 	}
 

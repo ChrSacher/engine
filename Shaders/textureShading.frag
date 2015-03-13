@@ -4,6 +4,7 @@
 
 const int MAXPOINTLIGHTS = 4;
 const int MAXSPOTLIGHTS = 4;
+const int MAXTEXTURES = 4;
 struct BaseLight
 {
 	vec3 color;
@@ -47,7 +48,7 @@ varying vec3 normal0;
 varying vec4 worldPos0;
 varying vec4 viewworldPos0;
 
-uniform sampler2D diffuse;
+uniform sampler2D Texture[MAXTEXTURES];
 uniform vec3 baseColor;
 uniform vec3 ambientLight;
 uniform DirectionalLight directionalLight;
@@ -57,6 +58,7 @@ uniform vec3 eyePos;
 uniform PointLight pointLights[MAXPOINTLIGHTS];
 uniform SpotLight spotLights[MAXSPOTLIGHTS];
 uniform Fog fog;
+uniform int numTextures;
 
 vec4 calcLight(BaseLight base,vec3 direction,vec3 normal)
 {
@@ -137,7 +139,12 @@ void main()
 {
 	vec4 totalLight = vec4(ambientLight,1);
 	vec4 color = vec4(baseColor,1);
-	vec4 textureColor = texture2D(diffuse,uv0);
+	vec4 textureColor = vec4(0,0,0,0);
+	for(int i = 0;i < numTextures;i++)
+	{
+		textureColor = texture2D(Texture[i],uv0);
+	}
+	textureColor = textureColor / numTextures;
 	color*=textureColor;
 	vec3 normal = normalize(normal0);
 	totalLight += calcDirectionalLight(directionalLight,normal);
