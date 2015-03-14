@@ -18,6 +18,7 @@ class Camera3d
 public:
     Camera3d(Vector3 Pos,float fov,float aspect,float zNear,float zFar);
 	~Camera3d(void);
+	Camera3d(){}
 	Matrix4 perspectiveMatrix;
 	Matrix4 viewMatrix;
 

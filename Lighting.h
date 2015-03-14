@@ -36,7 +36,7 @@ class ShadowMapFBO //funktioniert irgentwie nicht
 class AmbientLight
 {
 public:
-	AmbientLight(Vector3 ambient);
+	AmbientLight(Vector3 ambient = Vector3(0.1,0.1,0.1));
 	~AmbientLight(void);
 
 	Vector3 ambientLight;

@@ -222,7 +222,7 @@ void Maingame::gameloop()
 void Maingame::close()
 {
 	SDL_DestroyWindow( _window);
-	delete(camera,light,light2,object);
+	delete(camera,light,light2,object,shader,fog,point,sky,ui,object2);
 	TextureCache::deleteCache();
 	MeshCache::deleteCache();
 	_window = NULL;
@@ -248,13 +248,13 @@ void Maingame::createObjects()
 	object2 = new Objekt("models/box.obj",Vector3(0,-3,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1));
 	object2->transform->setScale(Vector3(1000.0f,0.01,1000));
 	point = new PointLight(Vector3(0,0,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
-	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,0.5),400,500,1);
+	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,0.5),400,500,0);
 	light3 = new SpotLight(PointLight(Vector3(0,0,1),BaseLight(Vector3(1,1,1),1),Attenuation(1,0,0),10),Vector3(1,1,0),0.7);
 	ui = new UIrenderer();
 	ui->addButton(Button(Vector2(0,0),Vector2(200,200),Vector4(1,0,0,1),true,""));
 	ui->addButton(Button(Vector2(200,200),Vector2(100,100),Vector4(0,0,1,0.2),true,""));
-	sky= new Skybox(Vector4(1,0,0,1));
-	sky->loadSkybox("","","","","","","");
+	sky= new Skybox(Vector4(1,1,1,1));
+	sky->loadSkybox("Texture/","posx.png","negx.png","posy.png","negy.png","posz.png","negz.png");
 	sky->setCamera(camera);
 
 }

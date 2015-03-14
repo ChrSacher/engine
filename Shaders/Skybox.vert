@@ -4,7 +4,7 @@ attribute vec3 position;
                                                                                     
 uniform mat4 WVP;                                                                  
                                                                                     
-out vec3 TexCoord0;                                                                 
+varying vec3 TexCoord0;                                                                 
                                                                                     
 void main()                                                                         
 {                                                                                   

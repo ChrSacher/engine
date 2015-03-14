@@ -150,14 +150,6 @@ void Mesh::loadBuffer()
 	glBindVertexArray(0);
 }
 
-OBJLoader::OBJLoader(void)
-{
-}
-
-
-OBJLoader::~OBJLoader(void)
-{
-}
 
 Model OBJLoader::loadOBJ(std::string path)
 {

@@ -140,12 +140,15 @@ void main()
 	vec4 totalLight = vec4(ambientLight,1);
 	vec4 color = vec4(baseColor,1);
 	vec4 textureColor = vec4(0,0,0,0);
-	for(int i = 0;i < numTextures;i++)
+	if(numTextures != 0)
 	{
-		textureColor = texture2D(Texture[i],uv0);
+		for(int i = 0;i < numTextures;i++)
+		{
+			textureColor = texture2D(Texture[i],uv0);
+		}
+		textureColor = textureColor / numTextures;
+		color*=textureColor;
 	}
-	textureColor = textureColor / numTextures;
-	color*=textureColor;
 	vec3 normal = normalize(normal0);
 	totalLight += calcDirectionalLight(directionalLight,normal);
 	for(int i = 0;i < MAXPOINTLIGHTS;i++)

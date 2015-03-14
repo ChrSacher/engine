@@ -81,10 +81,6 @@ class Maingame
 		FpsLimiter fpsLimiter;
 		InputManager input;
 		Shader *shader;
-		Mesh *mesh;
-		Mesh *mesh2;
-		Material *material;
-		Transform *transform;
 		Camera3d *camera;
 		AmbientLight *light;
 		DirectionalLight *light2;

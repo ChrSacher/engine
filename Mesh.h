@@ -49,8 +49,6 @@ struct Model
 class OBJLoader
 {
 public:
-	OBJLoader(void);
-	~OBJLoader(void);
 
 	static Model loadOBJ(std::string path);
 };
