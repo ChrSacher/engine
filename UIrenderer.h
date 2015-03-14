@@ -39,13 +39,14 @@ public:
 	};
 	GLuint vab[NUMBUFFERS];
 	void loadBuffer();
+	void releaseRenderer();
 
 };
 
 class Skybox 
 { 
 public: 
-   void loadSkybox(std::string a_sDirectory, std::string a_sFront, std::string a_sBack, std::string a_sLeft, std::string a_sRight, std::string a_sTop, std::string a_sBottom); 
+   void loadSkybox(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz); 
    void renderSkybox(); 
    Skybox(Vector4 Color = Vector4(1,1,1,1));
    ~Skybox(){};

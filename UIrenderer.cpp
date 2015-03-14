@@ -95,9 +95,9 @@ void UIrenderer::updateOrtho(float width,float height)
 	ortho = Matrix4().identity().InitOrthographic(0,width,0,height,-1,1);
 }
 
-void Skybox::loadSkybox(std::string a_sDirectory, std::string a_sFront, std::string a_sBack, std::string a_sLeft, std::string a_sRight, std::string a_sTop, std::string a_sBottom) 
+void Skybox::loadSkybox(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz) 
 { 
-	cube.addFiles(a_sDirectory, a_sFront, a_sBack, a_sLeft, a_sRight, a_sTop, a_sBottom);
+	cube.addFiles(Directory,  posx, negx,  posy,  negy, posz, negz);
 	cube.Load();
    glGenVertexArrays(1, &vao); 
    glBindVertexArray(vao); 
@@ -146,8 +146,8 @@ void Skybox::renderSkybox()
 	shader->setbaseColor(color);
 	cube.bind(GL_TEXTURE0);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	cube.unbind();
 	shader->unuse();
+	cube.unbind();
 	glDepthMask(1);
 	glCullFace(GL_BACK);
 	glBindVertexArray(0);
@@ -157,4 +157,15 @@ void Skybox::releaseSkybox()
 {
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1,&vbo);
+	delete(shader);
+}
+
+void UIrenderer::releaseRenderer()
+{
+	glDeleteVertexArrays(1, &vao);
+	for(int i =0;i<NUMBUFFERS;i++)
+	{
+		glDeleteBuffers(1,&vab[i]);
+	}
+	delete(shader);
 }

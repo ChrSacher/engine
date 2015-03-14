@@ -42,7 +42,6 @@ void Texture::addTexture(std::string path)
 
 Texture::~Texture(void)
 {
-
 }
 
 void Texture::bind(int unit)
@@ -130,6 +129,7 @@ Texture TextureLoader::load(std::string filepath)
 bool CubemapTexture::Load()
 {
     glGenTextures(1, &textureObj);
+	glActiveTexture (GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureObj);
 	GLenum types[6];
 	types[0] = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
@@ -182,14 +182,14 @@ void CubemapTexture::unbind()
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void CubemapTexture::addFiles(std::string a_sDirectory, std::string a_sFront, std::string a_sBack, std::string a_sLeft, std::string a_sRight, std::string a_sTop, std::string a_sBottom)
+void CubemapTexture::addFiles(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz)
 {
-	fileNames[0] = a_sDirectory + a_sFront;
-	fileNames[1] = a_sDirectory + a_sBack;
-	fileNames[2] = a_sDirectory +  a_sLeft;
-	fileNames[3] = a_sDirectory +  a_sRight;
-	fileNames[4] = a_sDirectory +  a_sTop;
-	fileNames[5] = a_sDirectory +  a_sBottom;
+	fileNames[0] = Directory + posx;
+	fileNames[1] = Directory + negx;
+	fileNames[2] = Directory +  posy;
+	fileNames[3] = Directory +  negy;
+	fileNames[4] = Directory +  posz;
+	fileNames[5] = Directory +  negz;
 }
 
 CubemapTexture::CubemapTexture(const std::string& Directory, const std::string& PosXFilename, const std::string& NegXFilename,
@@ -202,8 +202,14 @@ CubemapTexture::CubemapTexture(const std::string& Directory, const std::string& 
 
 void TextureCache::deleteCache()
 {
-	for (std::map<std::string,Texture>::const_iterator it = _textureMap.begin(); it != _textureMap.end(); ++it)
+	for (std::map<std::string,Texture>::iterator it = _textureMap.begin(); it != _textureMap.end(); ++it)
 	{
-		glDeleteTextures(1,&it->second.ID);
+		it->second.releaseTexture();
 	}	
+}
+
+
+void Texture::releaseTexture()
+{
+	glDeleteTextures(1,&ID);
 }

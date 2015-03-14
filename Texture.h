@@ -15,7 +15,7 @@ class Texture
 {
 public:
 	Texture(){}
-	Texture(std::string path );
+	Texture(std::string path);
 	
 	virtual ~Texture(void);
 	void bind(int unit = 0);
@@ -25,6 +25,7 @@ public:
 	std::string texturepath;
 	void drawTexture(bool check);
 	void addTexture(std::string path);
+	void releaseTexture();
 };
 
 class TextureCache
@@ -63,7 +64,7 @@ public:
 
     void bind(GLenum TextureUnit);
 	void unbind();
-	void addFiles(std::string a_sDirectory, std::string a_sFront, std::string a_sBack, std::string a_sLeft, std::string a_sRight, std::string a_sTop, std::string a_sBottom);
+	void addFiles(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz);
 private:
 
     std::string fileNames[6];
