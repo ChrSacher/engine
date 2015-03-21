@@ -1,16 +1,10 @@
-#version 330
-
-in vec3 WorldPos;
-
-uniform vec3 gLightWorldPos;
-
-out float FragColor;
-
+#version 330 core
+ 
+// Ouput data
+layout(location = 0) out float fragmentdepth;
+ 
 void main()
 {
-    vec3 LightToVertex = WorldPos - gLightWorldPos;
-
-    float LightToPixelDistance = length(LightToVertex);
-
-    FragColor = LightToPixelDistance;
+    // Not really needed, OpenGL does it anyway
+    fragmentdepth = gl_FragCoord.z;
 }

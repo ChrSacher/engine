@@ -93,4 +93,26 @@ class BasicShader
 	GLuint _programID;
 	int _numAttributes;
 };
+
+class ShadowMapFBO //funktioniert irgentwie nicht 
+{
+    public:
+        ShadowMapFBO();
+
+        ~ShadowMapFBO();
+
+        bool Init(unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection);
+
+        void BindForWriting();
+		void draw();
+        void BindForReading(GLuint unit = 0);
+		void releaseShadowMap();
+		Shader *shader;
+		Matrix4 biasMatrix, depthProjectionMatrix, depthViewMatrix,depthModelMatrix,depthMVP;
+        GLuint m_fbo;
+        GLuint m_shadowMap;
+		Vector3 lightDirection;
+		
+};
+
 #endif

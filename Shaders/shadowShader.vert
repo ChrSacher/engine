@@ -1,15 +1,12 @@
-attribute vec3 Position;
-attribute vec2 TexCoord;
-attribute vec3 Normal;
-
-uniform mat4 viewProjection;
-uniform mat4 modelMatrix;
-
-out vec3 WorldPos;
-
+#version 330 core
+ 
+// Input vertex data, different for all executions of this shader.
+layout(location = 0) in vec3 vertexPosition_modelspace;
+ 
+// Values that stay constant for the whole mesh.
+uniform mat4 depthMVP;
+ 
 void main()
 {
-    vec4 Pos4 = vec4(Position, 1.0);
-    gl_Position = viewProjection * modelMatrix * Pos4;
-    WorldPos = (modelMatrix * Pos4).xyz; 
+ 	gl_Position =  depthMVP * vec4(vertexPosition_modelspace,1);
 }

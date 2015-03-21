@@ -238,11 +238,8 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	void Shader::updateMaterial(Material &material)
 	{
 		material.texture.bind();
-		setUniform("Texture[0]",0);
-		setUniform("numTextures",1);
 		setSpecular(material);
 		setbaseColor(material.color);
-		material.texture.unbind();
 		
 	}
 	void Shader::updateObjekt(Objekt &object)
@@ -250,7 +247,6 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		setmodelMatrix(*object.transform);
 		updateMaterial(*object.material);
 		object.mesh.draw();
-		object.material->texture.unbind();
 	}
 
 	void Shader::updateDirectionLight(DirectionalLight light)
@@ -462,4 +458,74 @@ void BasicShader::unuse()
 	{
         glDisableVertexAttribArray(i);
     }
+}
+
+ShadowMapFBO::ShadowMapFBO()
+{
+}
+
+bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection)
+{
+	glGenFramebuffers(1, &m_fbo);
+	glGenTextures(1, &m_shadowMap);
+	glBindTexture(GL_TEXTURE_2D, m_shadowMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+	if (Status != GL_FRAMEBUFFER_COMPLETE) 
+	{
+		printf("FB error, status: 0x%x\n", Status);
+		return false;
+	}
+	biasMatrix = Matrix4(0.5, 0.0, 0.0, 0.0,
+	0.0, 0.5, 0.0, 0.0,
+	0.0, 0.0, 0.5, 0.0,
+	0.5, 0.5, 0.5, 1.0);
+
+	lightDirection = LightDirection;
+	depthProjectionMatrix = Matrix4().identity().InitOrthographic(-10,10,-10,10,-10,20);
+	depthViewMatrix = Matrix4().InitRotationFromVectors(lightDirection, Vector3(0,0,0), Vector3(0,1,0));
+	depthModelMatrix = Matrix4(1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f);
+	depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
+
+	shader = new Shader();
+	shader->addVertexShader("Shaders/2DShader.vert");
+	shader->addFragmentShader( "Shaders/2DShader.frag");
+	shader->addAttribute("position");
+	shader->addAttribute("uv");
+	shader->bind();
+	shader->linkShaders();
+}
+
+void ShadowMapFBO::BindForWriting()
+{
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+}
+
+void ShadowMapFBO::BindForReading(GLuint unit)
+{
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_shadowMap);
+	BoundTexture::currentID = -1;
+	BoundTexture::currentUnit = -1;
+}
+
+void ShadowMapFBO::draw()
+{
+	BindForReading();
+	shader->setUniform("depthMVP",depthMVP);
+}
+
+void ShadowMapFBO::releaseShadowMap()
+{
+	delete(shader);
+	glDeleteTextures(m_shadowMap);
+
 }

@@ -15,7 +15,7 @@ void main()
 {
 	gl_Position = viewMatrix * modelMatrix * vec4(position,1);
 	viewworldPos0 = gl_Position;
-	uv0=uv;
+	uv0=vec2(uv.x, 1.0f - uv.y); //uv;
 	normal0 = (modelMatrix * vec4(normal,0)).xyz;
 	worldPos0 = (modelMatrix * vec4(position,1));
 }

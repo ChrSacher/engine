@@ -92,6 +92,7 @@ class Maingame
 		SpotLight *light3;
 		UIrenderer *ui;
 		Skybox *sky;
+		ShadowMapFBO shadow;
 
 };
 
