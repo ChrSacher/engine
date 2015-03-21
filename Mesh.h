@@ -42,7 +42,6 @@ struct Model
 	std::vector<GLuint> Indices;
 	std::vector<Vertex> Vertices;
 	OBJIndex index;
-	Model();
 
 };
 
@@ -88,22 +87,15 @@ private:
 };
 
 
-class MeshCache
+class ModelCache
 {
 public:
 
-    static Mesh getMesh(std::string meshPath);
+    static Model getModel(std::string modelPath);
 	static void deleteCache();
 
 private:
-    static std::map<std::string, Mesh> _meshMap;
-};
-
-class MeshLoader
-{
-
-public:
-	static Mesh load(std::string filepath);
+    static std::map<std::string, Model> _modelMap;
 };
 
 

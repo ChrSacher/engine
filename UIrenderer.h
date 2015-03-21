@@ -19,7 +19,7 @@ public:
 	int ID;
 	static int IDCounter;
 	bool render;
-
+	bool operator<(Button &other);
 };	
 class UIrenderer
 {
@@ -27,7 +27,8 @@ public:
 	UIrenderer();
 	Shader *shader;
 	std::vector<Button> buttons;
-	void addButton(Button& newbutton){buttons.push_back(newbutton);loadBuffer();};
+	void addButton(Button& newbutton);
+	void addButton(Vector2 Start,Vector2 Size,Vector4 Color,bool Render,std::string texturepath);
 	void draw();
 	Matrix4 ortho;
 	void updateOrtho(float width,float height);

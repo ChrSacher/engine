@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
 Model loadOBJ(std::string path);
-std::map<std::string, Mesh> MeshCache::_meshMap;
+std::map<std::string, Model> ModelCache::_modelMap;
 
 Mesh::~Mesh(void)
 {
@@ -11,10 +11,7 @@ Mesh::~Mesh(void)
 void Mesh::releaseMesh()
 {
 	glDeleteVertexArrays(1, &vao);
-	for(int i= 0;i < NUMBUFFERS;i++)
-	{
-		glDeleteBuffers(1,&vab[i]);
-	}
+	glDeleteBuffers(NUMBUFFERS,vab);
 }
 void Mesh::draw()
 {
@@ -48,8 +45,9 @@ Mesh::Mesh(std::vector<Vertex> vertices)
 Mesh::Mesh(std::string path)
 {
 	
-	*this = MeshCache::getMesh(path);
-	
+	init();
+	model = ModelCache::getModel(path);
+	loadBufferVertex();
 }
 
 Mesh::Mesh()
@@ -263,44 +261,29 @@ Model OBJLoader::loadOBJ(std::string path)
 	return model;
 }
 
-Model::Model()
-{
-	
-}
-
-Mesh MeshCache::getMesh(std::string meshPath) 
+Model ModelCache::getModel(std::string modelPath) 
 {
 
     //lookup the texture and see if its in the map
-    auto mit = _meshMap.find(meshPath);
+    auto mit = _modelMap.find(modelPath);
     
     //check if its not in the map
-   if (mit == _meshMap.end()) 
+   if (mit == _modelMap.end()) 
 	{
         //Load the texture
-		 Mesh newMesh = MeshLoader::load(meshPath);
+		 Model newModel = OBJLoader::loadOBJ(modelPath);
 		 
         //Insert it into the map
-		_meshMap.insert(make_pair(meshPath, newMesh));
+		_modelMap.insert(make_pair(modelPath, newModel));
 
-        return newMesh;
+        return newModel;
     }
 	printf("loaded cached Mesh\n");
    return mit->second;
 }
 
-Mesh MeshLoader::load(std::string filepath)
-{
-	Mesh mesh;
-	mesh.init();
-	mesh.loadOBJ(filepath);
-	return mesh;
-};
 
-void MeshCache::deleteCache()
+void ModelCache::deleteCache()
 {
-	for (std::map<std::string , Mesh>::iterator it = _meshMap.begin(); it != _meshMap.end(); ++it)
-	{
-		it->second.releaseMesh();
-	}
+	_modelMap.clear();
 }
