@@ -16,22 +16,6 @@
 #include "Mesh.h"
 #include "Transform.h"
 
-class ShadowMapFBO //funktioniert irgentwie nicht 
-{
-    public:
-        ShadowMapFBO();
-
-        ~ShadowMapFBO();
-
-        bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
-
-        void BindForWriting();
-
-        void BindForReading(GLenum TextureUnit);
-		Matrix4 biasMatrix;
-        GLuint m_fbo;
-        GLuint m_shadowMap;
-};
 
 class AmbientLight
 {

@@ -4,11 +4,13 @@
 
 
 std::map<std::string, Texture> TextureCache::_textureMap;
+GLuint BoundTexture::currentID = -1;
+GLuint BoundTexture::currentUnit = -1;
 
 
 Texture::Texture(std::string path)
 {
-	addTexture(path);
+	*this = TextureCache::getTexture(path);
 }
 
 
@@ -46,8 +48,14 @@ Texture::~Texture(void)
 
 void Texture::bind(int unit)
 {
-	glActiveTexture(GL_TEXTURE0 + unit);
-	glBindTexture(GL_TEXTURE_2D,ID);
+	if(unit < 0 || unit > 32) fatalError("Texture unit is too large/too low");
+	if(BoundTexture::currentID != ID || BoundTexture::currentUnit != unit)
+	{
+		glActiveTexture(GL_TEXTURE0 + unit);
+		glBindTexture(GL_TEXTURE_2D,ID);
+		BoundTexture::currentID = ID;
+		BoundTexture::currentUnit = unit;
+	}
 }
 
 void Texture::unbind()
@@ -128,9 +136,9 @@ Texture TextureLoader::load(std::string filepath)
 
 bool CubemapTexture::Load()
 {
-    glGenTextures(1, &textureObj);
+    glGenTextures(1, &ID);
 	glActiveTexture (GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureObj);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
 	GLenum types[6];
 	types[0] = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
 	types[1] = GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
@@ -170,10 +178,16 @@ bool CubemapTexture::Load()
     return true;
 }
 
-void CubemapTexture::bind(GLenum TextureUnit)
+void CubemapTexture::bind(GLuint unit)
 {
-    glActiveTexture(TextureUnit);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureObj);
+	if(unit < 0 || unit > 32) fatalError("Texture unit is too large/too low");
+	if(BoundTexture::currentID != ID || BoundTexture::currentUnit != unit)
+	{
+		glActiveTexture(GL_TEXTURE0 + unit);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
+		BoundTexture::currentID = ID;
+		BoundTexture::currentUnit = unit;
+	};
 }
 
 void CubemapTexture::unbind()

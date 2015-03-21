@@ -11,6 +11,13 @@
 #include <iostream>
 #include "Errors.h"
 #include <vector>
+
+struct BoundTexture
+{
+	static GLuint currentID;
+	static GLuint currentUnit;
+};
+
 class Texture
 {
 public:
@@ -61,14 +68,13 @@ public:
 	~CubemapTexture(){};
 	CubemapTexture(){}
     bool Load();
-
-    void bind(GLenum TextureUnit);
+    void bind(GLuint unit = 0);
 	void unbind();
 	void addFiles(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz);
 private:
 
     std::string fileNames[6];
-    GLuint textureObj;
+    GLuint ID;
 	
 	
 };

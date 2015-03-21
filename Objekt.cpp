@@ -5,7 +5,7 @@ Objekt::Objekt(std::string objektpath,Vector3 pos,Vector3 rot,std::string textur
 {
 	material = new Material(texturepath,color,2,32);
 	transform = new Transform(pos,rot,Vector3(1,1,1));
-	mesh = MeshCache::getMesh(objektpath);
+	mesh = Mesh(objektpath);
 }
 
 
