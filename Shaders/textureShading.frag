@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 //The fragment shader operates on each pixel in a given polygon
 
 
@@ -46,11 +46,9 @@ varying vec2 uv0;
 varying vec3 normal0;
 varying vec4 worldPos0;
 varying vec4 viewworldPos0;
-//varying vec4 shadowCoord;
 
 
-uniform sampler2D texture;
-//uniform sampler2D shadowMap;
+uniform sampler2D Texture;
 uniform vec3 baseColor;
 uniform vec3 ambientLight;
 uniform DirectionalLight directionalLight;
@@ -141,8 +139,8 @@ void main()
 	vec4 totalLight = vec4(ambientLight,1);
 	vec4 color = vec4(baseColor,1);
 	vec4 textureColor = vec4(0,0,0,0);
-	textureColor = texture2D(texture,uv0);
-	//vec4 textureColor2 = texture2D(shadowMap,uv0); //for shadow mapping
+	textureColor = texture2D(Texture,uv0);
+
 	color*= textureColor;
 	vec3 normal = normalize(normal0);
 	totalLight += calcDirectionalLight(directionalLight,normal);
