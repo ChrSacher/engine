@@ -1,12 +1,10 @@
-#version 330 core
- 
-// Input vertex data, different for all executions of this shader.
-layout(location = 0) in vec3 vertexPosition_modelspace;
- 
-// Values that stay constant for the whole mesh.
+#version 330
+
 uniform mat4 depthMVP;
- 
-void main()
+
+layout (location = 0) in vec4 position;
+
+void main(void)
 {
- 	gl_Position =  depthMVP * vec4(vertexPosition_modelspace,1);
+    gl_Position =  depthMVP * position;
 }
