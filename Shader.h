@@ -59,17 +59,17 @@ public:
 	void updateMaterial(Material &material); //kann man auch überladen übersichtshalber mach ich das erst später
 	void updateCamera(Camera3d &camera);
 	void updateObjekt(Objekt &object);
-	void updateDirectionLight(DirectionalLight light);
-	void updateAmbientLight(AmbientLight ambient);
-	void updatePointLight(std::string uniformname ,PointLight point);
-	void updatePointLights(std::vector<PointLight> point);
-	void updateSpotLight(std::string uniformname ,SpotLight spot);
-	void updateSpotLights(std::vector<SpotLight> spot);
-	void updateFog(Fog fog);
+	void updateDirectionLight(DirectionalLight &light);
+	void updateAmbientLight(AmbientLight &ambient);
+	void updatePointLight(std::string uniformname ,PointLight &point);
+	void updatePointLights(std::vector<PointLight> &point);
+	void updateSpotLight(std::string uniformname ,SpotLight &spot);
+	void updateSpotLights(std::vector<SpotLight> &spot);
+	void updateFog(Fog &fog);
 	//
 
     int _numAttributes;
-
+	std::vector<GLuint> attachedShaders;
     void compileShader(const std::string& filePath, GLuint id);
 
     GLuint _programID;
@@ -94,25 +94,6 @@ class BasicShader
 	int _numAttributes;
 };
 
-class ShadowMapFBO //funktioniert irgentwie nicht 
-{
-    public:
-        ShadowMapFBO();
 
-        ~ShadowMapFBO();
-
-        bool Init(unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection);
-
-        void BindForWriting();
-		void draw();
-        void BindForReading(GLuint unit = 0);
-		void releaseShadowMap();
-		Shader *shader;
-		Matrix4 biasMatrix, depthProjectionMatrix, depthViewMatrix,depthModelMatrix,depthMVP;
-        GLuint m_fbo;
-        GLuint m_shadowMap;
-		Vector3 lightDirection;
-		
-};
 
 #endif

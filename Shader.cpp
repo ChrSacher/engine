@@ -10,10 +10,12 @@ Shader::Shader() : _numAttributes(0)
 	 }
 }
 
-
 Shader::~Shader()
 {
+	glUseProgram(0);
+	
 	glDeleteProgram(_programID);
+	
 }
 
 void Shader::addVertexShader(std::string path)
@@ -40,6 +42,7 @@ void Shader::addProgram(std::string path,int type)
     }
 	//Open the file
     std::ifstream shaderFile(path);
+	std::cout << "opening shader "  + path << std::endl;
     if (shaderFile.fail()) 
 	{
         perror(path.c_str());
@@ -88,7 +91,8 @@ void Shader::addProgram(std::string path,int type)
         std::printf("%s\n", &(errorLog[0]));
         fatalError("Shader " + path + " failed to compile");
     }
-	 glAttachShader(_programID, shader);
+	attachedShaders.push_back(shader);
+	glAttachShader(_programID, shader);
 
 	
 };
@@ -114,15 +118,18 @@ void Shader::linkShaders()
         std::vector<char> errorLog(maxLength);
         glGetProgramInfoLog(_programID, maxLength, &maxLength, &errorLog[0]);
 
-
-
+		for(int i = 0;i<attachedShaders.size();i++) glDetachShader(_programID,attachedShaders[i]);
+		for(int i = 0;i<attachedShaders.size();i++) glDeleteShader(attachedShaders[i]);
         //We don't need the program anymore.
         glDeleteProgram(_programID);
         //Don't leak shaders either.
         //print the error log and quit
         std::printf("%s\n", &(errorLog[0]));
         fatalError("Shaders failed to link!");
-    }
+    }	
+	for(int i = 0;i<attachedShaders.size();i++) glDetachShader(_programID,attachedShaders[i]);
+	for(int i = 0;i<attachedShaders.size();i++) glDeleteShader(attachedShaders[i]);
+	
 }
 
 //Adds an attribute to our shader. SHould be called between compiling and linking.
@@ -238,6 +245,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	void Shader::updateMaterial(Material &material)
 	{
 		material.texture.bind();
+		setUniform("texture",0);
 		setSpecular(material);
 		setbaseColor(material.color);
 		
@@ -249,18 +257,18 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		object.mesh.draw();
 	}
 
-	void Shader::updateDirectionLight(DirectionalLight light)
+	void Shader::updateDirectionLight(DirectionalLight &light)
 	{
 		setUniform("directionalLight.direction",light.direction);
 		setUniform("directionalLight.base.color",light.base.color);
 		setUniform("directionalLight.base.intensity",light.base.intensity);
 	}
-	void Shader::updateAmbientLight(AmbientLight ambient)
+	void Shader::updateAmbientLight(AmbientLight &ambient)
 	{
 		setUniform("ambientLight",ambient.ambientLight);
 	}
 
-	void Shader::updatePointLight(std::string uniformname ,PointLight point)
+	void Shader::updatePointLight(std::string uniformname ,PointLight &point)
 	{
 		setUniform(uniformname		   ,point.base);
 		setUniform(uniformname + ".pos",point.pos);
@@ -271,7 +279,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 
 
 	}
-	void Shader::updateFog(Fog fog)
+	void Shader::updateFog(Fog &fog)
 	{
 		setUniform("fog.density",fog.density);
 		setUniform("fog.color",fog.color);
@@ -280,7 +288,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		setUniform("fog.end",fog.end);
 	}
 
-	void Shader::updatePointLights(std::vector<PointLight> point)
+	void Shader::updatePointLights(std::vector<PointLight> &point)
 	{
 		if(point.size() > MAXPOINTLIGHTS)
 		{
@@ -298,7 +306,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 
 	}
 
-	void Shader::updateSpotLight(std::string uniformname ,SpotLight spot)
+	void Shader::updateSpotLight(std::string uniformname ,SpotLight &spot)
 	{
 		setUniform(uniformname + ".pointLight"	   ,spot.pointLight.base);
 		setUniform(uniformname + ".pointLight.pos",spot.pointLight.pos);
@@ -312,7 +320,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 
 	}
 
-	void Shader::updateSpotLights(std::vector<SpotLight> spot)
+	void Shader::updateSpotLights(std::vector<SpotLight> &spot)
 	{
 		if(spot.size() > MAXPOINTLIGHTS)
 		{
@@ -460,72 +468,3 @@ void BasicShader::unuse()
     }
 }
 
-ShadowMapFBO::ShadowMapFBO()
-{
-}
-
-bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection)
-{
-	glGenFramebuffers(1, &m_fbo);
-	glGenTextures(1, &m_shadowMap);
-	glBindTexture(GL_TEXTURE_2D, m_shadowMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-	if (Status != GL_FRAMEBUFFER_COMPLETE) 
-	{
-		printf("FB error, status: 0x%x\n", Status);
-		return false;
-	}
-	biasMatrix = Matrix4(0.5, 0.0, 0.0, 0.0,
-	0.0, 0.5, 0.0, 0.0,
-	0.0, 0.0, 0.5, 0.0,
-	0.5, 0.5, 0.5, 1.0);
-
-	lightDirection = LightDirection;
-	depthProjectionMatrix = Matrix4().identity().InitOrthographic(-10,10,-10,10,-10,20);
-	depthViewMatrix = Matrix4().InitRotationFromVectors(lightDirection, Vector3(0,0,0), Vector3(0,1,0));
-	depthModelMatrix = Matrix4(1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f);
-	depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
-
-	shader = new Shader();
-	shader->addVertexShader("Shaders/2DShader.vert");
-	shader->addFragmentShader( "Shaders/2DShader.frag");
-	shader->addAttribute("position");
-	shader->addAttribute("uv");
-	shader->bind();
-	shader->linkShaders();
-}
-
-void ShadowMapFBO::BindForWriting()
-{
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
-}
-
-void ShadowMapFBO::BindForReading(GLuint unit)
-{
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_shadowMap);
-	BoundTexture::currentID = -1;
-	BoundTexture::currentUnit = -1;
-}
-
-void ShadowMapFBO::draw()
-{
-	BindForReading();
-	shader->setUniform("depthMVP",depthMVP);
-}
-
-void ShadowMapFBO::releaseShadowMap()
-{
-	delete(shader);
-	glDeleteTextures(m_shadowMap);
-
-}
