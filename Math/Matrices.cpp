@@ -1332,6 +1332,28 @@ Matrix4& Matrix4::InitOrthographic(float left, float right, float bottom, float 
 		return *this;
 	};
 
+Matrix4& Matrix4::lookAt(Vector3 const &eye,Vector3 const &center,Vector3 const &up)
+{
+		Vector3 f((center-eye).normalize());
+		Vector3 s(f.cross(up).normalize());
+		Vector3 u(s.cross(f));
+
+		Matrix4 Result(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+		Result[0] = s.x;
+		Result[1] = s.y;
+		Result[2] = s.z;
+		Result[4] = u.x;
+		Result[5] = u.y;
+		Result[6] = u.z;
+		Result[8] =-f.x;
+		Result[9] =-f.y;
+		Result[10] =-f.z;
+		Result[12] =-s.dot(eye);
+		Result[13] = u.dot(eye);
+		Result[14] = f.dot(eye);
+		return Result;
+}
+
 // END OF MATRIX4 //////////////////////////////////////////////////////
 
 	Quaternion::Quaternion(float x, float y, float z, float w)

@@ -201,6 +201,7 @@ public:
 	Matrix4& InitRotationFromDirection(Vector3& forward,Vector3& up);
 	Matrix4& InitOrthographic(float left, float right, float bottom, float top, float near, float far);
 	Matrix4 ToRotationMatrix() const;
+	Matrix4& lookAt(Vector3 const &eye,Vector3 const &center,Vector3 const &up);
 protected:
 
 private:
