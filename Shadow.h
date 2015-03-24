@@ -9,9 +9,9 @@
 #include <vector>
 #include <fstream>
 #include <unordered_map>
-#include "Math/Matrices.h" 
-#include "Math/Vectors.h"
+#include "Math/3DMath.h"
 #include "Shader.h"
+#include "Objekt.h"
 class ShadowMapFBO //funktioniert irgentwie nicht 
 {
     public:
@@ -30,6 +30,7 @@ class ShadowMapFBO //funktioniert irgentwie nicht
 		Vector3 lightDirection;
 		void calculateMatrices();
 		void setLightDirection(Vector3 LightDirection);
+		void addObject(Objekt &object);
 		int width,height;
 		static void deleteShader();
 private:

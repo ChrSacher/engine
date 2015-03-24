@@ -1,6 +1,5 @@
 #pragma once
-#include "Math/Vectors.h" 
-#include "Math/Matrices.h"
+#include "Math/3DMath.h"
 #include <glew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>

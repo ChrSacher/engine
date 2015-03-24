@@ -11,8 +11,7 @@
 #include <vector>
 #include <fstream>
 #include <unordered_map>
-#include "Math/Matrices.h" 
-#include "Math/Vectors.h"
+#include "Math/3DMath.h"
 #include "Transform.h"
 #include "Camera3d.h"
 #include "Material.h"

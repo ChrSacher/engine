@@ -245,14 +245,14 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	void Shader::updateMaterial(Material &material)
 	{
 		material.texture.bind();
-		setUniform("texture",0);
+		setUniform("Texture",0);
 		setSpecular(material);
 		setbaseColor(material.color);
 		
 	}
 	void Shader::updateObjekt(Objekt &object)
 	{
-		setmodelMatrix(*object.transform);
+		setmodelMatrix(object.transform);
 		updateMaterial(*object.material);
 		object.mesh.draw();
 	}

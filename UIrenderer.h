@@ -4,7 +4,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <GL/GLu.h>
-#include "Math/Vectors.h"
+#include "Math/3DMath.h"
 #include "Shader.h"
 #include "Texture.h"
 class Button

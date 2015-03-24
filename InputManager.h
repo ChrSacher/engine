@@ -1,8 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-#include "Math/Vectors.h" 
-#include "Math/Matrices.h"
+#include "Math/3DMath.h"
 
  
 class InputManager

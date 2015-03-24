@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Math/Vectors.h" 
-#include "Math/Matrices.h"
+#include "Math/3DMath.h"
  
 class Transform
 {

@@ -10,8 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include "Math/Matrices.h"
-#include "Math/Vectors.h"
+#include "Math/3DMath.h"
 #include "Errors.h"
 #include "Mesh.h"
 #include "Transform.h"
