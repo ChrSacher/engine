@@ -102,13 +102,15 @@ void UIrenderer::loadBuffer()
 	
 
 	glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
-	glBufferData(GL_ARRAY_BUFFER,buttons.size() * 6 * sizeof(positions[0]),&positions[0],GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,buttons.size() * 6 * sizeof(positions[0]),0,GL_STREAM_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER,0,buttons.size() * 6  * sizeof(positions[0]),&positions[0]);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);
 
 	
 	glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
-	glBufferData(GL_ARRAY_BUFFER,buttons.size() * 6 * sizeof(uvs[0]),&uvs[0],GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,buttons.size() * 6 * sizeof(uvs[0]),0,GL_STREAM_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER,0,buttons.size() * 6  * sizeof(uvs[0]),&uvs[0]);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
 
@@ -205,6 +207,7 @@ void Skybox::releaseSkybox()
 {
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1,&vbo);
+	cube.releaseCubemap();
 	delete(shader);
 }
 

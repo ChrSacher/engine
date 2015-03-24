@@ -28,6 +28,7 @@
 #include "Objekt.h"
 #include "ParticleSystem.h"
 #include "UIrenderer.h"
+#include "Shadow.h"
 
 struct GameState
 {
@@ -75,7 +76,7 @@ class Maingame
 		float maxFPS;
 
 		SDL_Event event;
-		SDL_GLContext gContext;//OpenGL context
+		SDL_GLContext glContext;//OpenGL context
 		SDL_Window* _window;
 		GameState gamestate;
 		FpsLimiter fpsLimiter;

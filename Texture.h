@@ -71,6 +71,7 @@ public:
     void bind(GLuint unit = 0);
 	void unbind();
 	void addFiles(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz);
+	void releaseCubemap();
 private:
 
     std::string fileNames[6];

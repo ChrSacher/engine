@@ -16,5 +16,5 @@ Objekt::~Objekt(void)
 
 void Objekt::draw()
 {
-	
+	mesh.draw();
 };

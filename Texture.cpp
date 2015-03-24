@@ -150,6 +150,7 @@ bool CubemapTexture::Load()
     for (unsigned int i = 0 ; i < 6 ; i++) 
 	{
 		int width,height,numComponents;
+		printf("loading CubeMapTexture %s\n",fileNames[i].c_str());
 		char* data = (char*)stbi_load(fileNames[i].c_str(),&width,&height,&numComponents,4);
         if(data ==NULL)
 		{
@@ -180,7 +181,11 @@ bool CubemapTexture::Load()
 
 void CubemapTexture::bind(GLuint unit)
 {
-	if(unit < 0 || unit > 32) fatalError("Texture unit is too large/too low");
+	if(unit < 0 || unit > 32)
+	{
+			fatalError("Texture unit is too large/too low");
+			return;
+	}
 	if(BoundTexture::currentID != ID || BoundTexture::currentUnit != unit)
 	{
 		glActiveTexture(GL_TEXTURE0 + unit);
@@ -213,6 +218,11 @@ CubemapTexture::CubemapTexture(const std::string& Directory, const std::string& 
 	addFiles(Directory,PosXFilename,NegXFilename,PosYFilename,NegYFilename,PosZFilename, NegZFilename);
 	Load();
 }
+void CubemapTexture::releaseCubemap()
+{
+	glDeleteTextures(1,&ID);
+}
+
 
 void TextureCache::deleteCache()
 {

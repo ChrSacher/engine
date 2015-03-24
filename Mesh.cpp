@@ -5,7 +5,6 @@ std::map<std::string, Model> ModelCache::_modelMap;
 
 Mesh::~Mesh(void)
 {
-	
 }
 
 void Mesh::releaseMesh()
@@ -31,6 +30,7 @@ void Mesh::init()
 {
 	glGenVertexArrays(1,&vao);
 	glBindVertexArray(vao);
+	glGenBuffers(NUMBUFFERS,vab);
 }
 Mesh::Mesh(std::vector<Vertex> vertices)
 {
@@ -52,8 +52,11 @@ Mesh::Mesh(std::string path)
 
 Mesh::Mesh()
 {
-	
-	
+	vao=0;
+	for(int i = 0;i<NUMBUFFERS;i++)
+	{
+		vab[i] = 0;
+	}
 }
 
 Vertex::Vertex()
@@ -95,21 +98,24 @@ void Mesh::loadBufferVertex()
 			uvs.push_back(*model.Vertices[i].getUV());
 			normals.push_back(*model.Vertices[i].getNormal());
 		}
-		glGenBuffers(NUMBUFFERS,vab);
+		
 
 		glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
-		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(positions[0]),&positions[0],GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(positions[0]),NULL,GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER,0,model.Vertices.size()  * sizeof(positions[0]),&positions[0]);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
 
 	
 		glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
-		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(uvs[0]),&uvs[0],GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(uvs[0]),NULL,GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER,0,model.Vertices.size()  * sizeof(uvs[0]),&uvs[0]);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
 
 		glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALVB]);
-		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(normals[0]),&normals[0],GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(normals[0]),NULL,GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER,0,model.Vertices.size()  * sizeof(normals[0]),&normals[0]);
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
 		glBindVertexArray(0);
@@ -119,6 +125,7 @@ void Mesh::loadBufferVertex()
 void Mesh::clearData()
 {
 	model.Vertices.clear();
+	loadBufferVertex();
 }
 
 void Mesh::loadBuffer()

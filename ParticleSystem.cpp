@@ -42,6 +42,7 @@ ParticleSystem::ParticleSystem(void)
 
 ParticleSystem::~ParticleSystem(void)
 {
+	delete(shader);
 }
 
 void ParticleSystem::draw()
@@ -63,17 +64,20 @@ void ParticleSystem::update()
 {
 
 	//
-	std::vector<Particle> temp(ParticleBuffer);
-	ParticleBuffer.clear();
 	float time = SDL_GetTicks();
-	for(auto &x : temp)
+	int i = 0;
+	for(auto &x : ParticleBuffer)
 	{
 		if(x.lifeTime >= 0)
 		{
 			x.pos += x.vel;
 			x.lifeTime =- time;
-			ParticleBuffer.push_back(x);
 		}
+		else
+		{
+			ParticleBuffer.erase(ParticleBuffer.begin() + i);
+		}
+			i++;
 	}
 	//do everything before this
 	if(ParticleBuffer.size() > 0)

@@ -1,6 +1,7 @@
 ﻿
 #include "Maingame.h"
 
+
 Maingame::Maingame(void)
 {
 	SCREEN_HEIGHT = 480;
@@ -38,7 +39,7 @@ void Maingame::init()
     }
 
     //Set up our OpenGL context
-    SDL_GLContext glContext = SDL_GL_CreateContext(_window);
+	glContext = SDL_GL_CreateContext(_window);
     if (glContext == nullptr) 
 	{
         fatalError("SDL_GL context could not be created!");
@@ -59,12 +60,14 @@ void Maingame::init()
 	//Set VSYNC
     SDL_GL_SetSwapInterval(1);
 	RenderUtil::initGraphics();
+	glClearDepth(10000000.0f);
     //Set the background color to blue
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//SDL_SetRelativeMouseMode(SDL_TRUE);
 	initShaders();
 	createObjects();
-	
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	SDL_GL_SwapWindow(_window);
 	fpsLimiter.init(maxFPS);
 
 	return ;
@@ -176,24 +179,23 @@ void Maingame::update()
 void Maingame::render()
 {
 
-	//Color buffer leer machen
-	
-	glClearDepth(10000000);
+	//Color buffer leer machen	
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
 	sky->renderSkybox();
-	//shadowpass
+	//shadowpass doesn't work yet
 	shadow.BindForWriting();
 	object->draw();
 	object2->draw();
-	shadow.draw();
+	shadow.BindForReading(1);
 
 	//normal
+	glViewport(0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 	shader->use();
+	//shader->setUniform("depthMVP",shadow.depthMVP);
 	static int counter;
 	counter++;
 	shader->updateFog(*fog);
-	//object->transform->setRot(Vector3(0,counter/2,0));
+	object->transform->setRot(Vector3(0,counter/2,0));
 	shader->updateCamera(*camera);
 	shader->updateObjekt(*object);
 	shader->updateObjekt(*object2);
@@ -204,7 +206,7 @@ void Maingame::render()
 	shader->unuse();
 	ui->draw();
 	SDL_GL_SwapWindow(_window);
-	
+
 }
 void Maingame::gameloop()
 {
@@ -229,6 +231,10 @@ void Maingame::gameloop()
 void Maingame::close()
 {
 	SDL_DestroyWindow( _window);
+	SDL_GL_DeleteContext(glContext);
+	sky->releaseSkybox();
+	ShadowMapFBO::deleteShader();
+	ui->releaseRenderer();
 	delete(camera,light,light2,object,shader,fog,point,sky,ui,object2);
 	TextureCache::deleteCache();
 	ModelCache::deleteCache();
@@ -250,20 +256,20 @@ void Maingame::createObjects()
 	
 	camera = new Camera3d(Vector3(0,0,5.5),70,SCREEN_WIDTH/SCREEN_HEIGHT,0.1f,1000000.0f);
 	light = new AmbientLight(Vector3(0.1,0.1,0.1));
-	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.9f),Vector3(1.0f,1.0f,1.0f));
+	light2 = new DirectionalLight(BaseLight(Vector3(1.0f,1.0f,1.0f),0.1f),Vector3(1.0f,1.0f,1.0f));
 	object = new Objekt("models/test3.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,1,1));
 	object2 = new Objekt("models/box.obj",Vector3(0,-3,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1));
 	object2->transform->setScale(Vector3(1000.0f,0.01,1000));
-	point = new PointLight(Vector3(0,0,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
+	point = new PointLight(Vector3(0,1,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
 	fog = new Fog(0.05,Vector4(0.5,0.5,0.5,0.5),400,500,0);
 	light3 = new SpotLight(PointLight(Vector3(0,0,1),BaseLight(Vector3(1,0,1),1),Attenuation(1,0,0),20),Vector3(1,1,0),0.2);
 	ui = new UIrenderer();
-	ui->addButton(Button(Vector2(0,0),Vector2(200,200),Vector4(1,0,0,1),true,""));
-	ui->addButton(Button(Vector2(200,200),Vector2(100,100),Vector4(0,0,1,0.1),true,""));
+	ui->addButton(Button(Vector2(0,0),Vector2(50,50),Vector4(1,0,0,1),true,""));
+	ui->addButton(Button(Vector2(50,50),Vector2(50,50),Vector4(0,0,1,0.1),true,""));
 	sky= new Skybox(Vector4(1,1,1,1));
 	sky->loadSkybox("Texture/","posx.png","negx.png","posy.png","negy.png","posz.png","negz.png");
 	sky->setCamera(camera);
-	shadow.Init(SCREEN_WIDTH,SCREEN_HEIGHT,light2->direction);
+	shadow.Init(1024,1024,light2->direction);
 }
 
 void Maingame::initShaders()
@@ -273,7 +279,7 @@ void Maingame::initShaders()
 	shader->addFragmentShader( "Shaders/textureShading.frag");
 	shader->addAttribute("position");
 	shader->addAttribute("uv");
-	shader->addAttribute("normal");
-	
+	shader->addAttribute("normal");	
 	shader->linkShaders();
+	
 }
