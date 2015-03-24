@@ -11,8 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include "Math/Matrices.h" 
-#include "Math/Vectors.h"
+#include "Math/3DMath.h"
 #include "InputManager.h"
 #include "timing.h"
 #include "Errors.h"

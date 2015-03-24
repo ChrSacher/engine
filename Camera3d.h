@@ -5,8 +5,9 @@
 
 // GL Includes
 #include <GL\glew.h>
-#include "Math/Vectors.h" 
-#include "Math/Matrices.h"
+#include <SDL.h>
+#include <SDL_opengl.h>
+#include "Math/3DMath.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "Transform.h"
 #include <math.h>
@@ -16,37 +17,48 @@
 class Camera3d
 {
 public:
-    Camera3d(Vector3 Pos,float fov,float aspect,float zNear,float zFar);
+    Camera3d(Vector3 Pos,float fov,int width,int height,float zNear,float zFar);
+	Camera3d(int WindowWidth, int WindowHeight);
 	~Camera3d(void);
 	Camera3d(){}
 	Matrix4 perspectiveMatrix;
 	Matrix4 viewMatrix;
+    void OnMouse(int x, int y);
 
-	void set(Vector3 Pos,Vector3 Rot){transform.setPos(Pos);transform.setRot(Rot);};
-	void setPos(Vector3 newpos){transform.setPos(newpos);};
-	void setPos(float newx,float newy,float newz){transform.setPos(Vector3(newx,newy,newz));};
-	
-	void setRot(Vector3 newrot){transform.setRot(newrot);};
-	void setRot(float newx,float newy,float newz){transform.setRot(Vector3(newx,newy,newz));};
-
-	Vector3 getPos(){return transform.pos;};
-	Vector3 getRot(){return transform.rot;};
-	Vector3 getDir();
-	Transform transform;
 	float cameraspeed;
 	bool updateneeded;
 
 	Matrix4& GetViewProjection();
-	void updatePerspectiveMatrix(float fov,float aspect,float zNear,float zFar);
-
+	void updatePerspectiveMatrix(float fov,int width,int height,float zNear,float zFar);
+	Vector3 getDir();
+	Vector3 getPos();
+	Vector3 getUp();
+	void init();
 	//movement
 	void moveforward(float distance = 0);
 	void movebackward(float distance = 0);
 	void raise(float distance = 0);
 	void sink(float distance = 0);
-	void turnright(float distance = 0);
-	void turnleft(float distance = 0);
-	void strafeleft(float distance = 0);
-	void straferight(float distance = 0);
+	void turnright();
+	void turnleft();
+	void strafeleft();
+	void straferight();
+private:
+	Vector3 pos;
+    Vector3 dir;
+    Vector3 up;
+	Vector2 mousePos;
+	void Update();
+
+    int windowWidth;
+    int windowHeight;
+
+    float AngleH;
+    float AngleV;
+
+    bool OnUpperEdge;
+    bool OnLowerEdge;
+    bool OnLeftEdge;
+    bool OnRightEdge;
 
 };
