@@ -20,6 +20,7 @@ public:
 	Shader *shader;
 	Camera3d *camera;
 	int lastParticle;
+	void init();
 	void update();
 	void draw();
 };

@@ -25,9 +25,9 @@ public:
 	Vertex();
 	Vertex(const Vector3& position,const Vector2& tcoord,const Vector3 &tnormal);
 	Vertex(float x,float y,float z);
-	inline Vector3* getPos(){return &pos;};
-	inline Vector2* getUV(){return &uv;};
-	inline Vector3* getNormal(){return &normal;};
+	Vector3& getPos(){return pos;};
+	Vector2& getUV(){return uv;};
+	Vector3& getNormal(){return normal;};
 	Vector3 pos;
 	Vector2 uv;
 	Vector3 normal;
@@ -35,12 +35,13 @@ public:
 
 struct Model
 {
-	std::vector<Vector3> vertices;
+	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
 	std::vector<Vector2> uvs;
 	std::vector<GLuint> Indices;
 	std::vector<Vertex> Vertices;
 	OBJIndex index;
+	void center();
 
 };
 
@@ -48,7 +49,7 @@ class OBJLoader
 {
 public:
 
-	static Model loadOBJ(std::string path);
+	static Model loadOBJ(std::string path,bool autoCenter = false);
 };
 
 
@@ -60,10 +61,10 @@ public:
 	Mesh(void);
 	virtual ~Mesh(void);
 	Mesh(std::vector<Vertex> vertices);
-	Mesh(std::string path);
+	Mesh(std::string path,bool autoCenter = false);
 	void init();
 	void draw();
-	void loadOBJ(std::string path);
+	void loadOBJ(std::string path,bool autoCenter = false);
 	void loadBuffer();
 	void loadBufferVertex();
 	void clearData();
@@ -90,7 +91,7 @@ class ModelCache
 {
 public:
 
-    static Model getModel(std::string modelPath);
+    static Model getModel(std::string modelPath,bool autoCenter = false);
 	static void deleteCache();
 
 private:

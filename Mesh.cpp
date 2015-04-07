@@ -42,11 +42,11 @@ Mesh::Mesh(std::vector<Vertex> vertices)
 	}
 	loadBufferVertex();
 }
-Mesh::Mesh(std::string path)
+Mesh::Mesh(std::string path,bool autoCenter)
 {
 	
 	init();
-	model = ModelCache::getModel(path);
+	model = ModelCache::getModel(path,autoCenter);
 	loadBufferVertex();
 }
 
@@ -74,9 +74,9 @@ Vertex::Vertex(float x, float y, float z)
 	pos=Vector3(x,y,z);
 }
 
-void Mesh::loadOBJ(std::string path)
+void Mesh::loadOBJ(std::string path,bool autoCenter)
 {
-	model = OBJLoader::loadOBJ(path);
+	model = OBJLoader::loadOBJ(path,autoCenter);
 	loadBufferVertex();
 	
 };
@@ -94,27 +94,27 @@ void Mesh::loadBufferVertex()
 		normals.reserve(model.Vertices.size());
 		for(int i = 0;i< model.Vertices.size();i++)
 		{
-			positions.push_back(*model.Vertices[i].getPos());
-			uvs.push_back(*model.Vertices[i].getUV());
-			normals.push_back(*model.Vertices[i].getNormal());
+			positions.push_back(model.Vertices[i].getPos());
+			uvs.push_back(model.Vertices[i].getUV());
+			normals.push_back(model.Vertices[i].getNormal());
 		}
 		
 
 		glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
-		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(positions[0]),NULL,GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(positions[0]),NULL,GL_STATIC_DRAW);
 		glBufferSubData(GL_ARRAY_BUFFER,0,model.Vertices.size()  * sizeof(positions[0]),&positions[0]);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
 
 	
 		glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
-		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(uvs[0]),NULL,GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(uvs[0]),NULL,GL_STATIC_DRAW);
 		glBufferSubData(GL_ARRAY_BUFFER,0,model.Vertices.size()  * sizeof(uvs[0]),&uvs[0]);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
 
 		glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALVB]);
-		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(normals[0]),NULL,GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(normals[0]),NULL,GL_STATIC_DRAW);
 		glBufferSubData(GL_ARRAY_BUFFER,0,model.Vertices.size()  * sizeof(normals[0]),&normals[0]);
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
@@ -134,7 +134,7 @@ void Mesh::loadBuffer()
 	glGenBuffers(NUMBUFFERS,vab);
 
 	glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
-	glBufferData(GL_ARRAY_BUFFER,model.vertices.size() * sizeof(model.vertices[0]),&model.vertices[0],GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,model.positions.size() * sizeof(model.positions[0]),&model.positions[0],GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
 
@@ -156,7 +156,7 @@ void Mesh::loadBuffer()
 }
 
 
-Model OBJLoader::loadOBJ(std::string path)
+Model OBJLoader::loadOBJ(std::string path,bool autoCenter)
 {
 	printf("Loading OBJ file %s...\n", path.c_str());
 
@@ -232,7 +232,11 @@ Model OBJLoader::loadOBJ(std::string path)
 	Model model;
 	for(unsigned int i=0;i<temp_vertices.size();i++)
 	{
-		model.vertices.push_back(temp_vertices[i]);
+		model.positions.push_back(temp_vertices[i]);
+	}
+	if(autoCenter)
+	{
+		model.center();
 	}
 	for(unsigned int i=0;i<temp_uvs.size();i++)
 	{
@@ -260,15 +264,16 @@ Model OBJLoader::loadOBJ(std::string path)
 
 	for( unsigned int i=0; i<model.index.vertexIndex; i++ )
 	{
-		Vector3 vertex = model.vertices[ vertexIndices[i] - 1 ];
+		Vector3 vertex = model.positions[ vertexIndices[i] - 1 ];
 		Vector2 uv = temp_uvs[ uvIndices[i] - 1 ];
 		Vector3 normal = temp_normals[ normalIndices[i] - 1 ];
 		model.Vertices.push_back(Vertex(vertex,uv,normal));
 	}
+	
 	return model;
 }
 
-Model ModelCache::getModel(std::string modelPath) 
+Model ModelCache::getModel(std::string modelPath,bool autoCenter) 
 {
 
     //lookup the texture and see if its in the map
@@ -278,14 +283,14 @@ Model ModelCache::getModel(std::string modelPath)
    if (mit == _modelMap.end()) 
 	{
         //Load the texture
-		 Model newModel = OBJLoader::loadOBJ(modelPath);
+		 Model newModel = OBJLoader::loadOBJ(modelPath,autoCenter);
 		 
         //Insert it into the map
 		_modelMap.insert(make_pair(modelPath, newModel));
 
         return newModel;
     }
-	printf("loaded cached Mesh\n");
+	printf("loaded cached Model\n");
    return mit->second;
 }
 
@@ -293,4 +298,18 @@ Model ModelCache::getModel(std::string modelPath)
 void ModelCache::deleteCache()
 {
 	_modelMap.clear();
+}
+
+void Model::center()
+{
+	Vector3 center = Vector3(0,0,0);
+	for(int i = 0;i < positions.size();i++)
+	{
+		center += positions[i];
+	}
+	center /= positions.size();
+	for(int i = 0;i < positions.size();i++)
+	{
+		positions[i] -= center;
+	}
 }

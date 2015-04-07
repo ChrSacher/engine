@@ -11,9 +11,9 @@ public:
 	Vector3 rot,oldrot;
 	Vector3 sca,oldsca;
 	Matrix4 modelMatrix;
-	inline Vector3& getPos(){return pos;};
-	inline Vector3& getRot(){return rot;};
-	inline Vector3& getScale(){return sca;};
+	Vector3& getPos(){return pos;};
+	Vector3& getRot(){return rot;};
+	Vector3& getScale(){return sca;};
 
 	void setPos(Vector3& Pos);
 	void setRot(Vector3& Rot);

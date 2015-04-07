@@ -39,8 +39,10 @@ public:
 	void unuse();
 	void addUniform(const std::string& uniformname);
     void addAttribute(const std::string& attributeName);
+	std::map<std::string,GLint> uniforms;
 	GLint getUniformLocation(const std::string& uniformName);
 	//setters
+	
 	void setUniform(std::string uniformName, int value);
 	void setUniform(std::string uniformName, bool value);
 	void setUniform(std::string uniformName, float value);
@@ -78,8 +80,6 @@ public:
 		VIEW_MATRIX,
 		NUM_UNIFORMS
 	};
-
-	GLuint uniforms[NUM_UNIFORMS];
 };
 
 class BasicShader

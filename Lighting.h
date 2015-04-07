@@ -47,7 +47,7 @@ public:
 	BaseLight base;
 	Vector3 direction;
 	
-	DirectionalLight(BaseLight Base,Vector3 Dir){base=Base;direction=Dir;}
+	DirectionalLight(BaseLight Base = BaseLight(),Vector3 Dir = Vector3(1,1,1)){base=Base;direction=Dir;}
 	void setBase(BaseLight Base){base=Base;};
 	void setDirection(Vector3 dir){direction=dir;}
 	BaseLight getBaseLight(){return base;};
@@ -89,6 +89,7 @@ class SpotLight
 {
 public:
 	PointLight pointLight;
+	SpotLight(){}
 	Vector3 dir;
 	float cutoff;
 	SpotLight(PointLight point,Vector3 Dir,float Cutoff);
@@ -106,16 +107,17 @@ public:
 class Fog
 {
 public:
-	Fog(float Density,Vector4 Color = Vector4(0.5,0.5,0.5,1),float Start = 0,float End = 0,bool Type = true){density=Density;start=Start;end=End;color=Color;type=Type;}
+	Fog(float Density = 0.05,Vector4 Color = Vector4(0.5,0.5,0.5,1),float Start = 0,float End = 10,bool Type = true);
+
 	float density; //exp fog
 	float start; //linear fog only
 	float end; //linear fog only
 	Vector4 color;
 	int type; //0 = fog disabled 1 = linear 2 = exp 
 
-	void setDensity(float Density){density=Density;}
-	void setStart(float Start){if(Start != end)start=Start;else fatalError("Fog start = Fog end");}
-	void setEnd(float End){if(End != start)end=End;else fatalError("Fog start = Fog end");}
-	void setColor(Vector4 Color){color=Color;}
-	void setType(int Type){type=Type;}
+	void setDensity(float Density);
+	void setStart(float Start);
+	void setEnd(float End);
+	void setColor(Vector4 Color);
+	void setType(int Type);
 };

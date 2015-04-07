@@ -5,6 +5,11 @@ int Button::IDCounter = 0;
 
 UIrenderer::UIrenderer()
 {
+	
+}
+
+void UIrenderer::init()
+{
 	shader = new Shader();
 	shader->addVertexShader("Shaders/2DShader.vert");
 	shader->addFragmentShader( "Shaders/2DShader.frag");
@@ -17,7 +22,6 @@ UIrenderer::UIrenderer()
 	glBindVertexArray(vao);
 	glGenBuffers(NUMBUFFERS,vab);
 }
-
 void UIrenderer::releaseRenderer()
 {
 	glDeleteVertexArrays(1, &vao);
@@ -54,9 +58,9 @@ void UIrenderer::draw()
 			buttons[i].texture.bind();
 			glBindVertexArray(vao);
 			glDrawArrays(GL_TRIANGLES,offset,6);		
-			glBindVertexArray(0);
-			offset += 6;
+			glBindVertexArray(0);	
 		}
+		offset += 6;
 	}
 	shader->unuse();
 	glEnable(GL_CULL_FACE);
@@ -82,8 +86,6 @@ void UIrenderer::loadBuffer()
 	uvs.reserve(buttons.size() * 6);
 	for(int i=0;i< buttons.size();i++)
 	{
-		if(buttons[i].render)
-		{
 			positions.push_back(buttons[i].start);
 			positions.push_back(Vector2(buttons[i].start.x + buttons[i].size.x,buttons[i].start.y));
 			positions.push_back(Vector2(buttons[i].start.x + buttons[i].size.x,buttons[i].start.y + buttons[i].size.y));
@@ -97,19 +99,18 @@ void UIrenderer::loadBuffer()
 			uvs.push_back(Vector2(1,1));
 			uvs.push_back(Vector2(0,1));
 			uvs.push_back(Vector2(0,0));
-		}
 	}
 	
 
 	glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
-	glBufferData(GL_ARRAY_BUFFER,buttons.size() * 6 * sizeof(positions[0]),0,GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,buttons.size() * 6 * sizeof(positions[0]),0,GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER,0,buttons.size() * 6  * sizeof(positions[0]),&positions[0]);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);
 
 	
 	glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
-	glBufferData(GL_ARRAY_BUFFER,buttons.size() * 6 * sizeof(uvs[0]),0,GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,buttons.size() * 6 * sizeof(uvs[0]),0,GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER,0,buttons.size() * 6  * sizeof(uvs[0]),&uvs[0]);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
@@ -169,14 +170,26 @@ void Skybox::loadSkybox(std::string Directory, std::string posx, std::string neg
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);
-	glBufferData(GL_ARRAY_BUFFER,36 * 3 * sizeof(positions[0]),&positions[0],GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,36 * 3 * sizeof(positions[0]),NULL,GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER,0,36 * 3 *sizeof(positions[0]),&positions[0]);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
 	glBindVertexArray(0);
 	transform.setScale(Vector3(200,200,200));
 }
 
-Skybox::Skybox(Vector4 Color)
+void Skybox::setSkyboxTexture(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz) 
+{ 
+	cube.addFiles(Directory,  posx, negx,  posy,  negy, posz, negz);
+	cube.Load();
+}
+
+Skybox::Skybox()
+{
+	
+}
+
+void Skybox::init(Vector4 Color)
 {
 	shader = new Shader();
 	shader->addVertexShader("Shaders/Skybox.vert");

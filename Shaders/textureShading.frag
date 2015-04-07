@@ -42,13 +42,34 @@ struct Fog
    int type;
 };
 
+vec2 poissonDisk[16] = vec2[]( 
+   vec2( -0.94201624, -0.39906216 ), 
+   vec2( 0.94558609, -0.76890725 ), 
+   vec2( -0.094184101, -0.92938870 ), 
+   vec2( 0.34495938, 0.29387760 ), 
+   vec2( -0.91588581, 0.45771432 ), 
+   vec2( -0.81544232, -0.87912464 ), 
+   vec2( -0.38277543, 0.27676845 ), 
+   vec2( 0.97484398, 0.75648379 ), 
+   vec2( 0.44323325, -0.97511554 ), 
+   vec2( 0.53742981, -0.47373420 ), 
+   vec2( -0.26496911, -0.41893023 ), 
+   vec2( 0.79197514, 0.19090188 ), 
+   vec2( -0.24188840, 0.99706507 ), 
+   vec2( -0.81409955, 0.91437590 ), 
+   vec2( 0.19984126, 0.78641367 ), 
+   vec2( 0.14383161, -0.14100790 ) 
+);
+
+
 varying vec2 uv0;
 varying vec3 normal0;
 varying vec4 worldPos0;
 varying vec4 viewworldPos0;
-
+varying vec4 shadowCoord0;
 
 uniform sampler2D Texture;
+uniform sampler2DShadow shadowMap;
 uniform vec3 baseColor;
 uniform vec3 ambientLight;
 uniform DirectionalLight directionalLight;
@@ -58,6 +79,7 @@ uniform vec3 eyePos;
 uniform PointLight pointLights[MAXPOINTLIGHTS];
 uniform SpotLight spotLights[MAXSPOTLIGHTS];
 uniform Fog fog;
+uniform bool shadowEnabled;
 
 vec4 calcLight(BaseLight base,vec3 direction,vec3 normal)
 {
@@ -154,8 +176,21 @@ void main()
 	if(spotLights[i].pointLight.base.intensity > 0)
 		totalLight += calcSpotLight(spotLights[i],normal);
 	}
-	gl_FragColor = color * totalLight;
+
+	float bias = 0.005;
+	float visibility = 1;
+	if(shadowEnabled)
+	{
+		for (int i=0;i<4;i++)
+		{
+			visibility -= 0.2*(1.0-texture( shadowMap, vec3(shadowCoord0.xy + poissonDisk[i]/700.0,  (shadowCoord0.z-bias)/shadowCoord0.w) ));
+		}
+	}
+	gl_FragColor = color * clamp(totalLight,0.0,1.0) * vec4(visibility,visibility,visibility,1);
 	float dist = length(viewworldPos0);
-	gl_FragColor = mix(gl_FragColor, fog.color,getFogFactor(fog, dist) ); 
+	if(fog.type > 0.1)
+	{
+		gl_FragColor = mix(gl_FragColor, fog.color,getFogFactor(fog, dist) ); 
+	}
 	
 }

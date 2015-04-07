@@ -19,7 +19,7 @@ ShadowMapFBO::~ShadowMapFBO()
         glDeleteTextures(1, &m_shadowMap);
 	}
 }
-bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection)
+bool ShadowMapFBO::Init(unsigned int ShadowWidth, unsigned int ShadowHeight,unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection,bool enabled)
 {
 	if (m_fbo != 0) 
 	{
@@ -30,11 +30,13 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight,Vect
 	{
         glDeleteTextures(1, &m_shadowMap);
 	}
-	glGenFramebuffers(1, &m_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	width=WindowWidth;
-	height=WindowHeight;
+	isEnabled = enabled;
+	glGenFramebuffersEXT(1, &m_fbo);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
+	shadowWidth=ShadowWidth;
+	shadowHeight=ShadowHeight;
+	windowWidth=WindowWidth;
+	windowHeight=WindowHeight;
 	glGenTextures(1, &m_shadowMap);
 	glBindTexture(GL_TEXTURE_2D, m_shadowMap);
 	
@@ -44,57 +46,68 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight,Vect
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT,GL_FLOAT, 0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_shadowMap, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT,GL_UNSIGNED_BYTE, 0);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,GL_TEXTURE_2D, m_shadowMap, 0);
+	 glBindTexture(GL_TEXTURE_2D, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
-	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (Status != GL_FRAMEBUFFER_COMPLETE) 
+	GLenum Status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	if (Status != GL_FRAMEBUFFER_COMPLETE_EXT) 
 	{
 		printf("FB error, status: 0x%x\n", Status);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		isEnabled = false;
 		return false;
 	}
 	lightDirection  = LightDirection;
-	depthProjectionMatrix = Matrix4().identity().InitOrthographic(-30,30,-30,30,-300,600);
-	depthViewMatrix = Matrix4().lookAt(lightDirection , Vector3(0,2,0), Vector3(0,1,0));
-	depthModelMatrix = Matrix4(1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f);
-
+	depthProjectionMatrix = Matrix4().identity().InitOrthographic(-10,10,-10,10,-10,10);
+	depthViewMatrix = Matrix4().lookAt(lightDirection,Vector3(0,0,0), Vector3(0,1,0));
+	depthModelMatrix = Matrix4().identity();
+	biasMatrix = Matrix4(	0.5, 0.0, 0.0, 0.0,
+							0.0, 0.5, 0.0, 0.0,
+							0.0, 0.0, 0.5, 0.0,
+							0.5, 0.5, 0.5, 1.0
+							);
 	calculateMatrices();
-
-	
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	return true;
 }
 
 void ShadowMapFBO::BindForWriting()
 {
-	
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D,m_shadowMap);
-	
-	glCullFace(GL_FRONT);
-	glViewport(0,0,width,height);
-	ShadowMapFBO::getShader()->use();
-	glColorMask(false, false, false, false);
+	if(isEnabled)
+	{
+		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_fbo);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(GL_TEXTURE0);
+		glCullFace(GL_FRONT);
+		glBindTexture(GL_TEXTURE_2D,m_shadowMap);
+		glViewport(0,0,shadowWidth,shadowHeight);
+		ShadowMapFBO::getShader()->use();
+		ShadowMapFBO::getShader()->setUniform("depthMVP",depthMVP);
+		glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
+	}
 }
 
 void ShadowMapFBO::BindForReading(GLuint unit)
 {  
-		
-	ShadowMapFBO::getShader()->unuse();
-	glCullFace(GL_BACK);
-	glColorMask(TRUE,TRUE,TRUE,TRUE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glActiveTexture(GL_TEXTURE0 + unit);
-	glBindTexture(GL_TEXTURE_2D,m_shadowMap);
-	BoundTexture::currentID = -1;
-	BoundTexture::currentID = -1;
+	if(isEnabled)
+	{	
+		ShadowMapFBO::getShader()->unuse();
+		glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+		depthMVP = Matrix4().identity();
+		glCullFace(GL_BACK);
+		calculateMatrices();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0,0,windowWidth,windowHeight);
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(GL_TEXTURE0 + unit);
+		glBindTexture(GL_TEXTURE_2D,m_shadowMap);
+		BoundTexture::currentID = -1;
+		BoundTexture::currentID = -1;
+	}
 }
 
 Shader* ShadowMapFBO::getShader()
@@ -121,8 +134,6 @@ void ShadowMapFBO::deleteShader()
 void ShadowMapFBO::calculateMatrices()
 {
 	depthMVP =  depthProjectionMatrix * depthViewMatrix *  depthModelMatrix;
-	ShadowMapFBO::getShader()->setUniform("depthMVP",depthMVP);
-
 }
 
 void ShadowMapFBO::setLightDirection(Vector3 LightDirection)
@@ -134,7 +145,11 @@ void ShadowMapFBO::setLightDirection(Vector3 LightDirection)
 
 void ShadowMapFBO::addObject(Objekt &object)
 {
-	depthModelMatrix = object.transform.getMatrix();
-	calculateMatrices();
-	object.draw();
+	if(isEnabled)
+	{
+		depthModelMatrix = object.getMatrix();
+		calculateMatrices();
+		ShadowMapFBO::getShader()->setUniform("depthMVP",depthMVP);
+		object.draw();
+	}
 }

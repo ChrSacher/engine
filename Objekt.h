@@ -22,10 +22,12 @@
 class Objekt
 {
 public:
-	Objekt(std::string objektpath,Vector3 pos,Vector3 rot,std::string texturepath,Vector3 color);
+	Objekt(std::string objektpath,Vector3 pos,Vector3 rot,std::string texturepath,Vector3 color,bool autoCenter = false);
+	Objekt();
 	~Objekt(void);
 	void draw();
-	Material *material;
+	Matrix4& getMatrix();
+	Material material;
 	Mesh mesh;
 	Transform transform;
 };

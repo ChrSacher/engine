@@ -21,7 +21,7 @@ struct BoundTexture
 class Texture
 {
 public:
-	Texture(){}
+	Texture(){ID = 0;}
 	Texture(std::string path);
 	
 	virtual ~Texture(void);

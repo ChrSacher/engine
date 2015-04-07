@@ -1739,7 +1739,7 @@ Matrix4 Matrix4::lookAt(Vector3 const &eye,Vector3 const &center,Vector3 const &
 		Vector3 s((f.cross(up)).normalize());
 		Vector3 u(s.cross(f));
 
-		Matrix4 Result(1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1);
+		Matrix4 Result = Matrix4().identity();
 		Result[0] = s.x;
 		Result[4] = s.y;
 		Result[8] = s.z;

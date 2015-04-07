@@ -41,15 +41,16 @@ public:
 	GLuint vab[NUMBUFFERS];
 	void loadBuffer();
 	void releaseRenderer();
-
+	void init();
 };
 
 class Skybox 
 { 
 public: 
    void loadSkybox(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz); 
+   void setSkyboxTexture(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz); 
    void renderSkybox(); 
-   Skybox(Vector4 Color = Vector4(1,1,1,1));
+   Skybox();
    ~Skybox(){};
    void setCamera(Camera3d* Camera){camera=Camera;};
    void releaseSkybox(); 
@@ -57,6 +58,7 @@ public:
    void setPos(Vector3 Pos){transform.setPos(Pos);};
    void setRot(Vector3 Rot){transform.setRot(Rot);}
    void setScale(Vector3 Scale){transform.setPos(Scale);}
+   void init(Vector4 Color = Vector4(1,1,1,1));
 private: 
 	Shader* shader;
 	Camera3d *camera;

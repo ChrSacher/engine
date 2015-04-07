@@ -3,6 +3,7 @@
 
 Shader::Shader() : _numAttributes(0)
 {
+	/*create program */
 	 _programID = glCreateProgram();
 	 if(_programID == 0)
 	 {
@@ -13,11 +14,9 @@ Shader::Shader() : _numAttributes(0)
 Shader::~Shader()
 {
 	glUseProgram(0);
-	
 	glDeleteProgram(_programID);
 	
 }
-
 void Shader::addVertexShader(std::string path)
 {
 	addProgram(path,GL_VERTEX_SHADER);
@@ -35,7 +34,8 @@ void Shader::addFragmentShader(std::string path)
 
 void Shader::addProgram(std::string path,int type)
 {
-	int shader = glCreateShader(type);
+	/* create shader to attach to program*/
+	int shader = glCreateShader(type); 
 	if (shader == 0) 
 	{
         fatalError("shader failed to be created!");
@@ -155,8 +155,10 @@ void Shader::use()
     }
 }
 
-//disable the shader
-void Shader::unuse() {
+
+void Shader::unuse() 
+{
+	//disable the shader
     glUseProgram(0);
     for (int i = 0; i < _numAttributes; i++) 
 	{
@@ -166,12 +168,23 @@ void Shader::unuse() {
 
 GLint Shader::getUniformLocation(const std::string& uniformName)
 {
-	GLint location =glGetUniformLocation(_programID, uniformName.c_str());
-	if(location == GL_INVALID_INDEX)
-	{
-		fatalError("Uniform " + uniformName + " not found");
-	}
-	return location;
+	auto mit = uniforms.find(uniformName);
+    
+    //check if its not in the map
+   if (mit == uniforms.end()) 
+   {
+		GLint location =glGetUniformLocation(_programID, uniformName.c_str());
+		if(location == GL_INVALID_INDEX)
+		{
+			fatalError("Uniform " + uniformName + " not found");
+			return -1;
+		}	 
+        //Insert it into the map
+		uniforms.insert(make_pair(uniformName, location));
+
+        return location; 
+    }
+   return mit->second;
 }
 
 	void Shader::setUniform(std::string uniformName, int value)
@@ -203,6 +216,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		glUniformMatrix4fv(getUniformLocation(uniformName),1,GL_FALSE,&value[0]);
 	}
 
+	//standard shader specific settings
 	void Shader::setUniform(std::string uniformName,BaseLight value)
 	{
 		setUniform(uniformName + ".base.intensity",value.getIntensity());
@@ -253,7 +267,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	void Shader::updateObjekt(Objekt &object)
 	{
 		setmodelMatrix(object.transform);
-		updateMaterial(*object.material);
+		updateMaterial(object.material);
 		object.mesh.draw();
 	}
 

@@ -29,7 +29,7 @@ Matrix4 Transform::getMatrix()
 
 void Transform::calculateMatrix()
 {
-	modelMatrix = Matrix4().identity().translate(pos).rotateX(rot.x).rotateY(rot.y).rotateZ(rot.z).scale(sca);
+	modelMatrix = Matrix4().identity().scale(sca).rotateX(rot.x).rotateY(rot.y).rotateZ(rot.z).translate(pos);
 }
 
 void Transform::setPos(Vector3& Pos)

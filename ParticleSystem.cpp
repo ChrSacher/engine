@@ -6,6 +6,10 @@ std::vector<Particle> ParticleBuffer;
 
 ParticleSystem::ParticleSystem(void)
 {
+	
+}
+void ParticleSystem::init()
+{
 	shader = new Shader();
 	shader->addVertexShader("Shaders/particleShader.vert");
 	shader->addFragmentShader( "Shaders/particleShader.frag");
@@ -38,6 +42,7 @@ ParticleSystem::ParticleSystem(void)
 		ParticleBuffer.push_back( Particle(Vector3(rand() % 10,rand() % 10,rand() % 10),Vector3((rand() % 10) * 0.1f,(rand() % 10) * 0.1f,(rand() % 10) * 0.1f),Vector4((rand() % 10) * 0.1f,(rand() % 10) * 0.1f,(rand() % 10) * 0.1f ,1)));
 	}
 }
+
 
 
 ParticleSystem::~ParticleSystem(void)
@@ -73,11 +78,6 @@ void ParticleSystem::update()
 			x.pos += x.vel;
 			x.lifeTime =- time;
 		}
-		else
-		{
-			ParticleBuffer.erase(ParticleBuffer.begin() + i);
-		}
-			i++;
 	}
 	//do everything before this
 	if(ParticleBuffer.size() > 0)
@@ -89,15 +89,18 @@ void ParticleSystem::update()
 		colors.reserve(ParticleBuffer.size());
 		for(int i = 0;i< ParticleBuffer.size();i++)
 		{
+			if(ParticleBuffer[i].lifeTime >= 0)
+			{
 			positions.push_back(ParticleBuffer[i].pos);
 			colors.push_back(ParticleBuffer[i].color);
+			}
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
-		glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(ParticleBuffer[0].pos[0]) * 3 * ParticleBuffer.size(),&ParticleBuffer[0].pos[0]);
 		glBufferData(GL_ARRAY_BUFFER, ParticleCount * sizeof(ParticleBuffer[0].pos[0]) * 3, NULL, GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(ParticleBuffer[0].pos[0]) * 3 * ParticleBuffer.size(),&positions[0]);		
 		glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
 		glBufferData(GL_ARRAY_BUFFER, ParticleCount * sizeof(ParticleBuffer[0].color[0]) * 4, NULL, GL_STREAM_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(ParticleBuffer[0].color[0]) * 4 * ParticleBuffer.size(),&ParticleBuffer[0].color[0]);
+		glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(ParticleBuffer[0].color[0]) * 4 * ParticleBuffer.size(),&colors[0]);
 		
 	}
 
