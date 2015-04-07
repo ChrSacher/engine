@@ -56,9 +56,4 @@ private:
     float AngleH;
     float AngleV;
 
-    bool OnUpperEdge;
-    bool OnLowerEdge;
-    bool OnLeftEdge;
-    bool OnRightEdge;
-
 };

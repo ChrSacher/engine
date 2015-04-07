@@ -3,7 +3,7 @@ const float DEG2RAD = 3.141593f / 180;
 const float RAD2DEG = 180 / 3.141593;
 
 const static float STEP_SCALE = 0.1f;
-const float mouseSpeed = 0.05;
+const float mouseSpeed = 0.2f;
 const static float EDGE_STEP = 0.5f;
 const static int MARGIN = 50;
 
@@ -76,11 +76,6 @@ void Camera3d::init()
     }
     
     AngleV = -(asin(dir.y) * RAD2DEG);
-
-    OnUpperEdge = false;
-    OnLowerEdge = false;
-    OnLeftEdge  = false;
-    OnRightEdge = false;
 	mousePos.x  = windowWidth / 2;
     mousePos.y  = windowHeight / 2;
 }
