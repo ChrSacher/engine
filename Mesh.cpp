@@ -5,12 +5,13 @@ std::map<std::string, Model> ModelCache::_modelMap;
 
 Mesh::~Mesh(void)
 {
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(NUMBUFFERS,vab);
 }
 
 void Mesh::releaseMesh()
 {
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(NUMBUFFERS,vab);
+	
 }
 void Mesh::draw()
 {
@@ -52,11 +53,7 @@ Mesh::Mesh(std::string path,bool autoCenter)
 
 Mesh::Mesh()
 {
-	vao=0;
-	for(int i = 0;i<NUMBUFFERS;i++)
-	{
-		vab[i] = 0;
-	}
+	init();
 }
 
 Vertex::Vertex()

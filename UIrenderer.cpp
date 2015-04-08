@@ -5,11 +5,6 @@ int Button::IDCounter = 0;
 
 UIrenderer::UIrenderer()
 {
-	
-}
-
-void UIrenderer::init()
-{
 	shader = new Shader();
 	shader->addVertexShader("Shaders/2DShader.vert");
 	shader->addFragmentShader( "Shaders/2DShader.frag");
@@ -22,12 +17,13 @@ void UIrenderer::init()
 	glBindVertexArray(vao);
 	glGenBuffers(NUMBUFFERS,vab);
 }
-void UIrenderer::releaseRenderer()
+UIrenderer::~UIrenderer()
 {
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(NUMBUFFERS,vab);
 	delete(shader);
 }
+
 void UIrenderer::addButton(Button& newbutton)
 {
 	buttons.push_back(newbutton);
@@ -184,12 +180,7 @@ void Skybox::setSkyboxTexture(std::string Directory, std::string posx, std::stri
 	cube.Load();
 }
 
-Skybox::Skybox()
-{
-	
-}
-
-void Skybox::init(Vector4 Color)
+Skybox::Skybox(Vector4 Color)
 {
 	shader = new Shader();
 	shader->addVertexShader("Shaders/Skybox.vert");
@@ -215,15 +206,13 @@ void Skybox::renderSkybox()
 	glCullFace(GL_BACK);
 	glBindVertexArray(0);
 }
-
-void Skybox::releaseSkybox()
-{
+ Skybox::~Skybox()
+ {
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1,&vbo);
 	cube.releaseCubemap();
 	delete(shader);
-}
-
+ }
 
 bool Button::operator<(Button &other)
 {

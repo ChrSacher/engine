@@ -51,22 +51,22 @@ public:
 	void setUniform(std::string uniformName, Matrix4 value);
 	void setUniform(std::string uniformName,BaseLight value);
 	//uniforms setters
-	void setmodelMatrix(Transform &transform);
-	void setviewMatrix(Camera3d &view);
+	void setmodelMatrix(Transform *transform);
+	void setviewMatrix(Camera3d *view);
 	void setbaseColor(Vector3 Color);
 	void setbaseColor(Vector4 Color);
-	void setSpecular(Material &material);
-	void setCameraPos(Camera3d &view);
-	void updateMaterial(Material &material); //kann man auch überladen übersichtshalber mach ich das erst später
-	void updateCamera(Camera3d &camera);
-	void updateObjekt(Objekt &object);
-	void updateDirectionLight(DirectionalLight &light);
-	void updateAmbientLight(AmbientLight &ambient);
-	void updatePointLight(std::string uniformname ,PointLight &point);
+	void setSpecular(Material *material);
+	void setCameraPos(Camera3d *view);
+	void updateMaterial(Material *material); //kann man auch überladen übersichtshalber mach ich das erst später
+	void updateCamera(Camera3d *camera);
+	void updateObjekt(Objekt *object);
+	void updateDirectionLight(DirectionalLight *light);
+	void updateAmbientLight(AmbientLight *ambient);
+	void updatePointLight(std::string uniformname ,PointLight *point);
 	void updatePointLights(std::vector<PointLight> &point);
-	void updateSpotLight(std::string uniformname ,SpotLight &spot);
+	void updateSpotLight(std::string uniformname ,SpotLight *spot);
 	void updateSpotLights(std::vector<SpotLight> &spot);
-	void updateFog(Fog &fog);
+	void updateFog(Fog *fog);
 	//
 
     int _numAttributes;

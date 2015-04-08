@@ -57,7 +57,7 @@ void ParticleSystem::draw()
     if (count > 0)
     {
 		shader->setUniform("eyePos",camera->getPos());
-		shader->setviewMatrix(*camera);
+		shader->setviewMatrix(camera);
         glBindVertexArray(vao);
         glDrawArrays(GL_POINTS, 0, count);
         glBindVertexArray(0);

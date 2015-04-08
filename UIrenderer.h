@@ -25,6 +25,7 @@ class UIrenderer
 {
 public:
 	UIrenderer();
+	~UIrenderer();
 	Shader *shader;
 	std::vector<Button> buttons;
 	void addButton(Button& newbutton);
@@ -40,8 +41,6 @@ public:
 	};
 	GLuint vab[NUMBUFFERS];
 	void loadBuffer();
-	void releaseRenderer();
-	void init();
 };
 
 class Skybox 
@@ -50,15 +49,13 @@ public:
    void loadSkybox(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz); 
    void setSkyboxTexture(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz); 
    void renderSkybox(); 
-   Skybox();
-   ~Skybox(){};
+   Skybox(Vector4 Color = Vector4(1,1,1,1));
+   ~Skybox();
    void setCamera(Camera3d* Camera){camera=Camera;};
-   void releaseSkybox(); 
    void setColor(Vector4 Color){color=Color;}
    void setPos(Vector3 Pos){transform.setPos(Pos);};
    void setRot(Vector3 Rot){transform.setRot(Rot);}
    void setScale(Vector3 Scale){transform.setPos(Scale);}
-   void init(Vector4 Color = Vector4(1,1,1,1));
 private: 
 	Shader* shader;
 	Camera3d *camera;

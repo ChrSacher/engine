@@ -28,6 +28,7 @@
 #include "ParticleSystem.h"
 #include "UIrenderer.h"
 #include "Shadow.h"
+#include <memory>
 
 struct GameState
 {
@@ -81,17 +82,17 @@ class Maingame
 		FpsLimiter fpsLimiter;
 		InputManager input;
 		Shader *shader;
-		Camera3d camera;
-		AmbientLight light;
-		DirectionalLight light2;
-		std::vector<Objekt> objects;
-		PointLight point;
-		ParticleSystem particle2;
-		Fog fog;
-		SpotLight light3;
-		UIrenderer ui;
-		Skybox sky;
-		ShadowMapFBO shadow;
+		Camera3d* camera;
+		AmbientLight* light;
+		DirectionalLight* light2;
+		std::vector<Objekt*> objects;
+		PointLight* point;
+		ParticleSystem* particle2;
+		Fog*fog;
+		SpotLight* light3;
+		UIrenderer* ui;
+		Skybox* sky;
+		ShadowMapFBO* shadow;
 
 };
 

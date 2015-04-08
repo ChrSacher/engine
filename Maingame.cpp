@@ -87,7 +87,7 @@ void Maingame::handleKeys()
 			case SDL_MOUSEMOTION:
 			{
 				input.setMouseCoords(event.motion.x,event.motion.y);
-				camera.OnMouse(event.motion.x,event.motion.y);
+				camera->OnMouse(event.motion.x,event.motion.y);
 				SDL_WarpMouseInWindow(_window,SCREEN_WIDTH /2,SCREEN_HEIGHT /2);	
 			};break;
 			case SDL_KEYUP:
@@ -106,17 +106,17 @@ void Maingame::handleKeys()
 					{
 						SCREEN_WIDTH = event.window.data1;
 						SCREEN_HEIGHT = event.window.data2 ;
-						camera.updatePerspectiveMatrix(70.0f,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
+						camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
 						//ui->updateOrtho(SCREEN_WIDTH,SCREEN_HEIGHT);
 						glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-						shadow.windowHeight = SCREEN_HEIGHT;
-						shadow.windowWidth = SCREEN_WIDTH;
+						shadow->windowHeight = SCREEN_HEIGHT;
+						shadow->windowWidth = SCREEN_WIDTH;
 					};break;
 					case SDL_WINDOWEVENT_MAXIMIZED:
 					{
 						SDL_MaximizeWindow(_window);
 						SDL_GetWindowSize(_window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
-						camera.updatePerspectiveMatrix(70.0f,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
+						camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
 						//ui->updateOrtho(SCREEN_WIDTH,SCREEN_HEIGHT);
 						glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 						SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
@@ -136,27 +136,27 @@ void Maingame::handleKeys()
 	}
 	if(input.isKeyDown(SDLK_w))
 	{
-		camera.moveforward();
+		camera->moveforward();
 	}
 	if(input.isKeyDown(SDLK_s))
 	{
-		camera.movebackward();
+		camera->movebackward();
 	}
 	if(input.isKeyDown(SDLK_q))
 	{
-		camera.raise();
+		camera->raise();
 	}
 	if(input.isKeyDown(SDLK_e))
 	{
-		camera.sink();
+		camera->sink();
 	}
 	if(input.isKeyDown(SDLK_a))
 	{
-		camera.strafeleft();
+		camera->strafeleft();
 	}
 	if(input.isKeyDown(SDLK_d))
 	{
-		camera.straferight();
+		camera->straferight();
 	}
 	if(input.isKeyDown(SDLK_ESCAPE))
 	{
@@ -174,26 +174,26 @@ void Maingame::render()
 {
 	//Color buffer leer machen	
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	shadow.BindForWriting();
+	shadow->BindForWriting();
 	for(int i = 0;i < objects.size();i++)
 	{
-		shadow.addObject(objects[i]);
+		shadow->addObject(objects[i]);
 	}
-	shadow.BindForReading(1);
-	sky.renderSkybox();
+	shadow->BindForReading(1);
+	sky->renderSkybox();
 	//normal
 	shader->use();
 	static int counter;
 	counter++;
 	
 	shader->setUniform("shadowMap",1);
-	shader->setUniform("biasDepthMVP",shadow.biasMatrix * shadow.depthMVP);
-	shader->setUniform("shadowEnabled",shadow.isEnabled);
+	shader->setUniform("biasDepthMVP",shadow->biasMatrix * shadow->depthMVP);
+	shader->setUniform("shadowEnabled",shadow->isEnabled);
 	shader->updateFog(fog);
 	shader->updateCamera(camera);
 	for(int i = 0;i < objects.size();i++)
 	{
-		objects[i].transform.setPos(Vector3(0,-i,(i + 1) * sin(counter * 3.14/180)));
+		objects[i]->transform->setPos(Vector3(0,-i,(i + 1) * sin(counter * 3.14/180)));
 		shader->updateObjekt(objects[i]);
 	}
 	shader->updateAmbientLight(light);;
@@ -201,7 +201,7 @@ void Maingame::render()
 	shader->updateDirectionLight(light2);
 	shader->updatePointLight("pointLights[0]",point);
 	shader->unuse();
-	ui.draw();
+	ui->draw();
 	SDL_GL_SwapWindow(_window);
 
 }
@@ -229,9 +229,11 @@ void Maingame::close()
 {
 	SDL_DestroyWindow( _window);
 	SDL_GL_DeleteContext(glContext);
-	sky.releaseSkybox();
-	ui.releaseRenderer();
-	//delete(camera,light,light2,shader,fog,point,sky,ui);
+	for(int i = 0;i<objects.size() ; i++)
+	{
+		delete(objects[i]);
+	}
+	delete(camera,light,light2,fog,point,sky,ui);
 	delete(shader);
 	TextureCache::deleteCache();
 	ModelCache::deleteCache();
@@ -251,24 +253,24 @@ void Maingame::run()
 void Maingame::createObjects()
 {
 	
-	camera = Camera3d(Vector3(0,2,0),70,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
-	light = AmbientLight(Vector3(0.2,0.5,0.2));
-	light2 = DirectionalLight(BaseLight(Vector3(1,0.9,0.8),0.8f),Vector3(0.3,1,1));
-	objects.push_back(Objekt("models/box.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1)));
-	objects.push_back(Objekt("models/box.obj",Vector3(0.0f,3.0f,3.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,0)));
-	objects.push_back(Objekt("models/box.obj",Vector3(0.0f,1.5f,1.5f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,0,1)));
-	objects.push_back(Objekt("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
-	objects[3].transform.setScale(Vector3(1000.0f,0.01,1000));
-	point =  PointLight(Vector3(0,1,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
-	fog =  Fog(0.05,Vector4(0.5,0.5,0.5,0.5),400,500,0);
-	light3 =  SpotLight(PointLight(Vector3(0,10,1),BaseLight(Vector3(1,0,1),1),Attenuation(1,0,0),10),Vector3(0,1,0),0.2);
-	ui.init();
-	ui.addButton(Button(Vector2(0,0),Vector2(50,50),Vector4(1,0,0,1),true,""));
-	ui.addButton(Button(Vector2(50,50),Vector2(50,50),Vector4(0,0,1,0.1),true,""));
-	sky.init(Vector4(1,1,1,1));
-	sky.loadSkybox("Texture/","posx.png","negx.png","posy.png","negy.png","posz.png","negz.png");
-	sky.setCamera(&camera);
-	shadow.Init(1024,1024,SCREEN_WIDTH,SCREEN_HEIGHT,light2.direction,false);
+	camera = new Camera3d(Vector3(0,2,0),70,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
+	light = new AmbientLight(Vector3(0.2,0.5,0.2));
+	light2 = new DirectionalLight(BaseLight(Vector3(1,0.9,0.8),0.8f),Vector3(0.3,1,1));
+	objects.push_back(new Objekt("models/box.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1)));
+	objects.push_back(new Objekt("models/box.obj",Vector3(0.0f,3.0f,3.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,0)));
+	objects.push_back(new Objekt("models/box.obj",Vector3(0.0f,1.5f,1.5f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,0,1)));
+	objects.push_back(new Objekt("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
+	objects[3]->transform->setScale(Vector3(1000.0f,0.01,1000));
+	point =  new PointLight(Vector3(0,1,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
+	fog =  new Fog(0.05,Vector4(0.5,0.5,0.5,0.5),400,500,0);
+	light3 =  new SpotLight(PointLight(Vector3(0,10,1),BaseLight(Vector3(1,0,1),1),Attenuation(1,0,0),10),Vector3(0,1,0),0.2);
+	ui = new UIrenderer();
+	ui->addButton(Button(Vector2(0,0),Vector2(50,50),Vector4(1,0,0,1),true,""));
+	ui->addButton(Button(Vector2(50,50),Vector2(50,50),Vector4(0,0,1,0.1),true,""));
+	sky = new Skybox();
+	sky->loadSkybox("Texture/","posx.png","negx.png","posy.png","negy.png","posz.png","negz.png");
+	sky->setCamera(camera);
+	shadow = new ShadowMapFBO(1024,1024,SCREEN_WIDTH,SCREEN_HEIGHT,light2->direction,false);
 }
 
 void Maingame::initShaders()

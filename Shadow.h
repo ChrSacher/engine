@@ -15,11 +15,9 @@
 class ShadowMapFBO //funktioniert irgentwie nicht 
 {
     public:
-        ShadowMapFBO();
+        ShadowMapFBO(unsigned int ShadowWidth, unsigned int ShadowHeight,unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection,bool enabled);
 
 		~ShadowMapFBO();
-
-        bool Init(unsigned int ShadowWidth, unsigned int ShadowHeight,unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection,bool enabled);
 
         void BindForWriting();
         void BindForReading(GLuint unit = 0);
@@ -31,9 +29,12 @@ class ShadowMapFBO //funktioniert irgentwie nicht
 		Vector3 lightDirection;
 		void calculateMatrices();
 		void setLightDirection(Vector3 LightDirection);
-		void addObject(Objekt &object);
+		void addObject(Objekt *object);
 		unsigned int shadowWidth,shadowHeight;
 		unsigned int windowWidth,windowHeight;
+
+		//braucht verbesserung
+		//irgentwie funktioniert es nicht ein statischen pointer zu haben und den zu initialisieren
 		static void deleteShader();
 private:
 		static Shader * getShader();

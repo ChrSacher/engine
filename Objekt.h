@@ -27,8 +27,8 @@ public:
 	~Objekt(void);
 	void draw();
 	Matrix4& getMatrix();
-	Material material;
-	Mesh mesh;
-	Transform transform;
+	Material *material;
+	Mesh *mesh;
+	Transform *transform;
 };
 

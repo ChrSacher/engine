@@ -223,14 +223,14 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		setUniform(uniformName + ".base.color",value.getColor());
 	}
 
-	void Shader::setmodelMatrix(Transform &transform) 
+	void Shader::setmodelMatrix(Transform *transform) 
 	{
-		setUniform("modelMatrix",transform.getMatrix());
+		setUniform("modelMatrix",transform->getMatrix());
 	}
 
-	void Shader::setviewMatrix(Camera3d &view)
+	void Shader::setviewMatrix(Camera3d *view)
 	{
-		setUniform("viewMatrix",view.GetViewProjection());
+		setUniform("viewMatrix",view->GetViewProjection());
 	};
 
 	void Shader::setbaseColor(Vector3 Color)
@@ -241,65 +241,65 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 	{
 		setUniform("baseColor",Color);
 	}
-	void Shader::setSpecular(Material &material)
+	void Shader::setSpecular(Material *material)
 	{
-		setUniform("specularIntensity",material.getIntensity());
-		setUniform("specularPower",material.getPower());
+		setUniform("specularIntensity",material->getIntensity());
+		setUniform("specularPower",material->getPower());
 	}
-	void Shader::setCameraPos(Camera3d &view)
+	void Shader::setCameraPos(Camera3d *view)
 	{
-		setUniform("eyePos",view.getPos());
+		setUniform("eyePos",view->getPos());
 	}
-	void Shader::updateCamera(Camera3d &view)
+	void Shader::updateCamera(Camera3d *view)
 	{
 		setCameraPos(view);
 		setviewMatrix(view);
 		
 	}
-	void Shader::updateMaterial(Material &material)
+	void Shader::updateMaterial(Material *material)
 	{
-		material.texture.bind();
+		material->texture.bind();
 		setUniform("Texture",0);
 		setSpecular(material);
-		setbaseColor(material.color);
+		setbaseColor(material->color);
 		
 	}
-	void Shader::updateObjekt(Objekt &object)
+	void Shader::updateObjekt(Objekt *object)
 	{
-		setmodelMatrix(object.transform);
-		updateMaterial(object.material);
-		object.mesh.draw();
+		setmodelMatrix(object->transform);
+		updateMaterial(object->material);
+		object->mesh->draw();
 	}
 
-	void Shader::updateDirectionLight(DirectionalLight &light)
+	void Shader::updateDirectionLight(DirectionalLight *light)
 	{
-		setUniform("directionalLight.direction",light.direction);
-		setUniform("directionalLight.base.color",light.base.color);
-		setUniform("directionalLight.base.intensity",light.base.intensity);
+		setUniform("directionalLight.direction",light->direction);
+		setUniform("directionalLight.base.color",light->base.color);
+		setUniform("directionalLight.base.intensity",light->base.intensity);
 	}
-	void Shader::updateAmbientLight(AmbientLight &ambient)
+	void Shader::updateAmbientLight(AmbientLight *ambient)
 	{
-		setUniform("ambientLight",ambient.ambientLight);
+		setUniform("ambientLight",ambient->ambientLight);
 	}
 
-	void Shader::updatePointLight(std::string uniformname ,PointLight &point)
+	void Shader::updatePointLight(std::string uniformname ,PointLight *point)
 	{
-		setUniform(uniformname		   ,point.base);
-		setUniform(uniformname + ".pos",point.pos);
-		setUniform(uniformname + ".atten.constant",point.attenuation.constant);
-		setUniform(uniformname + ".atten.exponent",point.attenuation.exponent);
-		setUniform(uniformname + ".atten.linear",point.attenuation.linear);
-		setUniform(uniformname + ".range",point.range);
+		setUniform(uniformname		   ,point->base);
+		setUniform(uniformname + ".pos",point->pos);
+		setUniform(uniformname + ".atten.constant",point->attenuation.constant);
+		setUniform(uniformname + ".atten.exponent",point->attenuation.exponent);
+		setUniform(uniformname + ".atten.linear",point->attenuation.linear);
+		setUniform(uniformname + ".range",point->range);
 
 
 	}
-	void Shader::updateFog(Fog &fog)
+	void Shader::updateFog(Fog *fog)
 	{
-		setUniform("fog.density",fog.density);
-		setUniform("fog.color",fog.color);
-		setUniform("fog.start",fog.start);
-		setUniform("fog.type",fog.type);
-		setUniform("fog.end",fog.end);
+		setUniform("fog.density",fog->density);
+		setUniform("fog.color",fog->color);
+		setUniform("fog.start",fog->start);
+		setUniform("fog.type",fog->type);
+		setUniform("fog.end",fog->end);
 	}
 
 	void Shader::updatePointLights(std::vector<PointLight> &point)
@@ -314,22 +314,22 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 			std::string string("pointLights[");
 			string.append(std::to_string(i));
 			string = string  + "]";
-			updatePointLight(string,point[i]);
+			updatePointLight(string,&point[i]);
 		}
 
 
 	}
 
-	void Shader::updateSpotLight(std::string uniformname ,SpotLight &spot)
+	void Shader::updateSpotLight(std::string uniformname ,SpotLight *spot)
 	{
-		setUniform(uniformname + ".pointLight"	   ,spot.pointLight.base);
-		setUniform(uniformname + ".pointLight.pos",spot.pointLight.pos);
-		setUniform(uniformname + ".pointLight.atten.constant",spot.pointLight.attenuation.constant);
-		setUniform(uniformname + ".pointLight.atten.exponent",spot.pointLight.attenuation.exponent);
-		setUniform(uniformname + ".pointLight.atten.linear",spot.pointLight.attenuation.linear);
-		setUniform(uniformname + ".pointLight.range",spot.pointLight.range);
-		setUniform(uniformname + ".cutoff",spot.cutoff);
-		setUniform(uniformname + ".dir",spot.dir);
+		setUniform(uniformname + ".pointLight"	   ,spot->pointLight.base);
+		setUniform(uniformname + ".pointLight.pos",spot->pointLight.pos);
+		setUniform(uniformname + ".pointLight.atten.constant",spot->pointLight.attenuation.constant);
+		setUniform(uniformname + ".pointLight.atten.exponent",spot->pointLight.attenuation.exponent);
+		setUniform(uniformname + ".pointLight.atten.linear",spot->pointLight.attenuation.linear);
+		setUniform(uniformname + ".pointLight.range",spot->pointLight.range);
+		setUniform(uniformname + ".cutoff",spot->cutoff);
+		setUniform(uniformname + ".dir",spot->dir);
 
 
 	}

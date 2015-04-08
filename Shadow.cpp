@@ -1,35 +1,8 @@
 ﻿#include "Shadow.h"
 
 
-ShadowMapFBO::ShadowMapFBO()
+ShadowMapFBO::ShadowMapFBO(unsigned int ShadowWidth, unsigned int ShadowHeight,unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection,bool enabled)
 {
-	m_fbo = 0;
-    m_shadowMap = 0;
-}
-
-ShadowMapFBO::~ShadowMapFBO()
-{
-	if (m_fbo != 0) 
-	{
-       glDeleteFramebuffers(1, &m_fbo);
-    }
-
-    if (m_shadowMap != 0) 
-	{
-        glDeleteTextures(1, &m_shadowMap);
-	}
-}
-bool ShadowMapFBO::Init(unsigned int ShadowWidth, unsigned int ShadowHeight,unsigned int WindowWidth, unsigned int WindowHeight,Vector3 LightDirection,bool enabled)
-{
-	if (m_fbo != 0) 
-	{
-       glDeleteFramebuffers(1, &m_fbo);
-    }
-
-    if (m_shadowMap != 0) 
-	{
-        glDeleteTextures(1, &m_shadowMap);
-	}
 	isEnabled = enabled;
 	glGenFramebuffersEXT(1, &m_fbo);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
@@ -58,12 +31,16 @@ bool ShadowMapFBO::Init(unsigned int ShadowWidth, unsigned int ShadowHeight,unsi
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		isEnabled = false;
-		return false;
+		return;
 	}
 	lightDirection  = LightDirection;
+
 	depthProjectionMatrix = Matrix4().identity().InitOrthographic(-10,10,-10,10,-10,10);
+
 	depthViewMatrix = Matrix4().lookAt(lightDirection,Vector3(0,0,0), Vector3(0,1,0));
+
 	depthModelMatrix = Matrix4().identity();
+
 	biasMatrix = Matrix4(	0.5, 0.0, 0.0, 0.0,
 							0.0, 0.5, 0.0, 0.0,
 							0.0, 0.0, 0.5, 0.0,
@@ -72,8 +49,15 @@ bool ShadowMapFBO::Init(unsigned int ShadowWidth, unsigned int ShadowHeight,unsi
 	calculateMatrices();
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	return true;
+	return;
 }
+
+ShadowMapFBO::~ShadowMapFBO()
+{
+       glDeleteFramebuffers(1, &m_fbo);
+       glDeleteTextures(1, &m_shadowMap);
+}
+
 
 void ShadowMapFBO::BindForWriting()
 {
@@ -143,13 +127,13 @@ void ShadowMapFBO::setLightDirection(Vector3 LightDirection)
 	calculateMatrices();
 }
 
-void ShadowMapFBO::addObject(Objekt &object)
+void ShadowMapFBO::addObject(Objekt *object)
 {
 	if(isEnabled)
 	{
-		depthModelMatrix = object.getMatrix();
+		depthModelMatrix = object->getMatrix();
 		calculateMatrices();
 		ShadowMapFBO::getShader()->setUniform("depthMVP",depthMVP);
-		object.draw();
+		object->draw();
 	}
 }
