@@ -1,0 +1,4 @@
+Öffne das projekt in visual studio.
+Gehe auf Projekt->Eigenschaften oder alt-F7.
+Oben links bei Konfikuration stelle alle konfigurationen ein.
+Dann unter VC++-Verzeichznissse  ändere den pfad zu deinem speicherort bei Includeverzeichnisse und Bibliotheksverzeichnisse.
