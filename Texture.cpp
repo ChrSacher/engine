@@ -3,17 +3,13 @@
 #include "Texture.h"
 
 
-std::map<std::string, Texture> TextureCache::_textureMap;
-GLuint BoundTexture::currentID = -1;
-GLuint BoundTexture::currentUnit = -1;
+std::map<std::string, TextureAndCount> TextureCache::textureMap;
 
 
 Texture::Texture(std::string path)
 {
 	*this = TextureCache::getTexture(path);
 }
-
-
 
 void Texture::addTexture(std::string path)
 {
@@ -48,21 +44,10 @@ Texture::~Texture(void)
 
 void Texture::bind(int unit)
 {
-	if(unit < 0 || unit > 32) fatalError("Texture unit is too large/too low");
-	if(BoundTexture::currentID != ID || BoundTexture::currentUnit != unit)
-	{
-		glActiveTexture(GL_TEXTURE0 + unit);
-		glBindTexture(GL_TEXTURE_2D,ID);
-		BoundTexture::currentID = ID;
-		BoundTexture::currentUnit = unit;
-	}
+	if(unit < 0 || unit > 30) fatalError("Texture unit is too large/too low");
+	BoundTexture::getInstance().bind(ID,unit);
 }
 
-void Texture::unbind()
-{
-	//glDisable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0);
-}
 
 void Texture::drawTexture(bool check)
 {
@@ -82,21 +67,22 @@ Texture TextureCache::getTexture(std::string texturePath)
 {
 
     //lookup the texture and see if its in the map
-    auto mit = _textureMap.find(texturePath);
+    auto mit = textureMap.find(texturePath);
     
     //check if its not in the map
-    if (mit == _textureMap.end()) 
+    if (mit == textureMap.end()) 
 	{
         //Load the texture
 		 Texture newTexture = TextureLoader::load(texturePath);
 		 
         //Insert it into the map
-		_textureMap.insert(make_pair(texturePath, newTexture));
+		textureMap.insert(make_pair(texturePath, TextureAndCount(newTexture,1)));
 
         return newTexture;
     }
 	printf("loaded cached Texture\n");
-    return mit->second;
+	mit->second.count ++;
+    return mit->second.texture;
 }
 
 Texture TextureLoader::load(std::string filepath)
@@ -110,6 +96,7 @@ Texture TextureLoader::load(std::string filepath)
 	{
 		printf("Couldn't load texture %s\nLoading Backup Texture\n",filepath.c_str());
 		data = (char*)stbi_load("texture/white.png",&width,&height,&numComponents,4);
+
 		texture.texturepath="Texture/white.png";
 		if(data == NULL)
 		{
@@ -122,9 +109,9 @@ Texture TextureLoader::load(std::string filepath)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2); //anisotropy filtering for better quality and workload
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 2); //anisotropy filtering for better quality but more workload
 	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	texture.width=width;
@@ -134,6 +121,46 @@ Texture TextureLoader::load(std::string filepath)
 	
 	return texture;
 }
+
+
+void TextureCache::lowerCount(std::string texturePath)
+{
+	auto mit = textureMap.find(texturePath);
+    
+    //check if its not in the map
+    if (mit == textureMap.end()) 
+	{
+        printf("Cannot lower count on non existing texture path %s\n",texturePath);
+		return;
+    }
+	mit->second.count --;
+	if(mit->second.count < 1)
+	{
+		mit->second.texture.releaseTexture();
+		textureMap.erase(mit);
+	}
+	return;
+}
+
+void TextureCache::lowerCount(GLuint textureID)
+{
+	for (std::map<std::string,TextureAndCount>::iterator mit = textureMap.begin(); mit != textureMap.end(); ++mit)
+	{
+		if(mit->second.texture.ID == textureID)
+		{
+			mit->second.count -- ;
+			if(mit->second.count < 1)
+			{
+				mit->second.texture.releaseTexture();
+				textureMap.erase(mit);
+			}
+			return;
+		};
+	};
+	printf("couldn't find ID %d",textureID);
+}
+
+
 
 bool CubemapTexture::Load()
 {
@@ -187,19 +214,7 @@ void CubemapTexture::bind(GLuint unit)
 			fatalError("Texture unit is too large/too low");
 			return;
 	}
-	if(BoundTexture::currentID != ID || BoundTexture::currentUnit != unit)
-	{
-		glActiveTexture(GL_TEXTURE0 + unit);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
-		BoundTexture::currentID = ID;
-		BoundTexture::currentUnit = unit;
-	};
-}
-
-void CubemapTexture::unbind()
-{
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	BoundTexture::getInstance().bind(ID,unit,GL_TEXTURE_CUBE_MAP);
 }
 
 void CubemapTexture::addFiles(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz)
@@ -221,20 +236,82 @@ CubemapTexture::CubemapTexture(const std::string& Directory, const std::string& 
 }
 void CubemapTexture::releaseCubemap()
 {
+	BoundTexture::getInstance().unbind(ID);
 	glDeleteTextures(1,&ID);
 }
 
 
 void TextureCache::deleteCache()
 {
-	for (std::map<std::string,Texture>::iterator it = _textureMap.begin(); it != _textureMap.end(); ++it)
+	for (std::map<std::string,TextureAndCount>::iterator it = textureMap.begin(); it != textureMap.end(); ++it)
 	{
-		it->second.releaseTexture();
+		it->second.texture.releaseTexture();
 	}	
 }
 
 
 void Texture::releaseTexture()
 {
+	BoundTexture::getInstance().unbind(ID);
 	glDeleteTextures(1,&ID);
+}
+
+bool BoundTexture::isBound(GLuint ID,GLuint unit)
+{
+	GLint program;
+	glGetIntegerv(GL_CURRENT_PROGRAM,&program);
+	auto mit = boundUnitMap.find(program);
+	if (mit == boundUnitMap.end()) 
+	{
+		GLuint newarray[31] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+		std::vector<GLuint> temp(newarray,newarray + 31);
+		boundUnitMap.insert(std::make_pair((GLuint)program,temp));
+		return false;
+    }
+	if(mit->second[unit] == ID)
+	{		
+		return true;
+	}
+	else return false;
+	
+}
+
+void BoundTexture::unbind(GLuint ID,GLenum TextureType)
+{
+	for (auto mit = boundUnitMap.begin(); mit != boundUnitMap.end(); ++mit)
+	{
+		for(int i = 0; i < 31 ; i++)
+		{
+			if(mit->second[i] == ID)
+			{
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(TextureType,0);
+			}
+		}
+	}
+}
+
+void BoundTexture::bind(GLuint ID,GLuint unit,GLenum TextureType)
+{
+		if(!(isBound(ID,unit)))
+		{
+			glActiveTexture(GL_TEXTURE0 + unit);
+			glBindTexture(TextureType, ID);
+			GLint program;
+			glGetIntegerv(GL_CURRENT_PROGRAM,&program);
+			auto mit = boundUnitMap.find(program);
+			if (mit == boundUnitMap.end()) 
+			{
+				printf("BoundTexture unexpected error which shouldn't happen \n");
+				return;
+			}
+			mit->second[unit] = ID;
+		}
+
+}
+
+BoundTexture& BoundTexture::getInstance()
+{
+	static BoundTexture boundTexture;
+	return boundTexture;
 }

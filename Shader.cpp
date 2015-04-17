@@ -1,5 +1,6 @@
 #include "Shader.h"
 
+GLuint Shader::currentActiveShader = -1;
 
 Shader::Shader() : _numAttributes(0)
 {
@@ -148,6 +149,7 @@ void Shader::bind()
 void Shader::use() 
 {
     glUseProgram(_programID);
+	Shader::currentActiveShader =_programID;
     //enable all the attributes we added with addAttribute
     for (int i = 0; i < _numAttributes; i++) 
 	{
@@ -160,6 +162,7 @@ void Shader::unuse()
 {
 	//disable the shader
     glUseProgram(0);
+	Shader::currentActiveShader = -1;
     for (int i = 0; i < _numAttributes; i++) 
 	{
         glDisableVertexAttribArray(i);
@@ -264,7 +267,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		setbaseColor(material->color);
 		
 	}
-	void Shader::updateObjekt(Objekt *object)
+	void Shader::updateObject(Object *object)
 	{
 		setmodelMatrix(object->transform);
 		updateMaterial(object->material);
@@ -273,9 +276,9 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 
 	void Shader::updateDirectionLight(DirectionalLight *light)
 	{
-		setUniform("directionalLight.direction",light->direction);
-		setUniform("directionalLight.base.color",light->base.color);
-		setUniform("directionalLight.base.intensity",light->base.intensity);
+		setUniform("directionalLight.direction",light->getDirection());
+		setUniform("directionalLight.base.color",light->getBaseLight().getColor());
+		setUniform("directionalLight.base.intensity",light->getBaseLight().getIntensity());
 	}
 	void Shader::updateAmbientLight(AmbientLight *ambient)
 	{

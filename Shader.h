@@ -15,18 +15,33 @@
 #include "Transform.h"
 #include "Camera3d.h"
 #include "Material.h"
-#include "Objekt.h"
+#include "Object.h"
 #include "Lighting.h"
 
 const int static MAXPOINTLIGHTS = 4;
 const int static MAXSPOTLIGHTS = 4;
 
-
+class ShaderObjectPipeLine
+{
+public:
+	ShaderObjectPipeLine();
+	~ShaderObjectPipeLine();
+	enum
+	{
+		VERTEXBUFFER,
+		TEXTUREBUFFER,
+		NORMALBUFFER,
+		INDICESBUFFER,
+		NUMBUFFERS
+	};
+	GLuint vao,vab[NUMBUFFERS];
+};
 class Shader
 {
 public:
 	Shader();
 	~Shader(void);
+	static GLuint currentActiveShader;
 
     void compileShaders(const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilepath);
     void linkShaders();
@@ -35,7 +50,7 @@ public:
 	void addFragmentShader(std::string path);
 	void addProgram(std::string path,int type);
 	void bind();
-		void use();
+	void use();
 	void unuse();
 	void addUniform(const std::string& uniformname);
     void addAttribute(const std::string& attributeName);
@@ -59,7 +74,7 @@ public:
 	void setCameraPos(Camera3d *view);
 	void updateMaterial(Material *material); //kann man auch überladen übersichtshalber mach ich das erst später
 	void updateCamera(Camera3d *camera);
-	void updateObjekt(Objekt *object);
+	void updateObject(Object *object);
 	void updateDirectionLight(DirectionalLight *light);
 	void updateAmbientLight(AmbientLight *ambient);
 	void updatePointLight(std::string uniformname ,PointLight *point);

@@ -42,7 +42,6 @@ struct Model
 	std::vector<Vertex> Vertices;
 	OBJIndex index;
 	void center();
-
 };
 
 class OBJLoader
@@ -82,8 +81,7 @@ private:
 		NUMBUFFERS
 	};
 	
-	GLuint vao,vbo;
-	GLuint vab[NUMBUFFERS];
+	GLuint vao ,vab[NUMBUFFERS];
 };
 
 

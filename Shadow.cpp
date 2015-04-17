@@ -75,7 +75,7 @@ void ShadowMapFBO::BindForWriting()
 	}
 }
 
-void ShadowMapFBO::BindForReading(GLuint unit)
+void ShadowMapFBO::BindForReading()
 {  
 	if(isEnabled)
 	{	
@@ -87,10 +87,7 @@ void ShadowMapFBO::BindForReading(GLuint unit)
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0,0,windowWidth,windowHeight);
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glActiveTexture(GL_TEXTURE0 + unit);
-		glBindTexture(GL_TEXTURE_2D,m_shadowMap);
-		BoundTexture::currentID = -1;
-		BoundTexture::currentID = -1;
+		BoundTexture::getInstance().bind(m_shadowMap,31);
 	}
 }
 
@@ -127,7 +124,7 @@ void ShadowMapFBO::setLightDirection(Vector3 LightDirection)
 	calculateMatrices();
 }
 
-void ShadowMapFBO::addObject(Objekt *object)
+void ShadowMapFBO::addObject(Object *object)
 {
 	if(isEnabled)
 	{

@@ -358,9 +358,11 @@ struct Quaternion
     void Normalize();
 
     Quaternion Conjugate();  
- };
+
+};
 
 Quaternion operator*(const Quaternion& l, const Quaternion& r);
 
 Quaternion operator*(const Quaternion& q, const Vector3& v);
+
 

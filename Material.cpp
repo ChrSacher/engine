@@ -13,5 +13,5 @@ Material::Material(std::string path,Vector3 Color,float intensity ,float power)
 
 Material::~Material(void)
 {
-
+	TextureCache::lowerCount(texture.ID);
 }

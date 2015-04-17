@@ -21,7 +21,6 @@ class AmbientLight
 public:
 	AmbientLight(Vector3 ambient = Vector3(0.1,0.1,0.1));
 	~AmbientLight(void);
-
 	Vector3 ambientLight;
 	void setAmbient(Vector3 newambient);
 	Vector3 getAmbient();
@@ -89,10 +88,9 @@ class SpotLight
 {
 public:
 	PointLight pointLight;
-	SpotLight(){}
 	Vector3 dir;
 	float cutoff;
-	SpotLight(PointLight point,Vector3 Dir,float Cutoff);
+	SpotLight(PointLight point = PointLight(),Vector3 Dir = Vector3(1,1,1),float Cutoff = 0.4f);
 	~SpotLight(){};
 	//setters
 	void setPointLight(PointLight &light){pointLight=light;}

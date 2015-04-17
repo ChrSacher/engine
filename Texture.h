@@ -12,11 +12,25 @@
 #include "Errors.h"
 #include <vector>
 
-struct BoundTexture
+class BoundTexture
 {
-	static GLuint currentID;
-	static GLuint currentUnit;
+public:
+	static BoundTexture& getInstance();
+	
+
+	BoundTexture(BoundTexture const&);              // Don't Implement
+	void operator=(BoundTexture const&);
+
+	std::map<GLuint,std::vector<GLuint>> boundUnitMap; //Shader, Bound textures map  //unit 31 is reserviert für schatten
+	bool isBound(GLuint ID,GLuint unit);
+	void unbind(GLuint ID,GLenum TextureType = GL_TEXTURE_2D);
+	void bind(GLuint ID,GLuint unit,GLenum TextureType = GL_TEXTURE_2D);
+
+private:
+	BoundTexture(){};
+	~BoundTexture(){};
 };
+
 
 class Texture
 {
@@ -26,7 +40,6 @@ public:
 	
 	virtual ~Texture(void);
 	void bind(int unit = 0);
-	void unbind();
 	GLuint ID;
 	int width,height;
 	std::string texturepath;
@@ -35,15 +48,24 @@ public:
 	void releaseTexture();
 };
 
+struct TextureAndCount
+{
+	Texture texture;
+	GLuint count;
+	TextureAndCount(Texture newtexture,GLuint Count){count = Count;texture = newtexture;};
+};
+
 class TextureCache
 {
 public:
 
     static Texture getTexture(std::string texturePath);
+	static void lowerCount(std::string texturePath);
+	static void lowerCount(GLuint textureID);
 	static void deleteCache();
-
+	
 private:
-    static std::map<std::string, Texture> _textureMap;
+    static std::map<std::string, TextureAndCount> textureMap;
 };
 
 
@@ -69,7 +91,6 @@ public:
 	CubemapTexture(){}
     bool Load();
     void bind(GLuint unit = 0);
-	void unbind();
 	void addFiles(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz);
 	void releaseCubemap();
 private:

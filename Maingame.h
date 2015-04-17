@@ -20,15 +20,20 @@
 #include "Texture.h"
 #include "Transform.h"
 #include "Camera3d.h"
-#include "RenderUtil.h"
 #include <math.h>
 #include "Material.h"
 #include "Lighting.h"
-#include "Objekt.h"
+#include "Object.h"
 #include "ParticleSystem.h"
 #include "UIrenderer.h"
 #include "Shadow.h"
 #include <memory>
+
+//check for memory leaks
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 
 struct GameState
 {
@@ -50,7 +55,7 @@ class Maingame
 		//bool initGL();//matrizen initialisieren + farbe
 		void handleKeys(); //Eingabe 
 		void update();//Pro frame update
-		void render();//Objekte rendern
+		void render();//Objecte rendern
 		void close(); //Schliessen von SDL + Resourcen
 		void run();
 		void gameloop();
@@ -72,7 +77,6 @@ class Maingame
 		float _time;
 		int SCREEN_WIDTH;
 		int SCREEN_HEIGHT;
-		bool windowed;
 		float maxFPS;
 
 		SDL_Event event;
@@ -85,7 +89,7 @@ class Maingame
 		Camera3d* camera;
 		AmbientLight* light;
 		DirectionalLight* light2;
-		std::vector<Objekt*> objects;
+		std::vector<Object*> objects;
 		PointLight* point;
 		ParticleSystem* particle2;
 		Fog*fog;

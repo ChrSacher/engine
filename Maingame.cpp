@@ -8,7 +8,6 @@ Maingame::Maingame(void)
 	SCREEN_WIDTH = 640;
 	gamestate.playing=true;
 	gamestate.paused=false;
-	windowed=true;
 	maxFPS=60;
 }
 
@@ -57,16 +56,30 @@ void Maingame::init()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	//Set VSYNC
     SDL_GL_SetSwapInterval(1);
-	RenderUtil::initGraphics();
+
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CW);
+	glCullFace(GL_BACK);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glReadBuffer(GL_BACK);
+	glDrawBuffer(GL_BACK);
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+	//glEnable(GL_FRAMEBUFFER_SRGB);
 	glClearDepth(1.0f);
     //Set the background color to blue
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	SDL_ShowCursor(SDL_FALSE); 
+
 	initShaders();
 	createObjects();
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	SDL_GL_SwapWindow(_window);
-	fpsLimiter.init(maxFPS);
+	fpsLimiter.init(maxFPS); //using frame rater limiter since when do not have time dependent yet
 
 	return ;
 }
@@ -107,20 +120,15 @@ void Maingame::handleKeys()
 						SCREEN_WIDTH = event.window.data1;
 						SCREEN_HEIGHT = event.window.data2 ;
 						camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
-						//ui->updateOrtho(SCREEN_WIDTH,SCREEN_HEIGHT);
 						glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-						shadow->windowHeight = SCREEN_HEIGHT;
-						shadow->windowWidth = SCREEN_WIDTH;
 					};break;
 					case SDL_WINDOWEVENT_MAXIMIZED:
 					{
 						SDL_MaximizeWindow(_window);
 						SDL_GetWindowSize(_window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
 						camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
-						//ui->updateOrtho(SCREEN_WIDTH,SCREEN_HEIGHT);
 						glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 						SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
-						windowed=false;
 					};break;
 				}
 			};break;
@@ -162,6 +170,28 @@ void Maingame::handleKeys()
 	{
 		gamestate.playing=false;
 	}
+	if(input.isKeyPressed(SDLK_F11))
+	{
+		static bool windowed = true;
+		if(windowed)
+		{
+			SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
+			SDL_MaximizeWindow(_window);
+			SDL_GetWindowSize(_window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
+			camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
+			glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);		
+			windowed = false;
+		}
+		else
+		{
+			SDL_SetWindowFullscreen(_window, SDL_FALSE);
+			SDL_GetWindowSize(_window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
+			camera->updatePerspectiveMatrix(70.0f,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
+			glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+			
+			windowed = true;
+		}
+	}
 	return;
 }
 
@@ -174,27 +204,18 @@ void Maingame::render()
 {
 	//Color buffer leer machen	
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	shadow->BindForWriting();
-	for(int i = 0;i < objects.size();i++)
-	{
-		shadow->addObject(objects[i]);
-	}
-	shadow->BindForReading(1);
+
 	sky->renderSkybox();
 	//normal
 	shader->use();
 	static int counter;
 	counter++;
-	
-	shader->setUniform("shadowMap",1);
-	shader->setUniform("biasDepthMVP",shadow->biasMatrix * shadow->depthMVP);
-	shader->setUniform("shadowEnabled",shadow->isEnabled);
 	shader->updateFog(fog);
 	shader->updateCamera(camera);
 	for(int i = 0;i < objects.size();i++)
 	{
 		objects[i]->transform->setPos(Vector3(0,-i,(i + 1) * sin(counter * 3.14/180)));
-		shader->updateObjekt(objects[i]);
+		shader->updateObject(objects[i]); //Draw objects
 	}
 	shader->updateAmbientLight(light);;
 	shader->updateSpotLight("spotLights[0]",light3);
@@ -202,6 +223,7 @@ void Maingame::render()
 	shader->updatePointLight("pointLights[0]",point);
 	shader->unuse();
 	ui->draw();
+
 	SDL_GL_SwapWindow(_window);
 
 }
@@ -227,18 +249,20 @@ void Maingame::gameloop()
 
 void Maingame::close()
 {
-	SDL_DestroyWindow( _window);
-	SDL_GL_DeleteContext(glContext);
 	for(int i = 0;i<objects.size() ; i++)
 	{
 		delete(objects[i]);
 	}
-	delete(camera,light,light2,fog,point,sky,ui);
+	delete(camera,light,light2,light3,fog,point,sky,ui);
 	delete(shader);
 	TextureCache::deleteCache();
 	ModelCache::deleteCache();
 	_window = NULL;
+	
+	SDL_DestroyWindow( _window);
+	SDL_GL_DeleteContext(glContext);
 	SDL_Quit();
+
 	exit(0);
 }
 
@@ -254,13 +278,13 @@ void Maingame::createObjects()
 {
 	
 	camera = new Camera3d(Vector3(0,2,0),70,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
-	light = new AmbientLight(Vector3(0.2,0.5,0.2));
+	light = new AmbientLight(Vector3(0.2,0.2,0.2));
 	light2 = new DirectionalLight(BaseLight(Vector3(1,0.9,0.8),0.8f),Vector3(0.3,1,1));
-	objects.push_back(new Objekt("models/box.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1)));
-	objects.push_back(new Objekt("models/box.obj",Vector3(0.0f,3.0f,3.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,0)));
-	objects.push_back(new Objekt("models/box.obj",Vector3(0.0f,1.5f,1.5f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,0,1)));
-	objects.push_back(new Objekt("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
-	objects[3]->transform->setScale(Vector3(1000.0f,0.01,1000));
+	objects.push_back(new Object("models/box.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1)));
+	objects.push_back(new Object("models/box.obj",Vector3(0.0f,3.0f,3.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1)));
+	objects.push_back(new Object("models/box.obj",Vector3(0.0f,1.5f,1.5f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,0,1)));
+	objects.push_back(new Object(*objects[2]));
+	objects.push_back(new Object("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
 	point =  new PointLight(Vector3(0,1,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
 	fog =  new Fog(0.05,Vector4(0.5,0.5,0.5,0.5),400,500,0);
 	light3 =  new SpotLight(PointLight(Vector3(0,10,1),BaseLight(Vector3(1,0,1),1),Attenuation(1,0,0),10),Vector3(0,1,0),0.2);
@@ -270,7 +294,6 @@ void Maingame::createObjects()
 	sky = new Skybox();
 	sky->loadSkybox("Texture/","posx.png","negx.png","posy.png","negy.png","posz.png","negz.png");
 	sky->setCamera(camera);
-	shadow = new ShadowMapFBO(1024,1024,SCREEN_WIDTH,SCREEN_HEIGHT,light2->direction,false);
 }
 
 void Maingame::initShaders()
