@@ -1,11 +1,11 @@
 #include "Object.h"
 
-
+GLuint Object::id = 0;
 Object::Object(std::string Objectpath,Vector3 pos,Vector3 rot,std::string texturepath,Vector3 color,bool autoCenter)
 {
-	static GLuint id = 0;
-	id++;
+
 	ID = id;
+	id++;
 	material = new Material(texturepath,color,2,32);
 	transform =  new Transform(pos,rot,Vector3(1,1,1));
 	mesh = new Mesh(Objectpath,autoCenter);
@@ -32,6 +32,8 @@ Matrix4& Object::getMatrix()
 
 Object::Object()
 {
+	ID = id;
+	id++;
 	material = new Material();
 	transform = new Transform();
 	mesh = new Mesh();
@@ -39,6 +41,8 @@ Object::Object()
 
 Object::Object(const Object& otherobject)
 {
+	ID = id;
+	id++;
 	material = new Material(*otherobject.material);
 	transform = new Transform(*otherobject.transform);
 	mesh = new Mesh(*otherobject.mesh);

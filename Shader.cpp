@@ -518,9 +518,9 @@ void Shader::addObject(Object* object)
 	glGenBuffers(NUMBUFFERS,vab);
 	lastOffset = 0;
 	static GLuint Max_Size = 2000000 ;
-	remainingSize[1] = 0;
-	remainingSize[2] = 0;
-	remainingSize[3] = 0;
+	remainingSize[0] = Max_Size;
+	remainingSize[1] = Max_Size * 2/3;
+	remainingSize[2] = Max_Size;
 	glBindBuffer(GL_ARRAY_BUFFER,vab[VERTEXBUFFER]);
 
 	glBufferData(GL_ARRAY_BUFFER,Max_Size,NULL,GL_DYNAMIC_DRAW);
@@ -573,6 +573,84 @@ void Shader::addObject(Object* object)
 	}
 	glBindVertexArray(0);
  }
+
+ void Shader::ObjectBatch::loadBufferLast()
+ {
+	glBindVertexArray(vao);
+		std::vector<Vector3> positions;
+		std::vector<Vector2> uvs;
+		std::vector<Vector3> normals;
+		int i = objects.size() - 1 ;
+		if(!objects[i])
+		{
+			printf("Object was null and has been deleted");
+			deleteObject(i);
+		}
+		positions.reserve(objects[i]->count);
+		uvs.reserve(objects[i]->count);
+		normals.reserve(objects[i]->count);
+		for(int j = 0;j < objects[i]->count;j++)
+		{
+			positions.push_back(objects[i]->object->mesh->model.Vertices[j].getPos());
+			uvs.push_back(objects[i]->object->mesh->model.Vertices[j].getUV());
+			normals.push_back(objects[i]->object->mesh->model.Vertices[j].getNormal());
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER,vab[VERTEXBUFFER]);
+		glBufferSubData(GL_ARRAY_BUFFER,lastOffset * sizeof(Vector3),sizeof(Vector3)  * objects[i]->count,&positions[0]);
+
+	
+		glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREBUFFER]);
+		glBufferSubData(GL_ARRAY_BUFFER,lastOffset * sizeof(Vector2),sizeof(Vector2)  * objects[i]->count,&uvs[0]);
+
+		glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALBUFFER]);
+		glBufferSubData(GL_ARRAY_BUFFER,lastOffset * sizeof(Vector3),sizeof(Vector3)  * objects[i]->count,&normals[0]);
+		
+	glBindVertexArray(0);
+ }
+
+ void Shader::ObjectBatch::loadBufferIndex(GLuint index)
+ {
+	 for(int i = index;i< objects.size();i++)
+	{
+		std::vector<Vector3> positions;
+		std::vector<Vector2> uvs;
+		std::vector<Vector3> normals;
+		positions.reserve(objects[i]->count);
+		uvs.reserve(objects[i]->count);
+		normals.reserve(objects[i]->count);
+		for(int j = 0;j < objects[i]->count;j++)
+		{
+			positions.push_back(objects[i]->object->mesh->model.Vertices[j].getPos());
+			uvs.push_back(objects[i]->object->mesh->model.Vertices[j].getUV());
+			normals.push_back(objects[i]->object->mesh->model.Vertices[j].getNormal());
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER,vab[VERTEXBUFFER]);
+		glBufferSubData(GL_ARRAY_BUFFER,objects[i]->offset * sizeof(Vector3),sizeof(Vector3)  * objects[i]->count,&positions[0]);
+
+	
+		glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREBUFFER]);
+		glBufferSubData(GL_ARRAY_BUFFER,objects[i]->offset * sizeof(Vector2),sizeof(Vector2)  * objects[i]->count,&uvs[0]);
+
+		glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALBUFFER]);
+		glBufferSubData(GL_ARRAY_BUFFER,objects[i]->offset * sizeof(Vector3),sizeof(Vector3)  * objects[i]->count,&normals[0]);
+		
+	}
+	 //empty every afterwards
+	 glBindBuffer(GL_ARRAY_BUFFER,vab[VERTEXBUFFER]);
+		glBufferSubData(GL_ARRAY_BUFFER,objects[objects.size() - 1]->offset * sizeof(Vector3),remainingSize[0],NULL);
+
+	
+		glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREBUFFER]);
+		glBufferSubData(GL_ARRAY_BUFFER,objects[objects.size() - 1]->offset * sizeof(Vector2),remainingSize[1],NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALBUFFER]);
+		glBufferSubData(GL_ARRAY_BUFFER,objects[objects.size() - 1]->offset * sizeof(Vector3),remainingSize[2],NULL);
+
+	glBindVertexArray(0);
+ }
+
  Shader::ObjectBatch::~ObjectBatch()
 {
 	glDeleteVertexArrays(1, &vao);
@@ -621,9 +699,10 @@ void  Shader::ShaderObjectPipeLine::deleteObject(Object* removeObject)
 	{
 		for(int j = 0;j < batches[i]->objects.size();j++)
 		{
+				batches[i]->deleteObject(j);
 			if(batches[i]->objects[j]->object->ID == removeObject->ID)
 			{
-				batches[i]->deleteObject(j);
+				j--;
 			}
 		}
 	}
@@ -632,13 +711,20 @@ void  Shader::ShaderObjectPipeLine::deleteObject(Object* removeObject)
 
 void Shader::ObjectBatch::deleteObject(GLuint index)
 {
-	for(int i = index; i < objects.size() - 1;i++)
+	if(!(index == objects.size() -1) )
 	{
-		objects[i + 1]->offset = objects[i]->offset;
+		for(int i = index; i < objects.size() - 1;i++)
+		{
+			objects[i + 1]->offset = objects[i]->offset;
+		}
 	}
+	remainingSize[0] += objects[index]->count * sizeof(Vector3 );
+	remainingSize[1] += objects[index]->count * sizeof(Vector2 );
+	remainingSize[2] += objects[index]->count * sizeof(Vector3 );
 	delete(objects[index]);
-	objects.erase(objects.begin() + index - 1);
-	loadBuffer();
+	objects.erase(objects.begin() + index);
+	
+	loadBufferIndex(index);
 	
 }
 
@@ -663,7 +749,7 @@ void  Shader::ObjectBatch::addObject(Object* newObject,GLuint positionsSize,GLui
 	remainingSize[1] -= textureSize;
 	remainingSize[2] -= normalSize;
 	lastOffset += newObject->mesh->model.Vertices.size();
-	loadBuffer();
+	loadBufferLast();
 }
 
 void  Shader::ShaderObjectPipeLine::renderBatches(Shader* shader)

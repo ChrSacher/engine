@@ -116,6 +116,8 @@ public:
 		GLuint lastOffset,remainingSize[3]; //pos,uv,normal size
 		bool isFull;
 		void loadBuffer();
+		void loadBufferLast();
+		void loadBufferIndex(GLuint index);
 	};
 
 	class ShaderObjectPipeLine

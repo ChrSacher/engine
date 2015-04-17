@@ -32,5 +32,7 @@ public:
 	Mesh *mesh;
 	Transform *transform;
 	bool operator=(const Object& other);
+private:
+	static GLuint id;
 };
 

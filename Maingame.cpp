@@ -217,7 +217,10 @@ void Maingame::render()
 		objects[i]->transform->setPos(Vector3(sin(counter   * 3.14/180)* i,i,0)); //Draw objects
 	};
 
-
+	if(counter == 100)
+	{
+		shader->pipeline->deleteObject(objects[2]);
+	}
 	shader->updateAmbientLight(light);;
 	shader->updateSpotLight("spotLights[0]",light3);
 	shader->updateDirectionLight(light2);
