@@ -214,13 +214,16 @@ void Maingame::render()
 	shader->updateCamera(camera);
 	for(int i = 0;i < objects.size();i++)
 	{
-		objects[i]->transform->setPos(Vector3(0,-i,(i + 1) * sin(counter * 3.14/180)));
-		shader->updateObject(objects[i]); //Draw objects
-	}
+		objects[i]->transform->setPos(Vector3(sin(counter   * 3.14/180)* i,i,0)); //Draw objects
+	};
+
+
 	shader->updateAmbientLight(light);;
 	shader->updateSpotLight("spotLights[0]",light3);
 	shader->updateDirectionLight(light2);
 	shader->updatePointLight("pointLights[0]",point);
+	
+	shader->renderBatch();
 	shader->unuse();
 	ui->draw();
 
@@ -294,6 +297,11 @@ void Maingame::createObjects()
 	sky = new Skybox();
 	sky->loadSkybox("Texture/","posx.png","negx.png","posy.png","negy.png","posz.png","negz.png");
 	sky->setCamera(camera);
+	for(int i = 0;i < objects.size();i++)
+	{
+		
+		shader->addObject(objects[i]);
+	}
 }
 
 void Maingame::initShaders()

@@ -21,21 +21,9 @@
 const int static MAXPOINTLIGHTS = 4;
 const int static MAXSPOTLIGHTS = 4;
 
-class ShaderObjectPipeLine
-{
-public:
-	ShaderObjectPipeLine();
-	~ShaderObjectPipeLine();
-	enum
-	{
-		VERTEXBUFFER,
-		TEXTUREBUFFER,
-		NORMALBUFFER,
-		INDICESBUFFER,
-		NUMBUFFERS
-	};
-	GLuint vao,vab[NUMBUFFERS];
-};
+
+
+
 class Shader
 {
 public:
@@ -50,6 +38,7 @@ public:
 	void addFragmentShader(std::string path);
 	void addProgram(std::string path,int type);
 	void bind();
+	void renderBatch();
 	void use();
 	void unuse();
 	void addUniform(const std::string& uniformname);
@@ -82,19 +71,65 @@ public:
 	void updateSpotLight(std::string uniformname ,SpotLight *spot);
 	void updateSpotLights(std::vector<SpotLight> &spot);
 	void updateFog(Fog *fog);
-	//
-
+	//temporary
+	void addObject(Object* object);
     int _numAttributes;
 	std::vector<GLuint> attachedShaders;
     void compileShader(const std::string& filePath, GLuint id);
-
-    GLuint _programID;
-	enum
+		
+		GLuint _programID;
+		enum
+		{
+			TRANSFORM_U,
+			VIEW_MATRIX,
+			NUM_UNIFORMS
+		};
+	class ObjectInformation
 	{
-		TRANSFORM_U,
-		VIEW_MATRIX,
-		NUM_UNIFORMS
+	public:
+		ObjectInformation(Object* newObject, GLuint Offset,GLuint Count);
+		~ObjectInformation();
+		Object* object;
+		GLuint offset;
+		GLuint count;
 	};
+
+	class ObjectBatch
+	{
+	public:
+		ObjectBatch();
+		~ObjectBatch();
+		enum
+		{
+			VERTEXBUFFER,
+			TEXTUREBUFFER,
+			NORMALBUFFER,
+			INDICESBUFFER,
+			NUMBUFFERS
+		};
+		void addObject(Object* newObject,GLuint positionsSize,GLuint  normalSize,GLuint textureSize);
+		void deleteObject(GLuint index);
+		bool checkSize(GLuint positionsSize,GLuint  normalSize,GLuint textureSize);
+		void render(Shader *shader);
+		GLuint vao,vab[NUMBUFFERS];
+		std::vector<ObjectInformation*> objects;
+		GLuint lastOffset,remainingSize[3]; //pos,uv,normal size
+		bool isFull;
+		void loadBuffer();
+	};
+
+	class ShaderObjectPipeLine
+	{
+	public:
+		ShaderObjectPipeLine();
+		~ShaderObjectPipeLine();
+		std::vector<ObjectBatch*> batches;
+		void addObject(Object* newObject);
+		void deleteObject(Object* removeObject);
+		void updateObject(Object* updateObject);
+		void renderBatches(Shader* shader);
+	};
+	ShaderObjectPipeLine *pipeline;
 };
 
 class BasicShader
@@ -107,6 +142,9 @@ class BasicShader
 	GLuint _programID;
 	int _numAttributes;
 };
+
+
+
 
 
 

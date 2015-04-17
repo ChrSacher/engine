@@ -48,3 +48,4 @@ bool Object::operator=(const Object& other)
 {
 	return (ID && other.ID);
 }
+
