@@ -221,6 +221,10 @@ void Maingame::render()
 	{
 		shader->pipeline->deleteObject(objects[2]);
 	}
+	if(counter == 1000)
+	{
+		shader->addObject(objects[2]);
+	}
 	shader->updateAmbientLight(light);;
 	shader->updateSpotLight("spotLights[0]",light3);
 	shader->updateDirectionLight(light2);
@@ -302,7 +306,6 @@ void Maingame::createObjects()
 	sky->setCamera(camera);
 	for(int i = 0;i < objects.size();i++)
 	{
-		
 		shader->addObject(objects[i]);
 	}
 }

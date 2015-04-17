@@ -182,7 +182,7 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		if(location == GL_INVALID_INDEX)
 		{
 			fatalError("Uniform " + uniformName + " not found");
-			return -1;
+			location = -1;
 		}	 
         //Insert it into the map
 		uniforms.insert(make_pair(uniformName, location));
@@ -497,6 +497,11 @@ void Shader::addObject(Object* object)
 	pipeline->addObject(object);
 }
 
+void Shader::deleteObject(Object* object)
+{
+	pipeline->deleteObject(object);
+}
+
  Shader::ObjectInformation::ObjectInformation(Object* newObject, GLuint Offset,GLuint Count)
 {
 	object = newObject;
@@ -675,23 +680,16 @@ void  Shader::ShaderObjectPipeLine::addObject(Object* newObject)
 	{
 		if(!(batches[i]->isFull))
 		{
-			GLuint positionsSize,normalSize,textureSize = 0;
-			positionsSize = newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getPos());
-			textureSize = newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getUV());
-			normalSize = newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getNormal());
-			if(batches[i]->checkSize(positionsSize,textureSize,normalSize))
+			
+			if(batches[i]->checkSize(newObject))
 			{
-				batches[i]->addObject(newObject,positionsSize,textureSize,normalSize);
+				batches[i]->addObject(newObject);
 				return;
 			}
 		}
 	}
 	batches.push_back(new ObjectBatch());
-	GLuint positionsSize,normalSize,textureSize = 0;
-			positionsSize = newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getPos());
-			textureSize = newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getUV());
-			normalSize = newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getNormal());
-	batches[batches.size() - 1]->addObject(newObject,positionsSize,textureSize,normalSize);
+	batches[batches.size() - 1]->addObject(newObject);
 }
 void  Shader::ShaderObjectPipeLine::deleteObject(Object* removeObject)
 {
@@ -699,9 +697,10 @@ void  Shader::ShaderObjectPipeLine::deleteObject(Object* removeObject)
 	{
 		for(int j = 0;j < batches[i]->objects.size();j++)
 		{
-				batches[i]->deleteObject(j);
+				
 			if(batches[i]->objects[j]->object->ID == removeObject->ID)
 			{
+				batches[i]->deleteObject(j);
 				j--;
 			}
 		}
@@ -733,8 +732,12 @@ void  Shader::ShaderObjectPipeLine::updateObject(Object* updateObject)
 
 }
 
-bool  Shader::ObjectBatch::checkSize(GLuint positionsSize,GLuint  normalSize,GLuint textureSize)
+bool  Shader::ObjectBatch::checkSize(Object* newObject)
 {
+	GLuint positionsSize,normalSize,textureSize = 0;
+			positionsSize = newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getPos());
+			textureSize = newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getUV());
+			normalSize = newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getNormal());
 	if(positionsSize <= remainingSize[0] && textureSize <= remainingSize[1] && normalSize <= remainingSize[2])
 	{
 		return true;
@@ -742,12 +745,12 @@ bool  Shader::ObjectBatch::checkSize(GLuint positionsSize,GLuint  normalSize,GLu
 	else return false;
 }
 
-void  Shader::ObjectBatch::addObject(Object* newObject,GLuint positionsSize,GLuint  normalSize,GLuint textureSize)
+void  Shader::ObjectBatch::addObject(Object* newObject)
 {
 	objects.push_back(new ObjectInformation(newObject,lastOffset,newObject->mesh->model.Vertices.size()));
-	remainingSize[0] -= positionsSize;
-	remainingSize[1] -= textureSize;
-	remainingSize[2] -= normalSize;
+	remainingSize[0] -= newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getPos());
+	remainingSize[1] -= newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getUV());
+	remainingSize[2] -= newObject->mesh->model.Vertices.size() * sizeof(newObject->mesh->model.Vertices[0].getNormal());
 	lastOffset += newObject->mesh->model.Vertices.size();
 	loadBufferLast();
 }

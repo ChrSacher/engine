@@ -26,64 +26,7 @@ const int static MAXSPOTLIGHTS = 4;
 
 class Shader
 {
-public:
-	Shader();
-	~Shader(void);
-	static GLuint currentActiveShader;
-
-    void compileShaders(const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilepath);
-    void linkShaders();
-	void addVertexShader(std::string path);
-	void addGeometryShader(std::string path);
-	void addFragmentShader(std::string path);
-	void addProgram(std::string path,int type);
-	void bind();
-	void renderBatch();
-	void use();
-	void unuse();
-	void addUniform(const std::string& uniformname);
-    void addAttribute(const std::string& attributeName);
-	std::map<std::string,GLint> uniforms;
-	GLint getUniformLocation(const std::string& uniformName);
-	//setters
-	
-	void setUniform(std::string uniformName, int value);
-	void setUniform(std::string uniformName, bool value);
-	void setUniform(std::string uniformName, float value);
-	void setUniform(std::string uniformName, Vector3 value);
-	void setUniform(std::string uniformName, Vector4 value);
-	void setUniform(std::string uniformName, Matrix4 value);
-	void setUniform(std::string uniformName,BaseLight value);
-	//uniforms setters
-	void setmodelMatrix(Transform *transform);
-	void setviewMatrix(Camera3d *view);
-	void setbaseColor(Vector3 Color);
-	void setbaseColor(Vector4 Color);
-	void setSpecular(Material *material);
-	void setCameraPos(Camera3d *view);
-	void updateMaterial(Material *material); //kann man auch überladen übersichtshalber mach ich das erst später
-	void updateCamera(Camera3d *camera);
-	void updateObject(Object *object);
-	void updateDirectionLight(DirectionalLight *light);
-	void updateAmbientLight(AmbientLight *ambient);
-	void updatePointLight(std::string uniformname ,PointLight *point);
-	void updatePointLights(std::vector<PointLight> &point);
-	void updateSpotLight(std::string uniformname ,SpotLight *spot);
-	void updateSpotLights(std::vector<SpotLight> &spot);
-	void updateFog(Fog *fog);
-	//temporary
-	void addObject(Object* object);
-    int _numAttributes;
-	std::vector<GLuint> attachedShaders;
-    void compileShader(const std::string& filePath, GLuint id);
-		
-		GLuint _programID;
-		enum
-		{
-			TRANSFORM_U,
-			VIEW_MATRIX,
-			NUM_UNIFORMS
-		};
+private: //nested class
 	class ObjectInformation
 	{
 	public:
@@ -107,9 +50,9 @@ public:
 			INDICESBUFFER,
 			NUMBUFFERS
 		};
-		void addObject(Object* newObject,GLuint positionsSize,GLuint  normalSize,GLuint textureSize);
+		void addObject(Object* newObject);
 		void deleteObject(GLuint index);
-		bool checkSize(GLuint positionsSize,GLuint  normalSize,GLuint textureSize);
+		bool checkSize(Object* newObject);
 		void render(Shader *shader);
 		GLuint vao,vab[NUMBUFFERS];
 		std::vector<ObjectInformation*> objects;
@@ -131,7 +74,70 @@ public:
 		void updateObject(Object* updateObject);
 		void renderBatches(Shader* shader);
 	};
+
+
+
+public:
+	Shader();
+	~Shader(void);
+	static GLuint currentActiveShader;
+	//shader operations
+    void compileShaders(const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilepath);
+    void linkShaders();
+	void addVertexShader(std::string path);
+	void addGeometryShader(std::string path);
+	void addFragmentShader(std::string path);
+	void addProgram(std::string path,int type);
+	void bind();
+	void use();
+	void unuse();
+    void addAttribute(const std::string& attributeName);
+	std::map<std::string,GLint> uniforms;
+	GLint getUniformLocation(const std::string& uniformName);
+	//setters
+	
+	void setUniform(std::string uniformName, int value);
+	void setUniform(std::string uniformName, bool value);
+	void setUniform(std::string uniformName, float value);
+	void setUniform(std::string uniformName, Vector3 value);
+	void setUniform(std::string uniformName, Vector4 value);
+	void setUniform(std::string uniformName, Matrix4 value);
+	void setUniform(std::string uniformName,BaseLight value);
+	void setmodelMatrix(Transform *transform);
+	void setviewMatrix(Camera3d *view);
+	void setbaseColor(Vector3 Color);
+	void setbaseColor(Vector4 Color);
+	void setSpecular(Material *material);
+	void setCameraPos(Camera3d *view);
+
+
+	//update operations
+	void updateMaterial(Material *material); //kann man auch überladen übersichtshalber mach ich das erst später
+	void updateCamera(Camera3d *camera);
+	void updateObject(Object *object);
+	void updateDirectionLight(DirectionalLight *light);
+	void updateAmbientLight(AmbientLight *ambient);
+	void updatePointLight(std::string uniformname ,PointLight *point);
+	void updatePointLights(std::vector<PointLight> &point);
+	void updateSpotLight(std::string uniformname ,SpotLight *spot);
+	void updateSpotLights(std::vector<SpotLight> &spot);
+	void updateFog(Fog *fog);
+
+
+	//Batch operations
+	void renderBatch();
+	void addObject(Object* object);
+	void deleteObject(Object* object);
+	//
+    int _numAttributes;
+	std::vector<GLuint> attachedShaders;
+    void compileShader(const std::string& filePath, GLuint id);	
+	GLuint _programID;
+
 	ShaderObjectPipeLine *pipeline;
+	//classes are only known to shader
+	
+	
 };
 
 class BasicShader
@@ -144,10 +150,5 @@ class BasicShader
 	GLuint _programID;
 	int _numAttributes;
 };
-
-
-
-
-
 
 #endif
