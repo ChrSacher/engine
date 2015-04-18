@@ -242,37 +242,22 @@ void Texture::releaseTexture()
 
 bool BoundTexture::isBound(GLuint ID,GLuint unit)
 {
-	GLint program;
-	glGetIntegerv(GL_CURRENT_PROGRAM,&program);
-	auto mit = boundUnitMap.find(program);
-	if (mit == boundUnitMap.end()) 
-	{
-		GLuint newarray[31] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-		std::vector<GLuint> temp(newarray,newarray + 31);
-		boundUnitMap.insert(std::make_pair((GLuint)program,temp));
-		return false;
-    }
-	if(mit->second[unit] == ID)
-	{		
-		return true;
-	}
-	else return false;
+	if(units[unit] == ID) return true;
+	return false;
 	
 }
 
 void BoundTexture::unbind(GLuint ID,GLenum TextureType)
 {
-	for (auto mit = boundUnitMap.begin(); mit != boundUnitMap.end(); ++mit)
-	{
 		for(int i = 0; i < 31 ; i++)
 		{
-			if(mit->second[i] == ID)
+			if(units[i] == ID)
 			{
 				glActiveTexture(GL_TEXTURE0 + i);
 				glBindTexture(TextureType,0);
+				units[i] = -1;
 			}
 		}
-	}
 }
 
 void BoundTexture::bind(GLuint ID,GLuint unit,GLenum TextureType)
@@ -281,15 +266,7 @@ void BoundTexture::bind(GLuint ID,GLuint unit,GLenum TextureType)
 		{
 			glActiveTexture(GL_TEXTURE0 + unit);
 			glBindTexture(TextureType, ID);
-			GLint program;
-			glGetIntegerv(GL_CURRENT_PROGRAM,&program);
-			auto mit = boundUnitMap.find(program);
-			if (mit == boundUnitMap.end()) 
-			{
-				printf("BoundTexture unexpected error which shouldn't happen \n");
-				return;
-			}
-			mit->second[unit] = ID;
+			units[unit] = ID;
 		}
 
 }

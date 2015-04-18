@@ -21,7 +21,7 @@ public:
 	BoundTexture(BoundTexture const&);              // Don't Implement
 	void operator=(BoundTexture const&);
 
-	std::map<GLuint,std::vector<GLuint>> boundUnitMap; //Shader, Bound textures map  //unit 31 is reserviert für schatten
+	GLuint units[31];
 	bool isBound(GLuint ID,GLuint unit); //check if ID is bound to unit in the current shader
 	void unbind(GLuint ID,GLenum TextureType = GL_TEXTURE_2D); //Unbind texture ID from all Units
 	void bind(GLuint ID,GLuint unit,GLenum TextureType = GL_TEXTURE_2D); //bind ID to unit 

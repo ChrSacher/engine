@@ -211,8 +211,11 @@ void Maingame::render()
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	sky->renderSkybox();
-	//normal
 	shader->use();
+	for(int i = 0;i < objects.size();i++)
+	{
+		shader->addObject(objects[i]);
+	}
 	
 	shader->updateFog(fog);
 	shader->updateCamera(camera);
@@ -223,7 +226,7 @@ void Maingame::render()
 	shader->renderBatch();
 	shader->unuse();
 	ui->draw();
-
+	shader->emptyBatch();
 	SDL_GL_SwapWindow(_window);
 
 }
@@ -288,7 +291,7 @@ void Maingame::createObjects()
 	
 	camera = new Camera3d(Vector3(0,2,0),70,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
 	light = new AmbientLight(Vector3(0.2,0.2,0.2));
-	light2 = new DirectionalLight(BaseLight(Vector3(1,0.9,0.8),0.8f),Vector3(0.3,1,1));
+	light2 = new DirectionalLight(BaseLight(Vector3(1,0.9,0.8),0.8f),Vector3(1,1,1));
 	objects.push_back(new Object("models/box.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1)));
 	objects.push_back(new Object("models/box.obj",Vector3(0.0f,3.0f,3.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1)));
 	objects.push_back(new Object("models/box.obj",Vector3(0.0f,1.5f,1.5f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,0,1)));
@@ -307,10 +310,7 @@ void Maingame::createObjects()
 	sky = new Skybox();
 	sky->loadSkybox("Texture/","posx.png","negx.png","posy.png","negy.png","posz.png","negz.png");
 	sky->setCamera(camera);
-	for(int i = 0;i < objects.size();i++)
-	{
-		shader->addObject(objects[i]);
-	}
+	
 }
 
 void Maingame::initShaders()
