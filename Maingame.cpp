@@ -229,7 +229,6 @@ void Maingame::render()
 	shader->updateSpotLight("spotLights[0]",light3);
 	shader->updateDirectionLight(light2);
 	shader->updatePointLight("pointLights[0]",point);
-	
 	shader->renderBatch();
 	shader->unuse();
 	ui->draw();
@@ -295,6 +294,10 @@ void Maingame::createObjects()
 	objects.push_back(new Object("models/box.obj",Vector3(0.0f,1.5f,1.5f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,0,1)));
 	objects.push_back(new Object(*objects[2]));
 	objects.push_back(new Object("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
+	for(int i = 0; i < 200 ;i++)
+	{
+		objects.push_back(new Object("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
+	}
 	point =  new PointLight(Vector3(0,1,0),BaseLight(Vector3(1,0,0),0.4),Attenuation(0,0,10),10);
 	fog =  new Fog(0.05,Vector4(0.5,0.5,0.5,0.5),400,500,0);
 	light3 =  new SpotLight(PointLight(Vector3(0,10,1),BaseLight(Vector3(1,0,1),1),Attenuation(1,0,0),10),Vector3(0,1,0),0.2);

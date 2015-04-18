@@ -9,6 +9,7 @@ Object::Object(std::string Objectpath,Vector3 pos,Vector3 rot,std::string textur
 	material = new Material(texturepath,color,2,32);
 	transform =  new Transform(pos,rot,Vector3(1,1,1));
 	mesh = new Mesh(Objectpath,autoCenter);
+	renderable = true;
 }
 
 
@@ -37,6 +38,7 @@ Object::Object()
 	material = new Material();
 	transform = new Transform();
 	mesh = new Mesh();
+	renderable = true;
 }
 
 Object::Object(const Object& otherobject)
@@ -46,6 +48,7 @@ Object::Object(const Object& otherobject)
 	material = new Material(*otherobject.material);
 	transform = new Transform(*otherobject.transform);
 	mesh = new Mesh(*otherobject.mesh);
+	renderable = true;
 }
 
 bool Object::operator=(const Object& other)

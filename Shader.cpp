@@ -230,12 +230,20 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 
 	void Shader::setmodelMatrix(Transform *transform) 
 	{
-		setUniform("modelMatrix",transform->getMatrix());
+		setUniform("MVP[0]",matrices.view * transform->getMatrix());
 	}
-
+	void Shader::setmodelMatrices(std::vector<Matrix4*> vectormatrices) 
+	{
+		std::string string =  "MVP[0]";
+		for(int i = 0; i < vectormatrices.size();i++)
+		{
+			string = "MVP[" + std::to_string(i) + "]";
+			setUniform(string,matrices.view * *vectormatrices[i]);
+		}
+	}
 	void Shader::setviewMatrix(Camera3d *view)
 	{
-		setUniform("viewMatrix",view->GetViewProjection());
+		matrices.view = view->GetViewProjection();
 	};
 
 	void Shader::setbaseColor(Vector3 Color)
@@ -491,7 +499,7 @@ void BasicShader::unuse()
     }
 }
 
-
+//-------------------------------------------
 void Shader::addObject(Object* object)
 {
 	pipeline->addObject(object);
@@ -543,7 +551,6 @@ void Shader::deleteObject(Object* object)
 	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
 
 	glBindVertexArray(0);
-	isFull = false;
 
 }
 
@@ -678,15 +685,11 @@ void  Shader::ShaderObjectPipeLine::addObject(Object* newObject)
 {
 	for(int i = 0; i < batches.size();i++)
 	{
-		if(!(batches[i]->isFull))
-		{
-			
 			if(batches[i]->checkSize(newObject))
 			{
 				batches[i]->addObject(newObject);
 				return;
 			}
-		}
 	}
 	batches.push_back(new ObjectBatch());
 	batches[batches.size() - 1]->addObject(newObject);
@@ -729,8 +732,11 @@ void Shader::ObjectBatch::deleteObject(GLuint index)
 
 void  Shader::ShaderObjectPipeLine::updateObject(Object* updateObject)
 {
-
+	deleteObject(updateObject);
+	addObject(updateObject);
 }
+
+
 
 bool  Shader::ObjectBatch::checkSize(Object* newObject)
 {
@@ -768,11 +774,23 @@ void  Shader::ObjectBatch::render(Shader *shader)
 	glBindVertexArray(vao);
 	for(int i = 0;i < objects.size();i++)
 	{
-		shader->setmodelMatrix(objects[i]->object->transform);
-		shader->updateMaterial(objects[i]->object->material);
-		glDrawArrays(GL_TRIANGLES,objects[i]->offset,objects[i]->count);
+		if(objects[i])
+		{
+			if(objects[i]->object->renderable)
+			{
+				shader->setmodelMatrix(objects[i]->object->transform);
+				shader->updateMaterial(objects[i]->object->material);
+				glDrawArrays(GL_TRIANGLES,objects[i]->offset,objects[i]->count);
+			}
+		}
+		else
+		{
+			printf("Encountered Null Object in batch\n Deleting it from the Batch/n");
+			deleteObject(i);
+			i--;
+		}
 	}
-	glBindVertexArray(0);
+	//glBindVertexArray(0);
 }
 
 

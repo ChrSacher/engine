@@ -57,7 +57,6 @@ private: //nested class
 		GLuint vao,vab[NUMBUFFERS];
 		std::vector<ObjectInformation*> objects;
 		GLuint lastOffset,remainingSize[3]; //pos,uv,normal size
-		bool isFull;
 		void loadBuffer();
 		void loadBufferLast();
 		void loadBufferIndex(GLuint index);
@@ -75,7 +74,10 @@ private: //nested class
 		void renderBatches(Shader* shader);
 	};
 
-
+	struct Matrices
+	{
+		Matrix4 model,view,projection;
+	};
 
 public:
 	Shader();
@@ -95,7 +97,7 @@ public:
 	std::map<std::string,GLint> uniforms;
 	GLint getUniformLocation(const std::string& uniformName);
 	//setters
-	
+	void setmodelMatrices(std::vector<Matrix4*> matrices);
 	void setUniform(std::string uniformName, int value);
 	void setUniform(std::string uniformName, bool value);
 	void setUniform(std::string uniformName, float value);
@@ -128,6 +130,7 @@ public:
 	void renderBatch();
 	void addObject(Object* object);
 	void deleteObject(Object* object);
+	ObjectInformation* getObject(Object* object);
 	//
     int _numAttributes;
 	std::vector<GLuint> attachedShaders;
@@ -135,6 +138,7 @@ public:
 	GLuint _programID;
 
 	ShaderObjectPipeLine *pipeline;
+	Matrices matrices;
 	//classes are only known to shader
 	
 	
