@@ -88,7 +88,7 @@ void Maingame::handleKeys()
 {
 
 	unsigned char key=NULL;
-	
+	input.update();
 	while( SDL_PollEvent( &event ) != 0 ) //Eingaben kontrolieren
 	{
 		switch(event.type)
@@ -197,7 +197,12 @@ void Maingame::handleKeys()
 
 void Maingame::update()
 {
-	input.update();
+	static int counter = 0;
+	counter++;
+	for(int i = 0;i < objects.size();i++)
+	{
+		objects[i]->transform->setPos(Vector3(sin(counter   * 3.14/180)* i,i,0)); //Draw objects
+	};
 }
 
 void Maingame::render()
@@ -208,23 +213,9 @@ void Maingame::render()
 	sky->renderSkybox();
 	//normal
 	shader->use();
-	static int counter;
-	counter++;
+	
 	shader->updateFog(fog);
 	shader->updateCamera(camera);
-	for(int i = 0;i < objects.size();i++)
-	{
-		objects[i]->transform->setPos(Vector3(sin(counter   * 3.14/180)* i,i,0)); //Draw objects
-	};
-
-	if(counter == 100)
-	{
-		shader->pipeline->deleteObject(objects[2]);
-	}
-	if(counter == 1000)
-	{
-		shader->addObject(objects[2]);
-	}
 	shader->updateAmbientLight(light);;
 	shader->updateSpotLight("spotLights[0]",light3);
 	shader->updateDirectionLight(light2);
@@ -239,14 +230,23 @@ void Maingame::render()
 void Maingame::gameloop()
 {
 	SDL_StartTextInput(); //text eingabe aktivieren
+	long int start = 0, end = SDL_GetTicks();
+	float delta = 0;
+	float frames = 1/maxFPS * 1000;
 	while( gamestate.playing )//Solange es nicht beended ist
 	{ 
-		fpsLimiter.begin();
+		start = SDL_GetTicks();
 		handleKeys();
-		update();
+
+		delta+=(float)(start - end);
+		while (delta >= frames) 
+		{
+			update();
+			delta -= frames;
+		}
 		
 		render();	
-		fps = fpsLimiter.end();
+		end = start;
 	}
 	SDL_StopTextInput();	//Text Eingabe anhalten
 	close(); //SDL beenden und Resourcen freigeben
@@ -294,7 +294,7 @@ void Maingame::createObjects()
 	objects.push_back(new Object("models/box.obj",Vector3(0.0f,1.5f,1.5f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,0,1)));
 	objects.push_back(new Object(*objects[2]));
 	objects.push_back(new Object("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
-	for(int i = 0; i < 200 ;i++)
+	for(int i = 0; i < 20 ;i++)
 	{
 		objects.push_back(new Object("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
 	}
