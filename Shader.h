@@ -32,9 +32,9 @@ private: //nested class
 	public:
 		ObjectInformation(Object* newObject, GLuint Offset,GLuint Count);
 		~ObjectInformation();
-		Object* object;
-		GLuint offset;
-		GLuint count;
+		Object* object; //pointer to object for matrices and textures
+		GLuint offset; //offset from all previous objects
+		GLuint count; //number of vertices
 	};
 
 	class ObjectBatch
@@ -51,6 +51,7 @@ private: //nested class
 			NUMBUFFERS
 		};
 		void addObject(Object* newObject);
+		bool updateObject(Object* updateObject);
 		void deleteObject(GLuint index);
 		bool checkSize(Object* newObject);
 		void render(Shader *shader);
@@ -59,6 +60,7 @@ private: //nested class
 		GLuint lastOffset,remainingSize[3]; //pos,uv,normal size
 		void loadBuffer();
 		void loadBufferLast();
+		void loadBufferIndexToLast(GLuint index);
 		void loadBufferIndex(GLuint index);
 	};
 

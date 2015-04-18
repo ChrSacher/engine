@@ -37,7 +37,7 @@ class ShadowMapFBO //funktioniert irgentwie nicht
 		//irgentwie funktioniert es nicht ein statischen pointer zu haben und den zu initialisieren
 		static void deleteShader();
 private:
-		static Shader * getShader();
+		static Shader* getShader();
 		
 		
 };

@@ -17,8 +17,8 @@ public:
 	Texture texture;
 	Vector3 color;
 
-	float specularIntensity;
-	float specularPower;
+	float specularIntensity; //size of the reflection
+	float specularPower; //strength
 
 	float getIntensity(){return specularIntensity;}
 	float getPower(){return specularPower;}

@@ -194,7 +194,7 @@ Skybox::Skybox(Vector4 Color)
 void Skybox::renderSkybox()
 {
 	glDepthMask(0);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_FRONT); //box vertices are from outside but you are looking from the inside
 	glBindVertexArray(vao);
 	shader->use();
 	shader->setUniform("WVP", camera->GetViewProjection() * transform.getMatrix() );

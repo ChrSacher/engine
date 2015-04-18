@@ -22,9 +22,9 @@ public:
 	void operator=(BoundTexture const&);
 
 	std::map<GLuint,std::vector<GLuint>> boundUnitMap; //Shader, Bound textures map  //unit 31 is reserviert für schatten
-	bool isBound(GLuint ID,GLuint unit);
-	void unbind(GLuint ID,GLenum TextureType = GL_TEXTURE_2D);
-	void bind(GLuint ID,GLuint unit,GLenum TextureType = GL_TEXTURE_2D);
+	bool isBound(GLuint ID,GLuint unit); //check if ID is bound to unit in the current shader
+	void unbind(GLuint ID,GLenum TextureType = GL_TEXTURE_2D); //Unbind texture ID from all Units
+	void bind(GLuint ID,GLuint unit,GLenum TextureType = GL_TEXTURE_2D); //bind ID to unit 
 
 private:
 	BoundTexture(){};
@@ -43,15 +43,15 @@ public:
 	GLuint ID;
 	int width,height;
 	std::string texturepath;
-	void drawTexture(bool check);
-	void addTexture(std::string path);
-	void releaseTexture();
+	void drawTexture(bool check); //disables or enables Textures in the engine
+	void addTexture(std::string path); //replaces current Texture with path
+	void releaseTexture(); //clears memory in opengl
 };
 
 struct TextureAndCount
 {
 	Texture texture;
-	GLuint count;
+	GLuint count; 
 	TextureAndCount(Texture newtexture,GLuint Count){count = Count;texture = newtexture;};
 };
 

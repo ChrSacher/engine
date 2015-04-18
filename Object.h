@@ -28,11 +28,12 @@ public:
 	void draw();
 	Matrix4& getMatrix();
 	GLuint ID;
-	Material *material;
-	Mesh *mesh;
-	Transform *transform;
-	bool operator=(const Object& other);
-	bool renderable;
+	Material *material; //texture + lighting variables
+	Mesh *mesh; //vertices
+	Transform *transform;//position, rotation, scaling in 3d space
+	bool operator==(const Object& other);
+	Object& operator=(const Object& other);
+	bool renderable; //render or don't render 
 private:
 	static GLuint id;
 };

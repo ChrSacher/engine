@@ -9,32 +9,14 @@ std::map<std::string, TextureAndCount> TextureCache::textureMap;
 Texture::Texture(std::string path)
 {
 	*this = TextureCache::getTexture(path);
+	bind();
 }
 
 void Texture::addTexture(std::string path)
 {
-	int width,height,numComponents;
-	char* data = (char*)stbi_load(path.c_str(),&width,&height,&numComponents,4);
-	texturepath=path.c_str();
-	if(data ==NULL)
-	{
-		printf("Couldn't load texture %s\n Loading Backup Texture\n",path.c_str());
-		data = (char*)stbi_load("texture/white.png",&width,&height,&numComponents,4);
-		texturepath="Texture/white.png";
-		if(data == NULL)
-		{
-			printf("Couldn't load backup texture");
-			fatalError("Was not able to load basic texture");
-		}
-	}
-	glGenTextures(1,&ID);
-	glBindTexture(GL_TEXTURE_2D,ID);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
-	stbi_image_free(data);
+	TextureCache::lowerCount(ID);
+	*this = TextureCache::getTexture(path);
+	bind();
 }
 
 
@@ -44,7 +26,7 @@ Texture::~Texture(void)
 
 void Texture::bind(int unit)
 {
-	if(unit < 0 || unit > 30) fatalError("Texture unit is too large/too low");
+	if(unit < 0 || unit > 30) fatalError("Texture unit is too large/too low"); //opengl only has units between 0 - 31
 	BoundTexture::getInstance().bind(ID,unit);
 }
 
@@ -117,7 +99,6 @@ Texture TextureLoader::load(std::string filepath)
 	texture.width=width;
 	texture.height=height;
 	stbi_image_free(data);
-
 	
 	return texture;
 }
@@ -134,7 +115,7 @@ void TextureCache::lowerCount(std::string texturePath)
 		return;
     }
 	mit->second.count --;
-	if(mit->second.count < 1)
+	if(mit->second.count < 1) //erase Texture if noone is using it
 	{
 		mit->second.texture.releaseTexture();
 		textureMap.erase(mit);
@@ -149,7 +130,7 @@ void TextureCache::lowerCount(GLuint textureID)
 		if(mit->second.texture.ID == textureID)
 		{
 			mit->second.count -- ;
-			if(mit->second.count < 1)
+			if(mit->second.count < 1) //release Texture if it is not used
 			{
 				mit->second.texture.releaseTexture();
 				textureMap.erase(mit);
@@ -164,7 +145,12 @@ void TextureCache::lowerCount(GLuint textureID)
 
 bool CubemapTexture::Load()
 {
-	if(ID > 0.1) glDeleteTextures(1,&ID);
+	
+	if(ID > 0.1)
+	{
+		BoundTexture::getInstance().unbind(ID);
+		glDeleteTextures(1,&ID);  //if there allready is a cubemap replace it
+	}
     glGenTextures(1, &ID);
 	glActiveTexture (GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
@@ -201,7 +187,7 @@ bool CubemapTexture::Load()
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
+	bind();
 
 
     return true;
@@ -214,7 +200,7 @@ void CubemapTexture::bind(GLuint unit)
 			fatalError("Texture unit is too large/too low");
 			return;
 	}
-	BoundTexture::getInstance().bind(ID,unit,GL_TEXTURE_CUBE_MAP);
+	BoundTexture::getInstance().bind(ID,unit,GL_TEXTURE_CUBE_MAP); 
 }
 
 void CubemapTexture::addFiles(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz)
@@ -236,7 +222,6 @@ CubemapTexture::CubemapTexture(const std::string& Directory, const std::string& 
 }
 void CubemapTexture::releaseCubemap()
 {
-	BoundTexture::getInstance().unbind(ID);
 	glDeleteTextures(1,&ID);
 }
 
@@ -252,7 +237,6 @@ void TextureCache::deleteCache()
 
 void Texture::releaseTexture()
 {
-	BoundTexture::getInstance().unbind(ID);
 	glDeleteTextures(1,&ID);
 }
 

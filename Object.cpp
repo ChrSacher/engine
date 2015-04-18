@@ -51,7 +51,7 @@ Object::Object(const Object& otherobject)
 	renderable = true;
 }
 
-bool Object::operator=(const Object& other)
+bool Object::operator==(const Object& other)
 {
 	return (ID && other.ID);
 }
