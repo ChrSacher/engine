@@ -77,8 +77,9 @@ void Maingame::init()
 	SDL_ShowCursor(SDL_FALSE); 
 
 	initShaders();
-	createObjects();
 	SDL_GL_SwapWindow(_window);
+	createObjects();
+	
 	fpsLimiter.init(maxFPS); //using frame rater limiter since when do not have time dependent yet
 
 	return ;
@@ -216,7 +217,7 @@ void Maingame::render()
 	{
 		shader->addObject(objects[i]);
 	}
-	
+	shader->deleteObject(objects[2]);
 	shader->updateFog(fog);
 	shader->updateCamera(camera);
 	shader->updateAmbientLight(light);;
@@ -297,7 +298,7 @@ void Maingame::createObjects()
 	objects.push_back(new Object("models/box.obj",Vector3(0.0f,1.5f,1.5f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,0,1)));
 	objects.push_back(new Object(*objects[2]));
 	objects.push_back(new Object("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
-	for(int i = 0; i < 20 ;i++)
+	for(int i = 0; i < 200 ;i++)
 	{
 		objects.push_back(new Object("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
 	}

@@ -6,13 +6,9 @@ std::map<std::string, Model> ModelCache::_modelMap;
 Mesh::~Mesh(void)
 {
 	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(NUMBUFFERS,vab);
+	glDeleteBuffers(1,&vab);
 }
 
-void Mesh::releaseMesh()
-{
-	
-}
 void Mesh::draw()
 {
 	glBindVertexArray(vao);
@@ -30,8 +26,7 @@ void Mesh::draw()
 void Mesh::init()
 {
 	glGenVertexArrays(1,&vao);
-	glBindVertexArray(vao);
-	glGenBuffers(NUMBUFFERS,vab);
+	glGenBuffers(1,&vab);
 }
 Mesh::Mesh(std::vector<Vertex> vertices)
 {
@@ -79,44 +74,18 @@ void Mesh::loadOBJ(std::string path,bool autoCenter)
 };
 
 void Mesh::loadBufferVertex()
-{
-	indiced=false;
-	if(model.Vertices.size() != 0)
-	{
-		std::vector<Vector3> positions;
-		std::vector<Vector2> uvs;
-		std::vector<Vector3> normals;
-		positions.reserve(model.Vertices.size());
-		uvs.reserve(model.Vertices.size());
-		normals.reserve(model.Vertices.size());
-		for(int i = 0;i< model.Vertices.size();i++)
-		{
-			positions.push_back(model.Vertices[i].getPos());
-			uvs.push_back(model.Vertices[i].getUV());
-			normals.push_back(model.Vertices[i].getNormal());
-		}
-		
-
-		glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
-		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(positions[0]),NULL,GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER,0,model.Vertices.size()  * sizeof(positions[0]),&positions[0]);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
-
-	
-		glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
-		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(uvs[0]),NULL,GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER,0,model.Vertices.size()  * sizeof(uvs[0]),&uvs[0]);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
-
-		glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALVB]);
-		glBufferData(GL_ARRAY_BUFFER,model.Vertices.size() * sizeof(normals[0]),NULL,GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER,0,model.Vertices.size()  * sizeof(normals[0]),&normals[0]);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
-		glBindVertexArray(0);
-	}
+{	
+	indiced = false;
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER,vab);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,pos));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,uv));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,normal));
+	glBufferData(GL_ARRAY_BUFFER,sizeof(Vertex) * model.Vertices.size(),&model.Vertices[0],GL_STATIC_DRAW);
+	glBindVertexArray(0);
 }
 
 void Mesh::clearData()
@@ -124,34 +93,6 @@ void Mesh::clearData()
 	model.Vertices.clear();
 	loadBufferVertex();
 }
-
-void Mesh::loadBuffer()
-{
-	indiced=true;
-	glGenBuffers(NUMBUFFERS,vab);
-
-	glBindBuffer(GL_ARRAY_BUFFER,vab[POSITIONVB]);
-	glBufferData(GL_ARRAY_BUFFER,model.positions.size() * sizeof(model.positions[0]),&model.positions[0],GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
-
-	
-	glBindBuffer(GL_ARRAY_BUFFER,vab[TEXTUREVB]);
-	glBufferData(GL_ARRAY_BUFFER,model.uvs.size() * sizeof(model.uvs[0]),&model.uvs[0],GL_STATIC_DRAW);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,0,0);
-
-	glBindBuffer(GL_ARRAY_BUFFER,vab[NORMALVB]);
-	glBufferData(GL_ARRAY_BUFFER,model.normals.size() * sizeof(model.normals[0]),&model.normals[0],GL_STATIC_DRAW);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vab[INDICESVB]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,model.Indices.size() * sizeof(model.Indices[0]),&model.Indices[0],GL_STATIC_DRAW);
-	
-	glBindVertexArray(0);
-}
-
 
 Model OBJLoader::loadOBJ(std::string path,bool autoCenter)
 {

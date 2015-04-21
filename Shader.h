@@ -51,17 +51,13 @@ private: //nested class
 			NUMBUFFERS
 		};
 		void addObject(Object* newObject);
-		bool updateObject(Object* updateObject);
-		void deleteObject(GLuint index);
+		void deleteObject(Object* removeObject);
 		bool checkSize(Object* newObject);
 		void render(Shader *shader);
-		GLuint vao,vab[NUMBUFFERS];
+		GLuint vao,vab;
 		std::vector<ObjectInformation> objects;
-		GLuint lastOffset,remainingSize[3]; //pos,uv,normal size
+		GLuint lastOffset,remainingSize; //pos,uv,normal size
 		void loadBuffer();
-		void loadBufferLast();
-		void loadBufferIndexToLast(GLuint index);
-		void loadBufferIndex(GLuint index);
 		void emptyBuffer();
 		GLuint maxSize;
 	};
@@ -74,7 +70,6 @@ private: //nested class
 		std::vector<ObjectBatch*> batches;
 		void addObject(Object* newObject);
 		void deleteObject(Object* removeObject);
-		void updateObject(Object* updateObject);
 		void renderBatches(Shader* shader);
 		void emptyBatch();
 	};

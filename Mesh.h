@@ -64,24 +64,12 @@ public:
 	void init();
 	void draw();
 	void loadOBJ(std::string path,bool autoCenter = false);
-	void loadBuffer();
 	void loadBufferVertex();
 	void clearData();
 	Model model;
-	void releaseMesh();
 private:
 	bool indiced;
-	
-	enum
-	{
-		POSITIONVB,
-		TEXTUREVB,
-		NORMALVB,
-		INDICESVB,
-		NUMBUFFERS
-	};
-	
-	GLuint vao ,vab[NUMBUFFERS];
+	GLuint vao ,vab;
 };
 
 
