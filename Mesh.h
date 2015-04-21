@@ -40,6 +40,7 @@ struct Model
 	std::vector<Vector2> uvs;
 	std::vector<GLuint> Indices;
 	std::vector<Vertex> Vertices;
+	GLuint count;
 	OBJIndex index;
 	void center();
 };

@@ -230,17 +230,25 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 
 	void Shader::setmodelMatrix(Transform *transform) 
 	{
-		setUniform("modelMatrix",transform->getMatrix());
+		setUniform("modelMatrix[0]",transform->getMatrix());
 		setUniform("MVP[0]",matrices.view * transform->getMatrix());
 	}
-	void Shader::setmodelMatrices(std::vector<Matrix4*> vectormatrices) 
+	void Shader::setmodelMatrices(std::vector<Matrix4*> modelMatrices,std::vector<Matrix4*> MVPMatrices) 
 	{
 		std::string string =  "MVP[0]";
-		for(int i = 0; i < vectormatrices.size();i++)
+		std::string string2 =  "modelMatrix[0]";
+		if(modelMatrices.size() == MVPMatrices.size())
 		{
-			string = "MVP[" + std::to_string(i) + "]";
-			setUniform(string,matrices.view * *vectormatrices[i]);
+			for(int i = 0; i < modelMatrices.size();i++)
+			{
+				string2 = "modelMatrix[" + std::to_string(i) + "]";
+				setUniform(string2,matrices.view * *modelMatrices[i]);
+				string = "MVP[" + std::to_string(i) + "]";
+				setUniform(string,matrices.view * *MVPMatrices[i]);
+			}
 		}
+		else
+			std::cout << "different ammount of matrices"<<std::endl;
 	}
 	void Shader::setviewMatrix(Camera3d *view)
 	{
@@ -548,14 +556,15 @@ void BasicShader::unuse()
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,normal));
 	glBindVertexArray(0);
+	countObjects = 0;
 
 }
 
  void Shader::ObjectBatch::loadBuffer()
  {
-	for(int i = 0;i< objects.size();i++)
+	glBindBuffer(GL_ARRAY_BUFFER,vab);
+	for(int i = 0;i< countObjects;i++)
 	{	
-		glBindBuffer(GL_ARRAY_BUFFER,vab);
 		glBufferSubData(GL_ARRAY_BUFFER,objects[i].offset * sizeof(Vertex),objects[i].count * sizeof(Vertex),&objects[i].object->mesh->model.Vertices[0]);
 	}
 	
@@ -571,10 +580,11 @@ void BasicShader::unuse()
  Shader::ShaderObjectPipeLine::ShaderObjectPipeLine()
 {
 	batches.push_back(new ObjectBatch());
+	countBatches = 1;
 }
  Shader::ShaderObjectPipeLine::~ShaderObjectPipeLine()
 {
-	for(int i = 0; i < batches.size();i++)
+	for(int i = 0; i < countBatches;i++)
 	{
 		delete(batches[i]);
 	}
@@ -582,9 +592,9 @@ void BasicShader::unuse()
 
 void  Shader::ShaderObjectPipeLine::addObject(Object* newObject)
 {
-	for(int i = 0; i < batches.size();i++)
+	for(int i = 0; i < countBatches;i++)
 	{
-		for(int j = 0;j < batches[i]->objects.size();j++)
+		for(int j = 0;j < batches[i]->countObjects;j++)
 		{
 			if(batches[i]->objects[j].object->ID == newObject->ID)
 			{
@@ -599,11 +609,13 @@ void  Shader::ShaderObjectPipeLine::addObject(Object* newObject)
 		}
 	}
 	batches.push_back(new ObjectBatch());
-	batches[batches.size() - 1]->addObject(newObject);
+	countBatches ++;
+	batches[countBatches - 1]->addObject(newObject);
+	
 }
 void  Shader::ShaderObjectPipeLine::deleteObject(Object* removeObject)
 {
-	for(int i = 0;i < batches.size();i++)
+	for(int i = 0;i < countBatches;i++)
 	{
 		batches[i]->deleteObject(removeObject);
 	}
@@ -612,17 +624,18 @@ void  Shader::ShaderObjectPipeLine::deleteObject(Object* removeObject)
 
 void Shader::ObjectBatch::deleteObject(Object* removeObject)
 {
-	for(int i = 0; i < objects.size(); i++)
+	for(int i = 0; i < countObjects; i++)
 	{
 		if(removeObject->ID == objects[i].object->ID)
 		{
 			remainingSize += objects[i].count * sizeof(Vertex);
 			
-			for(int j = i + 1; j < objects.size(); j ++)
+			for(int j = i + 1; j < countObjects; j ++)
 			{
 				objects[j].offset -= objects[i].count;
 			}
 			objects.erase(objects.begin() + i);
+			countObjects -- ;
 		}
 	}
 	
@@ -639,14 +652,16 @@ bool  Shader::ObjectBatch::checkSize(Object* newObject)
 
 void  Shader::ObjectBatch::addObject(Object* newObject)
 {
-	objects.push_back(ObjectInformation(newObject,lastOffset,newObject->mesh->model.Vertices.size()));
-	remainingSize -= newObject->mesh->model.Vertices.size() * sizeof(Vertex);
-	lastOffset += newObject->mesh->model.Vertices.size();
+	int i = newObject->mesh->model.Vertices.size();
+	objects.push_back(ObjectInformation(newObject,lastOffset,i));
+	remainingSize -= i * sizeof(Vertex);
+	lastOffset += i;
+	countObjects++;
 }
 
 void  Shader::ShaderObjectPipeLine::renderBatches(Shader* shader)
 {
-	for(int i = 0; i < batches.size(); i++)
+	for(int i = 0; i < countBatches; i++)
 	{
 		batches[i]->render(shader);
 	}
@@ -656,7 +671,7 @@ void  Shader::ObjectBatch::render(Shader *shader)
 {
 	glBindVertexArray(vao);
 	loadBuffer();
-	for(int i = 0;i < objects.size();i++)
+	for(int i = 0;i < countObjects;i++)
 	{
 			shader->setmodelMatrix(objects[i].object->transform);
 			shader->updateMaterial(objects[i].object->material);
@@ -667,11 +682,10 @@ void  Shader::ObjectBatch::render(Shader *shader)
 
 void Shader::ShaderObjectPipeLine::emptyBatch()
 {
-	for(int i = 0;i < batches.size();i ++)
-	{
-		
-		batches[i]->emptyBuffer();
-	}
+	for (auto &tempbatch : batches) // access by reference to avoid copying
+    {  
+       tempbatch->emptyBuffer();
+    }
 }
 
  void Shader::ObjectBatch::emptyBuffer()
@@ -682,4 +696,5 @@ void Shader::ShaderObjectPipeLine::emptyBatch()
 		glBufferData(GL_ARRAY_BUFFER,maxSize,NULL,GL_STREAM_DRAW);
 		lastOffset = 0;
 		remainingSize = maxSize;
+		countObjects = 0;
  }

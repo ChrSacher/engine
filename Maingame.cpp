@@ -53,9 +53,9 @@ void Maingame::init()
 	std::printf("***   OpenGL Version: %s   ***\n", glGetString(GL_VERSION));
     //Tell SDL that we want a double buffered window so we dont get
     //any flickering
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 0);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	//Set VSYNC
-    SDL_GL_SetSwapInterval(-1);
+    SDL_GL_SetSwapInterval(1);
 
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW);
@@ -290,7 +290,7 @@ void Maingame::run()
 void Maingame::createObjects()
 {
 	
-	camera = new Camera3d(Vector3(0,2,0),70,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,1000.0f);
+	camera = new Camera3d(Vector3(0,2,0),70,SCREEN_WIDTH,SCREEN_HEIGHT,0.1f,500.0f);
 	light = new AmbientLight(Vector3(0.2,0.2,0.2));
 	light2 = new DirectionalLight(BaseLight(Vector3(1,0.9,0.8),0.8f),Vector3(1,1,1));
 	objects.push_back(new Object("models/box.obj",Vector3(0.0f,0.0f,0.0f),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,1,1)));
@@ -298,7 +298,7 @@ void Maingame::createObjects()
 	objects.push_back(new Object("models/box.obj",Vector3(0.0f,1.5f,1.5f),Vector3(0.0f,0.0f,0.0f),"",Vector3(0,0,1)));
 	objects.push_back(new Object(*objects[2]));
 	objects.push_back(new Object("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
-	for(int i = 0; i < 200 ;i++)
+	for(int i = 0; i < 20 ;i++)
 	{
 		objects.push_back(new Object("models/box.obj",Vector3(0,-4,0),Vector3(0.0f,0.0f,0.0f),"",Vector3(1,0,1)));
 	}

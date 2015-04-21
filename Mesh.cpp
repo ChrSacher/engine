@@ -207,7 +207,7 @@ Model OBJLoader::loadOBJ(std::string path,bool autoCenter)
 		Vector3 normal = temp_normals[ normalIndices[i] - 1 ];
 		model.Vertices.push_back(Vertex(vertex,uv,normal));
 	}
-	
+	model.count = model.Vertices.size();
 	return model;
 }
 

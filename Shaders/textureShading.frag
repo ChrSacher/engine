@@ -154,9 +154,10 @@ void main()
 		totalLight += calcSpotLight(spotLights[i],normal);
 	}
 	gl_FragColor = color * totalLight;
-	float dist = length(viewworldPos0);
+	
 	if(fog.type > 0.1)
 	{
+		float dist = length(viewworldPos0);
 		gl_FragColor = mix(gl_FragColor, fog.color,getFogFactor(fog, dist) ); 
 	}
 	

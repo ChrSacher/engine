@@ -27,7 +27,7 @@ const int static MAXSPOTLIGHTS = 4;
 class Shader
 {
 private: //nested class
-	class ObjectInformation
+	struct ObjectInformation
 	{
 	public:
 		ObjectInformation(Object* newObject, GLuint Offset,GLuint Count);
@@ -60,6 +60,7 @@ private: //nested class
 		void loadBuffer();
 		void emptyBuffer();
 		GLuint maxSize;
+		GLuint countObjects;
 	};
 
 	class ShaderObjectPipeLine
@@ -72,6 +73,7 @@ private: //nested class
 		void deleteObject(Object* removeObject);
 		void renderBatches(Shader* shader);
 		void emptyBatch();
+		GLuint countBatches;
 	};
 
 	struct Matrices
@@ -97,7 +99,7 @@ public:
 	std::map<std::string,GLint> uniforms;
 	GLint getUniformLocation(const std::string& uniformName);
 	//setters
-	void setmodelMatrices(std::vector<Matrix4*> matrices);
+	void setmodelMatrices(std::vector<Matrix4*> modelMatrices,std::vector<Matrix4*> MVPMatrices);
 	void setUniform(std::string uniformName, int value);
 	void setUniform(std::string uniformName, bool value);
 	void setUniform(std::string uniformName, float value);
