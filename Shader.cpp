@@ -378,6 +378,11 @@ GLint Shader::getUniformLocation(const std::string& uniformName)
 		pipeline->renderBatches(this);
 	}
 
+	void Shader::renderShadowBatch()
+	{
+		pipeline->renderShadowBatches(this);
+	}
+
 	void Shader::addObject(Object* object)
 	{
 		pipeline->addObject(object);
@@ -562,15 +567,28 @@ void BasicShader::unuse()
 
  void Shader::ObjectBatch::loadBuffer()
  {
-	glBindBuffer(GL_ARRAY_BUFFER,vab);
-	for(int i = 0;i< countObjects;i++)
-	{	
-		glBufferSubData(GL_ARRAY_BUFFER,objects[i].offset * sizeof(Vertex),objects[i].count * sizeof(Vertex),&objects[i].object->mesh->model.Vertices[0]);
-	}
 	
+	
+ }
+ void Shader::ObjectBatch::loadBufferLast()
+ {
+	glBindBuffer(GL_ARRAY_BUFFER,vab);
+	glBufferSubData(GL_ARRAY_BUFFER,objects.back().offset * sizeof(Vertex),objects.back().count * sizeof(Vertex),&objects.back().object->mesh->model.Vertices[0]);
  }
 
 
+ void Shader::ObjectBatch::loadBufferIndexToLast(GLuint index)
+ {
+	 if(lastDeleteObjectIndex > 0)
+	 {
+		glBindBuffer(GL_ARRAY_BUFFER,vab);
+		for(int i = 0;i< countObjects;i++)
+		{	
+			glBufferSubData(GL_ARRAY_BUFFER,objects[i].offset * sizeof(Vertex),objects[i].count * sizeof(Vertex),&objects[i].object->mesh->model.Vertices[0]);
+		}
+		lastDeleteObjectIndex = -1;
+	 }
+ }
  Shader::ObjectBatch::~ObjectBatch()
 {
 	glDeleteVertexArrays(1, &vao);
@@ -598,7 +616,7 @@ void  Shader::ShaderObjectPipeLine::addObject(Object* newObject)
 		{
 			if(batches[i]->objects[j].object->ID == newObject->ID)
 			{
-				printf("object is allready in Batch");
+				//printf("object is allready in Batch"); //don't enable unless debugging
 				return;
 			}
 		}
@@ -657,6 +675,7 @@ void  Shader::ObjectBatch::addObject(Object* newObject)
 	remainingSize -= i * sizeof(Vertex);
 	lastOffset += i;
 	countObjects++;
+	loadBufferLast();
 }
 
 void  Shader::ShaderObjectPipeLine::renderBatches(Shader* shader)
@@ -667,14 +686,34 @@ void  Shader::ShaderObjectPipeLine::renderBatches(Shader* shader)
 	}
 }
 
+void  Shader::ShaderObjectPipeLine::renderShadowBatches(Shader* shader)
+{
+	for(int i = 0; i < countBatches; i++)
+	{
+		batches[i]->renderShadow(shader);
+	}
+}
+
 void  Shader::ObjectBatch::render(Shader *shader)
 {
 	glBindVertexArray(vao);
-	loadBuffer();
+	loadBufferIndexToLast(lastDeleteObjectIndex);
 	for(int i = 0;i < countObjects;i++)
 	{
 			shader->setmodelMatrix(objects[i].object->transform);
 			shader->updateMaterial(objects[i].object->material);
+			glDrawArrays(GL_TRIANGLES,objects[i].offset,objects[i].count);
+	}
+	glBindVertexArray(0);
+}
+
+void  Shader::ObjectBatch::renderShadow(Shader *shader)
+{
+	glBindVertexArray(vao);
+	loadBufferIndexToLast(lastDeleteObjectIndex);
+	for(int i = 0;i < countObjects;i++)
+	{
+			shader->setUniform("depthVP",objects[i].object->transform->getMatrix());
 			glDrawArrays(GL_TRIANGLES,objects[i].offset,objects[i].count);
 	}
 	glBindVertexArray(0);

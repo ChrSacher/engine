@@ -68,7 +68,7 @@ void Maingame::init()
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LESS);
-	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE); //enable shader point operations for particle engine
 	//glEnable(GL_FRAMEBUFFER_SRGB);
 	glClearDepth(1.0f);
     //Set the background color to blue
@@ -227,7 +227,7 @@ void Maingame::render()
 	shader->renderBatch();
 	shader->unuse();
 	ui->draw();
-	shader->emptyBatch();
+	//shader->emptyBatch();
 	SDL_GL_SwapWindow(_window);
 
 }
@@ -236,15 +236,16 @@ void Maingame::gameloop()
 	SDL_StartTextInput(); //text eingabe aktivieren
 	long int start = 0, end = SDL_GetTicks();
 	float delta = 0;
-	float frames = 1/maxFPS * 1000;
+	float frames = 1 / maxFPS * 1000;
 	while( gamestate.playing )//Solange es nicht beended ist
 	{ 
 		start = SDL_GetTicks();
-		handleKeys();
+		
 
 		delta+=(float)(start - end);
 		while (delta >= frames) 
 		{
+			handleKeys();
 			update();
 			delta -= frames;
 		}
@@ -308,9 +309,8 @@ void Maingame::createObjects()
 	ui = new UIrenderer();
 	ui->addButton(Button(Vector2(0,0),Vector2(50,50),Vector4(1,0,0,1),true,""));
 	ui->addButton(Button(Vector2(50,50),Vector2(50,50),Vector4(0,0,1,0.1),true,""));
-	sky = new Skybox();
+	sky = new Skybox(*camera);
 	sky->loadSkybox("Texture/","posx.png","negx.png","posy.png","negy.png","posz.png","negz.png");
-	sky->setCamera(camera);
 	
 }
 

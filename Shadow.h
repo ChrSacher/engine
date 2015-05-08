@@ -12,6 +12,8 @@
 #include "Math/3DMath.h"
 #include "Shader.h"
 #include "Object.h"
+#include "FBO.h"
+
 class ShadowMapFBO //funktioniert irgentwie nicht 
 {
     public:
@@ -23,21 +25,20 @@ class ShadowMapFBO //funktioniert irgentwie nicht
         void BindForReading();
 		
 		Matrix4 biasMatrix, depthProjectionMatrix, depthViewMatrix,depthModelMatrix,depthMVP,depthBiasMVP;
-        GLuint m_fbo;
-        GLuint m_shadowMap;
+        FBO fbo;
 		bool isEnabled;
 		Vector3 lightDirection;
 		void calculateMatrices();
 		void setLightDirection(Vector3 LightDirection);
 		void addObject(Object *object);
+		void render();
 		unsigned int shadowWidth,shadowHeight;
 		unsigned int windowWidth,windowHeight;
 
 		//braucht verbesserung
 		//irgentwie funktioniert es nicht ein statischen pointer zu haben und den zu initialisieren
-		static void deleteShader();
+		Shader *shader;
 private:
-		static Shader* getShader();
 		
 		
 };

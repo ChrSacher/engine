@@ -49,13 +49,13 @@ public:
    void loadSkybox(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz); 
    void setSkyboxTexture(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz); 
    void renderSkybox(); 
-   Skybox(Vector4 Color = Vector4(1,1,1,1));
+   Skybox(Camera3d &Camera = Camera3d(),Vector4 Color = Vector4(1,1,1,1));
    ~Skybox();
-   void setCamera(Camera3d* Camera){camera=Camera;};
-   void setColor(Vector4 Color){color=Color;}
-   void setPos(Vector3 Pos){transform.setPos(Pos);};
-   void setRot(Vector3 Rot){transform.setRot(Rot);}
-   void setScale(Vector3 Scale){transform.setPos(Scale);}
+   void setCamera(Camera3d* Camera);
+   void setColor(Vector4 Color);
+   void setPos(Vector3 Pos);
+   void setRot(Vector3 Rot);
+   void setScale(Vector3 Scale);
 private: 
 	Shader* shader;
 	Camera3d *camera;

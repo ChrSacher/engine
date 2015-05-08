@@ -1,8 +1,7 @@
 #include "ParticleSystem.h"
 
 
-const int ParticleCount = 10000;
-std::vector<Particle> ParticleBuffer;
+
 
 ParticleSystem::ParticleSystem(void)
 {
@@ -19,28 +18,23 @@ void ParticleSystem::init()
 
 	glGenVertexArrays(1,&vao);
 	glBindVertexArray(vao);
-	
+
 	glGenBuffers(1, &particles_position_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
 	// Initialize with empty (NULL) buffer : it will be updated later, each frame.
-	glBufferData(GL_ARRAY_BUFFER, ParticleCount * sizeof(ParticleBuffer[0].pos[0]), NULL, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,ParticleBuffer.size() * sizeof(ParticleBuffer[0].pos[0]), NULL, GL_STREAM_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Particle),0);
 	
 	glGenBuffers(1, &particles_color_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
 	// Initialize with empty (NULL) buffer : it will be updated later, each frame.
-	glBufferData(GL_ARRAY_BUFFER, ParticleCount * sizeof(ParticleBuffer[0].color[0]), NULL, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,ParticleBuffer.size() * sizeof(ParticleBuffer[0].color[0]), NULL, GL_STREAM_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,sizeof(Particle),0);
-
-	glBindVertexArray(0);
-	lastParticle=1000;
 	
-	for(int i=0;i<1000;i++)
-	{
-		ParticleBuffer.push_back( Particle(Vector3(rand() % 10,rand() % 10,rand() % 10),Vector3((rand() % 10) * 0.1f,(rand() % 10) * 0.1f,(rand() % 10) * 0.1f),Vector4((rand() % 10) * 0.1f,(rand() % 10) * 0.1f,(rand() % 10) * 0.1f ,1)));
-	}
+	glBindVertexArray(0);
+	lastParticle=0;
 }
 
 
@@ -96,10 +90,10 @@ void ParticleSystem::update()
 			}
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
-		glBufferData(GL_ARRAY_BUFFER, ParticleCount * sizeof(ParticleBuffer[0].pos[0]) * 3, NULL, GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,ParticleBuffer.size() * sizeof(ParticleBuffer[0].pos[0]) * 3, NULL, GL_STREAM_DRAW);
 		glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(ParticleBuffer[0].pos[0]) * 3 * ParticleBuffer.size(),&positions[0]);		
 		glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
-		glBufferData(GL_ARRAY_BUFFER, ParticleCount * sizeof(ParticleBuffer[0].color[0]) * 4, NULL, GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,ParticleBuffer.size() * sizeof(ParticleBuffer[0].color[0]) * 4, NULL, GL_STREAM_DRAW);
 		glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(ParticleBuffer[0].color[0]) * 4 * ParticleBuffer.size(),&colors[0]);
 		
 	}

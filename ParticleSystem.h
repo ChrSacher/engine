@@ -9,22 +9,6 @@
 #include "Camera3d.h"
 #include <random>
 
-class ParticleSystem
-{
-public:
-    ParticleSystem();
-    ~ParticleSystem();
-	GLuint vao;
-	GLuint particles_color_buffer;
-	GLuint particles_position_buffer;
-	Shader *shader;
-	Camera3d *camera;
-	int lastParticle;
-	void init();
-	void update();
-	void draw();
-};
-
 class Particle                                                                         
 { 
 public: 
@@ -33,14 +17,16 @@ public:
 		pos = Vector3();
 		vel = Vector3();
 		color = Vector4();
-		lifeTime=size=type=0;
+		lifeTime=type=0;
+		size = 1;
 	}
 	Particle(Vector3 Pos,Vector3 Vel,Vector4 Color)
 	{
 		pos = Pos;
 		vel = Vel;
 		color = Color;
-		lifeTime=size=type=0;
+		size = 1;
+		lifeTime=type=0;
 	}
 	~Particle(){};
    Vector3 pos; 
@@ -56,4 +42,23 @@ public:
 		return this->cameradistance > that.cameradistance;
 	}
 };
+
+class ParticleSystem
+{
+public:
+    ParticleSystem();
+    ~ParticleSystem();
+	GLuint vao;
+	GLuint particles_color_buffer;
+	GLuint particles_position_buffer;
+	Shader *shader;
+	Camera3d *camera;
+	int lastParticle;
+	void init();
+	void update();
+	void draw();
+	std::vector<Particle> ParticleBuffer;
+};
+
+
 

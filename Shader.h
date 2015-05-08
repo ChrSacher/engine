@@ -54,13 +54,17 @@ private: //nested class
 		void deleteObject(Object* removeObject);
 		bool checkSize(Object* newObject);
 		void render(Shader *shader);
+		void renderShadow(Shader *shader);
 		GLuint vao,vab;
 		std::vector<ObjectInformation> objects;
 		GLuint lastOffset,remainingSize; //pos,uv,normal size
 		void loadBuffer();
+		void loadBufferLast();
+		void loadBufferIndexToLast(GLuint index);
 		void emptyBuffer();
 		GLuint maxSize;
 		GLuint countObjects;
+		GLuint lastDeleteObjectIndex;
 	};
 
 	class ShaderObjectPipeLine
@@ -72,8 +76,10 @@ private: //nested class
 		void addObject(Object* newObject);
 		void deleteObject(Object* removeObject);
 		void renderBatches(Shader* shader);
+		void renderShadowBatches(Shader* shader);
 		void emptyBatch();
 		GLuint countBatches;
+		
 	};
 
 	struct Matrices
@@ -130,6 +136,7 @@ public:
 
 	//Batch operations
 	void renderBatch();
+	void renderShadowBatch();
 	void addObject(Object* object);
 	void deleteObject(Object* object);
 	void emptyBatch();

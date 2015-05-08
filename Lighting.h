@@ -19,7 +19,7 @@
 class AmbientLight
 {
 public:
-	AmbientLight(Vector3 ambient = Vector3(0.1,0.1,0.1));
+	AmbientLight(Vector3 ambient = Vector3(0.1f,0.1f,0.1f));
 	~AmbientLight(void);
 	Vector3 ambientLight;
 	void setAmbient(Vector3 newambient);
@@ -29,7 +29,7 @@ public:
 class BaseLight
 {
 public:
-	BaseLight(Vector3 Color = Vector3(0.3,0.4,0.1),float Intensity = 1.0f){color=Color;intensity=Intensity;}
+	BaseLight(Vector3 Color = Vector3(0.3f,0.4f,0.1f),float Intensity = 1.0f){color=Color;intensity=Intensity;}
 	Vector3 color;
 	float intensity;
 	//setters

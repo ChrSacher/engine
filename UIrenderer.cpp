@@ -180,7 +180,7 @@ void Skybox::setSkyboxTexture(std::string Directory, std::string posx, std::stri
 	cube.Load();
 }
 
-Skybox::Skybox(Vector4 Color)
+Skybox::Skybox(Camera3d &Camera,Vector4 Color)
 {
 	shader = new Shader();
 	shader->addVertexShader("Shaders/Skybox.vert");
@@ -189,15 +189,18 @@ Skybox::Skybox(Vector4 Color)
 	shader->bind();
 	shader->linkShaders();
 	color = Color;
+	camera = &Camera;
 }
 
 void Skybox::renderSkybox()
 {
 	glDepthMask(0);
+	
 	glCullFace(GL_FRONT); //box vertices are from outside but you are looking from the inside
 	glBindVertexArray(vao);
 	shader->use();
-	shader->setUniform("WVP", camera->GetViewProjection() * transform.getMatrix() );
+	transform.setPos(camera->getPos());
+	shader->setUniform("MVP", camera->GetViewProjection() * transform.getMatrix() );
 	shader->setbaseColor(color);
 	cube.bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -213,6 +216,29 @@ void Skybox::renderSkybox()
 	cube.releaseCubemap();
 	delete(shader);
  }
+
+   void  Skybox::setCamera(Camera3d* Camera)
+   {
+	   camera=Camera;
+   };
+   void  Skybox::setColor(Vector4 Color)
+   {
+	   color=Color;
+   }
+   void  Skybox::setPos(Vector3 Pos)
+   {
+	   transform.setPos(Pos);
+   };
+   void  Skybox::setRot(Vector3 Rot)
+   {
+	   transform.setRot(Rot);
+   }
+   void  Skybox::setScale(Vector3 Scale)
+   {
+	   transform.setPos(Scale);
+   }
+
+
 
 bool Button::operator<(Button &other)
 {

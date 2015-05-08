@@ -105,7 +105,8 @@ Model OBJLoader::loadOBJ(std::string path,bool autoCenter)
 
 
 	FILE * file = fopen(path.c_str(), "r");
-	if( file == NULL ){
+	if( file == NULL )
+	{
 		printf("Impossible to open the file %s ",path.c_str());
 		return Model();
 	}

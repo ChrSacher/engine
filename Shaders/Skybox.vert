@@ -2,13 +2,12 @@
                                                                                     
 attribute vec3 position;                                             
                                                                                     
-uniform mat4 WVP;                                                                  
+uniform mat4 MVP;                                                                  
                                                                                     
 varying vec3 TexCoord0;                                                                 
                                                                                     
 void main()                                                                         
 {                                                                                   
-    vec4 WVP_Pos = WVP * vec4(position, 1.0);                                      
-    gl_Position = WVP_Pos.xyzw;                                                     
+     gl_Position = MVP * vec4(position, 1.0);                                                                                          
     TexCoord0   = position;                                                         
 }

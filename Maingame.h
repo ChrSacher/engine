@@ -43,7 +43,6 @@ struct GameState
 	bool escapemenu;
 	bool drawgrid;
 	bool cameramove;
-
 };
 
 class Maingame
