@@ -60,7 +60,7 @@ private: //nested class
 		GLuint lastOffset,remainingSize; //pos,uv,normal size
 		void loadBuffer();
 		void loadBufferLast();
-		void loadBufferIndexToLast(GLuint index);
+		void loadBufferIndexToLast();
 		void emptyBuffer();
 		GLuint maxSize;
 		GLuint countObjects;

@@ -11,6 +11,9 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <memory>
+
+
 #include "Math/3DMath.h"
 #include "InputManager.h"
 #include "timing.h"
@@ -27,8 +30,7 @@
 #include "ParticleSystem.h"
 #include "UIrenderer.h"
 #include "Shadow.h"
-#include <memory>
-
+#include "Debugger.h"
 //check for memory leaks
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>

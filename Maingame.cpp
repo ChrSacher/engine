@@ -19,17 +19,22 @@ Maingame::~Maingame(void)
 
 void Maingame::init()
 {
-	
+	bool DebugMode = true;
+	if(DebugMode)
+	{
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+	}
 	//Initialize SDL
     SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,0);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,4); //4x multisampling     weiß nicht warum aber das muss vor create window gemacht werden obwohl es anderes vorgeschrieben wir
+			
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     //Open an SDL window
-    _window = SDL_CreateWindow("Game Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
+    _window = SDL_CreateWindow("Game Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (_window == nullptr)
 	{
         fatalError("SDL Window could not be created!");
@@ -56,7 +61,27 @@ void Maingame::init()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	//Set VSYNC
     SDL_GL_SetSwapInterval(1);
+	
+	if (glDebugMessageCallbackARB != NULL && DebugMode) 
+	{
 
+		float i;
+		glGetFloatv(GL_MAJOR_VERSION,&i);
+		if(i >= 4.0f)
+		{
+			glEnable(GL_DEBUG_OUTPUT);
+			glDebugMessageCallback(Core::DebugOutput::myCallback, NULL);
+			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE,
+							  GL_DONT_CARE, 0, NULL, GL_TRUE);
+		}
+		else
+		{
+			glEnable(GL_ARB_debug_output);
+			glDebugMessageCallback(Core::DebugOutput::myCallback, NULL);
+			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE,
+							  GL_DONT_CARE, 0, NULL, GL_TRUE);
+		};
+	}
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW);
 	glCullFace(GL_BACK);
@@ -227,7 +252,7 @@ void Maingame::render()
 	shader->renderBatch();
 	shader->unuse();
 	ui->draw();
-	//shader->emptyBatch();
+	//shader->emptyBatch(); //currently optimizing
 	SDL_GL_SwapWindow(_window);
 
 }

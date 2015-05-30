@@ -577,7 +577,7 @@ void BasicShader::unuse()
  }
 
 
- void Shader::ObjectBatch::loadBufferIndexToLast(GLuint index)
+ void Shader::ObjectBatch::loadBufferIndexToLast()
  {
 	 if(lastDeleteObjectIndex > 0)
 	 {
@@ -697,7 +697,7 @@ void  Shader::ShaderObjectPipeLine::renderShadowBatches(Shader* shader)
 void  Shader::ObjectBatch::render(Shader *shader)
 {
 	glBindVertexArray(vao);
-	loadBufferIndexToLast(lastDeleteObjectIndex);
+	loadBufferIndexToLast();
 	for(int i = 0;i < countObjects;i++)
 	{
 			shader->setmodelMatrix(objects[i].object->transform);
@@ -710,10 +710,10 @@ void  Shader::ObjectBatch::render(Shader *shader)
 void  Shader::ObjectBatch::renderShadow(Shader *shader)
 {
 	glBindVertexArray(vao);
-	loadBufferIndexToLast(lastDeleteObjectIndex);
+	loadBufferIndexToLast();
 	for(int i = 0;i < countObjects;i++)
 	{
-			shader->setUniform("depthVP",objects[i].object->transform->getMatrix());
+			shader->setUniform("modelMatrix[0]",objects[i].object->transform->getMatrix());
 			glDrawArrays(GL_TRIANGLES,objects[i].offset,objects[i].count);
 	}
 	glBindVertexArray(0);
@@ -721,9 +721,9 @@ void  Shader::ObjectBatch::renderShadow(Shader *shader)
 
 void Shader::ShaderObjectPipeLine::emptyBatch()
 {
-	for (auto &tempbatch : batches) // access by reference to avoid copying
+	for (int i = 0; i< countBatches; i++) // access by reference to avoid copying
     {  
-       tempbatch->emptyBuffer();
+       batches[i]->emptyBuffer();
     }
 }
 
