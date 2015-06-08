@@ -14,7 +14,7 @@
 #include "Errors.h"
 #include "Mesh.h"
 #include "Transform.h"
-
+#include "RenderUtil.h"
 
 class AmbientLight
 {
@@ -24,6 +24,9 @@ public:
 	Vector3 ambientLight;
 	void setAmbient(Vector3 newambient);
 	Vector3 getAmbient();
+private:
+	GLuint _ID;
+	static GLuint ID;
 };
 
 class BaseLight
@@ -46,11 +49,14 @@ public:
 	BaseLight base;
 	Vector3 direction;
 	
-	DirectionalLight(BaseLight Base = BaseLight(),Vector3 Dir = Vector3(1,1,1)){base=Base;direction=Dir;}
+	DirectionalLight(BaseLight Base = BaseLight(),Vector3 Dir = Vector3(1,1,1));
 	void setBase(BaseLight Base){base=Base;};
 	void setDirection(Vector3 dir){direction=dir;}
 	BaseLight getBaseLight(){return base;};
 	Vector3 getDirection(){return direction;};
+private:
+	GLuint _ID;
+	static GLuint ID;
 };
 
 class Attenuation
@@ -80,7 +86,9 @@ public:
 	float range;
 	BaseLight base;
 	Attenuation attenuation;
-
+private:
+	GLuint _ID;
+	static GLuint ID;
 
 };
 
@@ -100,6 +108,9 @@ public:
 	PointLight& getPointLight(){return pointLight;}
 	Vector3& getDir(){return dir;}
 	float& getcutoff(){return cutoff;}
+private:
+	GLuint _ID;
+	static GLuint ID;
 };
 
 class Fog
@@ -118,4 +129,20 @@ public:
 	void setEnd(float End);
 	void setColor(Vector4 Color);
 	void setType(int Type);
+private:
+	GLuint _ID;
+	static GLuint ID;
+};
+
+class LightingCache
+{
+public:
+	LightingCache();
+	~LightingCache();
+private:
+	std::vector<PointLight> _pointLights;
+	std::vector<SpotLight> _spotLights;
+	std::vector<AmbientLight> _ambientLights;
+	std::vector<DirectionalLight> _directionalLights;
+	std::vector<Fog> _fogs;
 };

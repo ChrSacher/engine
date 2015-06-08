@@ -132,6 +132,8 @@ void Shader::linkShaders()
     }	
 	for(int i = 0;i<attachedShaders.size();i++) glDetachShader(_programID,attachedShaders[i]);
 	for(int i = 0;i<attachedShaders.size();i++) glDeleteShader(attachedShaders[i]);
+	//add Program in RenderUtil now
+	//util.addProgram
 	
 }
 

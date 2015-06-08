@@ -27,7 +27,7 @@ Texture::~Texture(void)
 void Texture::bind(int unit)
 {
 	if(unit < 0 || unit > 30) fatalError("Texture unit is too large/too low"); //opengl only has units between 0 - 31
-	BoundTexture::getInstance().bind(ID,unit);
+	util.bindTexture(ID,unit);
 }
 
 
@@ -150,7 +150,7 @@ bool CubemapTexture::Load()
 	
 	if(ID > 0.1)
 	{
-		BoundTexture::getInstance().unbind(ID);
+		util.unbindTexture(ID);
 		glDeleteTextures(1,&ID);  //if there allready is a cubemap replace it
 	}
     glGenTextures(1, &ID);
@@ -203,7 +203,7 @@ void CubemapTexture::bind(GLuint unit)
 			fatalError("Texture unit is too large/too low");
 			return;
 	}
-	BoundTexture::getInstance().bind(ID,unit,GL_TEXTURE_CUBE_MAP); 
+	util.bindTexture(ID,unit,GL_TEXTURE_CUBE_MAP); 
 }
 
 void CubemapTexture::addFiles(std::string Directory, std::string posx, std::string negx, std::string posy, std::string negy, std::string posz, std::string negz)
@@ -243,39 +243,3 @@ void Texture::releaseTexture()
 	glDeleteTextures(1,&ID);
 }
 
-bool BoundTexture::isBound(GLuint ID,GLuint unit)
-{
-	if(units[unit] == ID) return true;
-	return false;
-	
-}
-
-void BoundTexture::unbind(GLuint ID,GLenum TextureType)
-{
-		for(int i = 0; i < 31 ; i++)
-		{
-			if(units[i] == ID)
-			{
-				glActiveTexture(GL_TEXTURE0 + i);
-				glBindTexture(TextureType,0);
-				units[i] = -1;
-			}
-		}
-}
-
-void BoundTexture::bind(GLuint ID,GLuint unit,GLenum TextureType)
-{
-		if(!(isBound(ID,unit)))
-		{
-			glActiveTexture(GL_TEXTURE0 + unit);
-			glBindTexture(TextureType, ID);
-			units[unit] = ID;
-		}
-
-}
-
-BoundTexture& BoundTexture::getInstance()
-{
-	static BoundTexture boundTexture;
-	return boundTexture;
-}
